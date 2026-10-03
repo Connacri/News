@@ -1,7 +1,6 @@
-import java.util.Properties
 import java.io.FileInputStream
-import java.util.regex.Pattern
-import java.security.MessageDigest
+import java.util.Properties
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     id("com.android.application")
@@ -27,18 +26,13 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_17.toString()
-    }
-
     defaultConfig {
         applicationId = "com.flutternews.osint"
-        minSdk = 23
+        minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
-        versionCode = flutter.versionCode.toInteger()
+        versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true
-        resValue("string", "google_app_id", "1:100841671094:android:7ce6f2e80bfd61ad315917")
     }
 
     signingConfigs {
@@ -54,7 +48,8 @@ android {
 
     buildTypes {
         release {
-            signingConfig = if (keystorePropertiesFile.exists()) {
+            signingConfig =
+            if (keystorePropertiesFile.exists()) {
                 signingConfigs.getByName("release")
             } else {
                 signingConfigs.getByName("debug")
@@ -63,7 +58,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
         }
     }
@@ -75,26 +70,12 @@ android {
     }
 }
 
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
+}
+
 dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
-}
-
-fun sha(alias: String): String {
-    val keytool = "keytool -list -v -keystore app/${keystoreProperties["storeFile"]} -alias $alias -storepass ${keystoreProperties["storePassword"]}"
-    val proc = ProcessBuilder(keytool.split(" ")).redirectErrorStream(true).start()
-    val out = proc.inputStream.bufferedReader().readText()
-    proc.waitFor()
-    val sha1 = Pattern.compile("SHA1:\\s*([0-9A-F:]+)").matcher(out).let { if (it.find()) it.group(1) else "" }
-    val sha256 = Pattern.compile("SHA256:\\s*([0-9A-F:]+)").matcher(out).let { if (it.find()) it.group(1) else "" }
-    return "SHA1=$sha1\nSHA256=$sha256"
-}
-
-tasks.register("printSigningInfo") {
-    doLast {
-        if (keystorePropertiesFile.exists()) {
-            println(sha(keystoreProperties["keyAlias"] as String))
-        } else {
-            println("no key.properties")
-        }
-    }
 }

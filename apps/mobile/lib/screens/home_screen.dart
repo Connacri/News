@@ -15,7 +15,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentTabIndex = 0;
-  String _selectedCountry = 'all';
+  final String _selectedCountry = 'all';
   String _selectedCategory = 'all';
 
   final List<Map<String, String>> _categories = [
