@@ -22,22 +22,53 @@ env:
   FLUTTER_VERSION: '3.44.0'
 
 jobs:
-  build:
-    name: Build & Publish (APK / AAB / Web)
+  verify:
+    name: Analyse statique
     runs-on: ubuntu-latest
     defaults:
       run:
         working-directory: apps/mobile
-
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
+          cache: gradle
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Static analysis
+        run: flutter analyze
+
+  build:
+    name: Build & Publish (APK / AAB / Web)
+    needs: verify
+    if: github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/mobile
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
           cache: gradle
 
       - name: Set up Flutter SDK
@@ -55,29 +86,28 @@ jobs:
           $ver = ([regex]::Match($pub, '(?m)^version:\s*(\S+)\+(\S+)')).Groups
           $name = $ver[1].Value
           $code = $ver[2].Value
-          $tag = if ($env:GITHUB_REF -like 'refs/tags/*') { $env:GITHUB_REF.Replace('refs/tags/','') } else { "v$name+$code" }
+          $isTag = $env:GITHUB_REF -like 'refs/tags/*'
+          if ($isTag) {
+            $tag = $env:GITHUB_REF.Replace('refs/tags/', '')
+          } else {
+            $tag = "build-$env:GITHUB_RUN_NUMBER"
+          }
           "name=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
           "code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "tag=$tag"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-          "isTag=$($env:GITHUB_REF -like 'refs/tags/*')" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
-      - name: Flutter doctor
-        run: flutter doctor -v
+          "tag=$tag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "version=v$name+$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "isTag=$isTag" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
 
       - name: Install dependencies
         run: flutter pub get
-
-      - name: Static analysis
-        run: flutter analyze --no-fatal-infos
 
       - name: Restore release keystore
         shell: pwsh
         env:
           KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
-          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
         run: |
           if (-not $env:KEYSTORE_B64) { throw 'ANDROID_KEYSTORE_BASE64 secret manquant' }
-          $bytes = [Convert]::FromBase64String(($env:KEYSTORE_B64 -replace '\s',''))
+          $bytes = [Convert]::FromBase64String(($env:KEYSTORE_B64 -replace '\s', ''))
           [IO.File]::WriteAllBytes("$PWD/android/app/upload-keystore.jks", $bytes)
 
       - name: Write key.properties
@@ -102,17 +132,18 @@ jobs:
           flutter build apk --release
           flutter build apk --release --split-per-abi
 
-      - name: Build Flutter Web
+      - name: Build Flutter Web (WasmGC)
         run: flutter build web --release --wasm
 
       - name: Collect release artifacts
         shell: pwsh
         run: |
           New-Item -ItemType Directory -Force -Path dist-release | Out-Null
-          Get-ChildItem build/app/outputs/flutter-apk/*.apk | Copy-Item -Destination dist-release
-          Get-ChildItem build/app/outputs/bundle/release/*.aab | Copy-Item -Destination dist-release
-          Get-ChildItem build/web | Copy-Item -Destination dist-release/web -Recurse -Force
+          Copy-Item build/app/outputs/flutter-apk/*.apk dist-release -Force
+          Copy-Item build/app/outputs/bundle/release/*.aab dist-release -Force
+          Copy-Item build/web dist-release/web -Recurse -Force
           Compress-Archive -Path dist-release/web -DestinationPath dist-release/flutter-news-web.zip -Force
+          Remove-Item dist-release/web -Recurse -Force
           Get-ChildItem dist-release | Format-Table Name, Length
 
       - name: Upload build artifacts
@@ -123,23 +154,23 @@ jobs:
           retention-days: 30
 
       - name: Publish GitHub Release
-        if: steps.version.outputs.isTag == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: FlutterNews ${{ steps.version.outputs.tag }}
+          name: FlutterNews ${{ steps.version.outputs.version }}
+          prerelease: ${{ steps.version.outputs.isTag == 'false' }}
           generate_release_notes: true
           files: |
             apps/mobile/dist-release/*.apk
             apps/mobile/dist-release/*.aab
+            apps/mobile/dist-release/flutter-news-web.zip
           body: |
-            ## FlutterNews OSINT and Tech Radar - ${{ steps.version.outputs.tag }}
+            FlutterNews OSINT & Tech Radar - ${{ steps.version.outputs.version }}
 
             Artefacts: APK (universal + split per ABI), AAB (Play Store), web zip (WasmGC).
-
-            Builds signees avec le keystore de release (secret ANDROID_KEYSTORE_BASE64).
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            Builds Android signees avec le keystore de release.
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   deploy-hosting:
     name: Deploy Flutter Web to Firebase Hosting
@@ -150,11 +181,11 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Java 17
+      - name: Set up Java 21
         uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
-          java-version: '17'
+          java-version: '21'
 
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
@@ -167,11 +198,11 @@ jobs:
         working-directory: apps/mobile
         run: flutter pub get
 
-      - name: Build Flutter Web
+      - name: Build Flutter Web (WasmGC)
         working-directory: apps/mobile
         run: flutter build web --release --wasm
 
-      - name: "Deploy to Firebase Hosting (target mobile)"
+      - name: 'Deploy to Firebase Hosting (target mobile)'
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
