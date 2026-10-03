@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Politique de confidentialité — FlutterNews OSINT &amp; Tech Radar</title>
+<meta name="description" content="Politique de confidentialité et protection des données personnelles de FlutterNews OSINT &amp; Tech Radar (RGPD, Firebase, cookies, droits des utilisateurs).">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://device-streaming-ccab91bb.web.app/security-policy">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' rx='128' fill='%23020617'/%3E%3Ccircle cx='256' cy='256' r='60' fill='%2338BDF8' fill-opacity='0.2' stroke='%2338BDF8' stroke-width='24'/%3E%3Ccircle cx='256' cy='256' r='24' fill='%2338BDF8'/%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#020617; --surface:#0b1220; --surface-2:#0f172a; --border:#1e293b;
+    --text:#e2e8f0; --muted:#94a3b8; --accent:#38bdf8; --accent-2:#34d399; --warn:#fbbf24;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0; background:var(--bg); color:var(--text); line-height:1.7;
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    font-size:16px;
+  }
+  a{color:var(--accent); text-decoration:none}
+  a:hover{text-decoration:underline}
+  .wrap{max-width:860px; margin:0 auto; padding:0 20px}
+  header.top{
+    position:sticky; top:0; z-index:20; background:rgba(2,6,23,.92);
+    backdrop-filter:blur(8px); border-bottom:1px solid var(--border);
+  }
+  header.top .bar{display:flex; align-items:center; gap:12px; padding:12px 0; flex-wrap:wrap}
+  .logo{width:38px;height:38px;border-radius:10px;flex:0 0 auto}
+  .brand{font-weight:800;letter-spacing:-.02em;line-height:1.2}
+  .brand small{display:block;font-weight:500;font-size:11px;color:var(--muted);letter-spacing:.06em;text-transform:uppercase}
+  .spacer{flex:1 1 auto}
+  .lang{display:inline-flex;border:1px solid var(--border);border-radius:999px;overflow:hidden}
+  .lang button{
+    background:transparent;border:0;color:var(--muted);font:inherit;font-size:12px;font-weight:700;
+    padding:6px 12px;cursor:pointer;letter-spacing:.04em;
+  }
+  .lang button[aria-pressed="true"]{background:var(--accent);color:#04121f}
+  .cta{
+    display:inline-flex;align-items:center;gap:6px;border:1px solid var(--accent);
+    color:var(--accent);border-radius:999px;padding:6px 14px;font-size:12px;font-weight:700;
+  }
+  .cta:hover{background:rgba(56,189,248,.12); text-decoration:none}
+  main{padding:34px 0 60px}
+  h1{font-size:clamp(24px,5vw,34px);line-height:1.2;letter-spacing:-.03em;margin:0 0 6px}
+  .lede{color:var(--muted);margin:0 0 4px}
+  .badge{
+    display:inline-block;font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+    color:var(--accent-2);background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);
+    border-radius:999px;padding:4px 10px;margin:10px 0 0;
+  }
+  .updated{color:var(--muted);font-size:13px;margin:18px 0 30px}
+  section{
+    background:var(--surface); border:1px solid var(--border); border-radius:16px;
+    padding:20px 22px; margin:0 0 16px;
+  }
+  h2{
+    font-size:17px;letter-spacing:-.01em;margin:0 0 12px;display:flex;align-items:center;gap:10px;
+  }
+  h2 .num{
+    flex:0 0 auto;width:26px;height:26px;border-radius:8px;display:grid;place-items:center;
+    background:rgba(56,189,248,.12);border:1px solid rgba(56,189,248,.35);color:var(--accent);
+    font-size:12px;font-weight:800;
+  }
+  h3{font-size:14px;margin:16px 0 6px;color:#cbd5e1}
+  p{margin:0 0 10px}
+  ul{margin:0 0 10px;padding-left:20px}
+  li{margin-bottom:6px}
+  code{
+    background:var(--surface-2);border:1px solid var(--border);border-radius:6px;
+    padding:1px 6px;font-size:12.5px;color:#bae6fd;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px}
+  th,td{border:1px solid var(--border);padding:9px 11px;text-align:left;vertical-align:top}
+  th{background:var(--surface-2);color:#cbd5e1;font-size:12px;letter-spacing:.05em;text-transform:uppercase}
+  tr:nth-child(even) td{background:rgba(15,23,42,.35)}
+  .callout{
+    border-left:3px solid var(--accent);background:rgba(56,189,248,.07);
+    padding:12px 14px;border-radius:0 10px 10px 0;margin:0 0 10px;font-size:14.5px;
+  }
+  .callout.warn{border-left-color:var(--warn);background:rgba(251,191,36,.07)}
+  .pill{display:inline-block;font-size:11.5px;font-weight:700;border-radius:6px;padding:2px 8px;border:1px solid var(--border);color:var(--muted)}
+  footer.bot{border-top:1px solid var(--border);color:var(--muted);font-size:13px;padding:22px 0 40px}
+  [hidden]{display:none !important}
+  @media (max-width:560px){ .cta span.full{display:none} .brand{font-size:14px} }
+  @media print{
+    body{background:#fff;color:#000}
+    header.top{position:static;background:#fff;border-color:#ccc}
+    .lang,.cta{display:none}
+    section{border-color:#ccc;background:#fff;page-break-inside:avoid}
+    th,td{border-color:#ccc}
+    th{background:#f3f4f6;color:#000}
+    .callout{background:#f6f8fa}
+    a{color:#0b5fff}
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap bar">
+    <svg class="logo" viewBox="0 0 512 512" fill="none" aria-hidden="true">
+      <rect width="512" height="512" rx="128" fill="#0b1220"/>
+      <circle cx="256" cy="256" r="120" stroke="#38BDF8" stroke-width="20" stroke-opacity=".5"/>
+      <circle cx="256" cy="256" r="60" fill="#38BDF8" fill-opacity=".2" stroke="#38BDF8" stroke-width="24"/>
+      <circle cx="256" cy="256" r="24" fill="#38BDF8"/>
+    </svg>
+    <div class="brand">FlutterNews OSINT &amp; Tech Radar<small>Politique de confidentialité</small></div>
+    <div class="spacer"></div>
+    <div class="lang" role="group" aria-label="Langue / Language">
+      <button type="button" id="btn-fr" aria-pressed="true">FR</button>
+      <button type="button" id="btn-en" aria-pressed="false">EN</button>
+    </div>
+    <a class="cta" href="/">← <span class="full">Retour à l'application</span><span aria-hidden="true">App</span></a>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div lang="fr">
+    <h1>Politique de confidentialité</h1>
+    <p class="lede">Comment FlutterNews OSINT &amp; Tech Radar collecte, utilise et protège vos données personnelles.</p>
+    <span class="badge">Conforme au RGPD</span>
+    <p class="updated">Dernière mise à jour : <strong>3 octobre 2026</strong> — version 1.0.0</p>
+
+    <section>
+      <h2><span class="num">1</span> Responsable du traitement</h2>
+      <p>Le site et l'application mobile <strong>FlutterNews OSINT &amp; Tech Radar</strong> (ci-après « l'Application ») sont édité et exploités par <strong>Ramzi</strong>, éditeur indépendant du projet <code>Connacri/News</code>.</p>
+      <p>Pour toute question relative aux données personnelles : <a href="mailto:connacri@gmail.com">connacri@gmail.com</a> — ou via le dépôt public <a href="https://github.com/Connacri/News/issues" rel="noopener">github.com/Connacri/News</a>.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">2</span> Principes Applied</h2>
+      <div class="callout">L'Application est un agrégateur de veille technologique et OSINT. Elle <strong>ne comporte ni publicité, ni.Traceur, ni cookie marketing</strong>, et ne vend ni ne loue aucune donnée.</div>
+      <ul>
+        <li><strong>Minimisation</strong> : seules les données nécessaires au fonctionnement du service sont traitées.</li>
+        <li><strong>Consentement</strong> : la connexion Google et les notifications push sont facultatives et révocables à tout moment.</li>
+        <li><strong>Transparence</strong> : cette page décrit l'intégralité des traitements mis en œuvre.</li>
+        <li><strong>Aucune décision automatisée</strong> : aucun profilage, aucune publicité ciblée, aucun scoring.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">3</span> Données collectées</h2>
+      <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Donnée</th><th>Source</th><th>Finalité</th><th>Base légale</th><th>Conservation</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Identifiant Google, adresse e-mail, nom d'affichage, photo de profil</td>
+            <td>Firebase Authentication (connexion Google)</td>
+            <td>Authentification et synchronisation des favoris sur votre compte</td>
+            <td>Exécution du contrat (service demandé)</td>
+            <td>Jusqu'à la suppression du compte ou la révocation du consentement</td>
+          </tr>
+          <tr>
+            <td>Favoris : identifiant et titre de l'article, URL, image, date d'enregistrement</td>
+            <td>Cloud Firestore (collection <code>users/{id}/bookmarks</code>)</td>
+            <td>Fournir la liste « Mes favoris » synchronisée</td>
+            <td>Exécution du contrat</td>
+            <td>Jusqu'à la suppression de l'article favori ou du compte</td>
+          </tr>
+          <tr>
+            <td>Jeton d'abonnement aux notifications push (FCM token)</td>
+            <td>Firebase Cloud Messaging</td>
+            <td>Envoyer les notifications push que vous avez activées</td>
+            <td>Consentement</td>
+            <td>Jusqu'au désabonnement ou à la suppression du compte</td>
+          </tr>
+          <tr>
+            <td>Préférences de langue et de podcast, traductions en cache, cache des articles consultés</td>
+            <td>Stockage local du navigateur (<code>localStorage</code>)</td>
+            <td>Mémoriser vos réglages et permettre la consultation hors ligne</td>
+            <td>Exécution du contrat / intérêt légitime (fonctionnement)</td>
+            <td>Jusqu'à l'effacement des données du navigateur</td>
+          </tr>
+          <tr>
+            <td>Adresse IP, User-Agent, horodatage des requêtes</td>
+            <td>Firebase Hosting / GitHub Pages (journaux serveur)</td>
+            <td>Sécurité, diagnostic technique et prévention des abus</td>
+            <td>Intérêt légitime (sécurité du service)</td>
+            <td>Selon les politiques de rétention de Google Cloud et GitHub</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="margin-top:12px">Aucune donnée sensible (santé, opinions politiques, convictions religieuses, orientation sexuelle, etc.) n'est collectée. Aucune donnée n'est vendue, louée ou échangée à des tiers.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">4</span> Caractère facultatif des données</h2>
+      <p>L'Application reste pleinement utilisable sans compte : consultation des flux, recherche, traductions et favoris restent disponibles en local. Seules la <strong>synchronisation multi-appareils</strong> (compte Google) et les <strong>notifications push</strong> nécessitent une donnée personnelle. Ces deux fonctions sont facultatives et n'affectent pas l'accès au contenu.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">5</span> Sous-traitants et transferts hors UE</h2>
+      <p>L'Application s'appuie sur les prestataires suivants, qui agissent en qualité de sous-traitants au sens du RGPD :</p>
+      <ul>
+        <li><strong>Google Ireland Limited / Google LLC</strong> — Firebase (Authentication, Firestore, Cloud Messaging, Hosting) et Firebase App Check. Infrastructure exploiting des États-Unis et de l'Irlande.</li>
+        <li><strong>GitHub, Inc. (Microsoft)</strong> — mirror GitHub Pages et gestion du code source. Infrastructure exploitée aux États-Unis.</li>
+      </ul>
+      <p>Ces transferts hors Union européenne sont encadrés par des clauses contractuelles types (SCC) et des garanties appropriées. Vous pouvez en demander copie à l'adresse de contact ci-dessus.</p>
+      <div class="callout warn">Les articles affichés proviennent de sources publiques tierces (Hacker News, dev.to, GitHub, NIST, CISA, Google Patents…). Leur consultation entraîne des requêtes vers ces services, qui peuvent appliquer leurs propres politiques de confidentialité. L'éditeur n'en contrôle pas le contenu et ne reçoit aucune donnée personnelle de votre part de ce fait.</div>
+    </section>
+
+    <section>
+      <h2><span class="num">6</span> Cookies et stockage local</h2>
+      <ul>
+        <li><strong>Aucun cookie publicitaire ni de mesure d'audience</strong> (pas de Google Analytics, pas de pixel, pas de réseau publicitaire).</li>
+        <li>Les seules informations stockées dans votre navigateur sont des <strong>préférences locales</strong> (langue, cache, favoris non synchronisés) via <code>localStorage</code> — elles ne sont transmises à aucun serveur.</li>
+        <li>Un <strong>service worker</strong> met en cache les fichiers de l'Application pour un fonctionnement hors ligne ; ce cache est local à votre appareil.</li>
+        <li>Vous pouvez à tout moment effacer ces données via <em>Paramètres → Confidentialité et sécurité → Effacer les données de navigation</em>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">7</span> Sécurité</h2>
+      <p>Les échanges sont chiffrés en transit (<strong>HTTPS / TLS</strong>). L'authentification et les règles d'accès aux favoris sont gérées par Firebase Authentication et les règles de sécurité Firestore, qui limitent chaque lecture et chaque écriture à son propriétaire. Aucune donnée n'est délibérément transmise en clair.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">8</span> Vos droits</      <h2>
+      <p>Conformément au RGPD, vous disposez d'un droit d'<strong>accès</strong>, de <strong>rectification</strong>, d'<strong>effacement</strong>, de <strong>limitation</strong>, d'<strong>opposition</strong> et de <strong>portabilité</strong> de vos données, ainsi que du droit de définir des directives relatives à leur sort après votre décès.</p>
+      <p>Exercice de vos droits : écrivez à <a href="mailto:connacri@gmail.com">connacri@gmail.com</a>. Réponse sous 30 jours. Le supprimation des favoris est directement accessible dans l'onglet « Mes favoris ». Vous pouvez également supprimer définitivement votre compte et l'ensemble de vos données synchronisées sur simple demande.</p>
+      <p>Si vous estimez, après nos réponses, que vos droits ne sont pas respectés, vous pouvez introduire une réclamation auprès de la <strong>CNPD</strong> (Commission nationale de l'informatique et des libertés) : <a href="https://www.cnpd.fr" rel="noopener">www.cnpd.fr</a>.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">9</span> Mineurs</h2>
+      <p>L'Application s'adresse à un public de <strong>15 ans et plus</strong>. Un mineur de moins de 15 ans doit obtenir l'accord préalable d'un titulaire de l'autorité parentale avant toute création de compte. L'éditeur ne recueille pas sciemment de données concernant des enfants de moins de 15 ans.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">10</span> Évolution de la politique</h2>
+      <p>Cette politique peut être mise à jour pour refléter des évolutions techniques ou réglementaires. La date de dernière mise à jour figure en haut de page ; toute modification substantielle sera signalée dans l'Application.</p>
+    </section>
+  </div>
+
+  <div lang="en" hidden>
+    <h1>Privacy Policy</h1>
+    <p class="lede">How FlutterNews OSINT &amp; Tech Radar collects, uses and protects your personal data.</p>
+    <span class="badge">GDPR compliant</span>
+    <p class="updated">Last updated: <strong>3 October 2026</strong> — version 1.0.0</p>
+
+    <section>
+      <h2><span class="num">1</span> Data controller</h2>
+      <p>The <strong>FlutterNews OSINT &amp; Tech Radar</strong> website and mobile app (the “App”) are published and operated by <strong>Ramzi</strong>, independent maintainer of the <code>Connacri/News</code> project.</p>
+      <p>For any privacy question: <a href="mailto:connacri@gmail.com">connacri@gmail.com</a> — or through the public repository <a href="https://github.com/Connacri/News/issues" rel="noopener">github.com/Connacri/News</a>.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">2</span> Principles</h2>
+      <div class="callout">The App is a tech-news and OSINT aggregator. It contains <strong>no advertising, no trackers and no marketing cookies</strong>, and it neither sells nor rents any data.</div>
+      <ul>
+        <li><strong>Data minimisation</strong>: only the data required to run the service is processed.</li>
+        <li><strong>Consent</strong>: Google sign-in and push notifications are optional and revocable at any time.</li>
+        <li><strong>Transparency</strong>: this page describes every processing operation in place.</li>
+        <li><strong>No automated decision-making</strong>: no profiling, no targeted advertising, no scoring.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">3</span> Data collected</h2>
+      <div class="scroll">
+      <table>
+        <thead>
+          <tr><th>Data</th><th>Source</th><th>Purpose</th><th>Legal basis</th><th>Retention</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Google ID, email address, display name, profile picture</td>
+            <td>Firebase Authentication (Google sign-in)</td>
+            <td>Authentication and bookmark sync across your devices</td>
+            <td>Performance of the contract (requested service)</td>
+            <td>Until account deletion or consent withdrawal</td>
+          </tr>
+          <tr>
+            <td>Bookmarks: article ID and title, URL, image, saved date</td>
+            <td>Cloud Firestore (<code>users/{id}/bookmarks</code> collection)</td>
+            <td>Provide the synced “My bookmarks” list</td>
+            <td>Performance of the contract</td>
+            <td>Until the bookmark or the account is deleted</td>
+          </tr>
+          <tr>
+            <td>Push notification subscription token (FCM token)</td>
+            <td>Firebase Cloud Messaging</td>
+            <td>Deliver the push notifications you enabled</td>
+            <td>Consent</td>
+            <td>Until unsubscribe or account deletion</td>
+          </tr>
+          <tr>
+            <td>Language and podcast preferences, cached translations, viewed-article cache</td>
+            <td>Browser local storage (<code>localStorage</code>)</td>
+            <td>Remember settings and support offline reading</td>
+            <td>Performance of the contract / legitimate interest</td>
+            <td>Until browser data is cleared</td>
+          </tr>
+          <tr>
+            <td>IP address, User-Agent, request timestamps</td>
+            <td>Firebase Hosting / GitHub Pages (server logs)</td>
+            <td>Security, diagnostics and abuse prevention</td>
+            <td>Legitimate interest (service security)</td>
+            <td>Per Google Cloud and GitHub retention policies</td>
+          </tr>
+        </tbody>
+      </table>
+      </div>
+      <p style="margin-top:12px">No sensitive data (health, political opinions, religious beliefs, sexual orientation, etc.) is collected. No data is sold, rented or exchanged with third parties.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">4</span> Optional nature of the data</h2>
+      <p>The App remains fully usable without an account: feeds, search, translations and bookmarks keep working locally. Only <strong>multi-device sync</strong> (Google account) and <strong>push notifications</strong> require personal data. Both are optional and do not restrict access to content.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">5</span> Processors and transfers outside the EU</h2>
+      <p>The App relies on the following processors acting as GDPR sub-processors:</p>
+      <ul>
+        <li><strong>Google Ireland Limited / Google LLC</strong> — Firebase (Authentication, Firestore, Cloud Messaging, Hosting) and Firebase App Check. Infrastructure hosted in the United States and Ireland.</li>
+        <li><strong>GitHub, Inc. (Microsoft)</strong> — GitHub Pages mirror and source code hosting. Infrastructure hosted in the United States.</li>
+      </ul>
+      <p>These transfers outside the European Union are covered by Standard Contractual Clauses (SCC) and appropriate safeguards. A copy can be requested at the contact address above.</p>
+      <div class="callout warn">Displayed articles come from public third-party sources (Hacker News, dev.to, GitHub, NIST, CISA, Google Patents…). Viewing them sends requests to those services, which apply their own privacy policies. The maintainer does not control that content and receives no personal data from it.</div>
+    </section>
+
+    <section>
+      <h2><span class="num">6</span> Cookies and local storage</h2>
+      <ul>
+        <li><strong>No advertising or analytics cookies</strong> (no Google Analytics, no tracking pixel, no ad network).</li>
+        <li>The only information stored in your browser are <strong>local preferences</strong> (language, cache, un-synced bookmarks) through <code>localStorage</code> — they are never sent to any server.</li>
+        <li>A <strong>service worker</strong> caches the App files for offline use; this cache stays on your device.</li>
+        <li>You can erase this data at any time via <em>Settings → Privacy and security → Clear browsing data</em>.</li>
+      </ul>
+    </section>
+
+    <section>
+      <h2><span class="num">7</span> Security</h2>
+      <p>Traffic is encrypted in transit (<strong>HTTPS / TLS</strong>). Authentication and bookmark access are handled by Firebase Authentication and Firestore security rules, which restrict every read and write to its owner. No data is intentionally transmitted in clear text.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">8</span> Your rights</h2>
+      <p>Under the GDPR, you have the right to <strong>access</strong>, <strong>rectify</strong>, <strong>erase</strong>, <strong>restrict</strong>, <strong>object to</strong> and <strong>port</strong> your data, plus the right to issue post-mortem instructions.</p>
+      <p>To exercise your rights: email <a href="mailto:connacri@gmail.com">connacri@gmail.com</a>. We respond within 30 days. Bookmarks can be deleted directly from the “My bookmarks” tab. You may also permanently delete your account and all synced data on simple request.</p>
+      <p>If you consider that your rights are still not satisfied, you may lodge a complaint with the <strong>CNPD</strong> (French data protection authority): <a href="https://www.cnpd.fr" rel="noopener">www.cnpd.fr</a>.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">9</span> Minors</h2>
+      <p>The App is intended for an audience aged <strong>15 and over</strong>. A child under 15 must obtain prior authorisation from a holder of parental authority before creating an account. The maintainer does not knowingly collect data from children under 15.</p>
+    </section>
+
+    <section>
+      <h2><span class="num">10</span> Policy updates</h2>
+      <p>This policy may be updated to reflect technical or regulatory changes. The last-update date is shown at the top of the page; any substantial change will be flagged inside the App.</p>
+    </section>
+  </div>
+
+</main>
+
+<footer class="bot">
+  <div class="wrap">
+    <p><strong>FlutterNews OSINT &amp; Tech Radar</strong> —_application de veille libre et indépendante, sans publicité ni suivi.</p>
+    <p>Édition : Ramzi · Source : <a href="https://github.com/Connacri/News" rel="noopener">github.com/Connacri/News</a> · Contact : <a href="mailto:connacri@gmail.com">connacri@gmail.com</a></p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  var KEY = 'flutternews_privacy_lang';
+  var fr = document.querySelector('[lang="fr"]');
+  var en = document.querySelector('[lang="en"]');
+  var bfr = document.getElementById('btn-fr');
+  var ben = document.getElementById('btn-en');
+
+  function apply(lang) {
+    var isFr = lang === 'fr';
+    fr.hidden = !isFr;
+    en.hidden = isFr;
+    document.documentElement.lang = isFr ? 'fr' : 'en';
+    bfr.setAttribute('aria-pressed', String(isFr));
+    ben.setAttribute('aria-pressed', String(!isFr));
+    try { localStorage.setItem(KEY, isFr ? 'fr' : 'en'); } catch (e) {}
+  }
+
+  var saved = null;
+  try { saved = localStorage.getItem(KEY); } catch (e) {}
+  if (!saved) {
+    saved = (navigator.language || 'fr').toLowerCase().indexOf('fr') === 0 ? 'fr' : 'en';
+  }
+  apply(saved);
+
+  bfr.addEventListener('click', function () { apply('fr'); });
+  ben.addEventListener('click', function () { apply('en'); });
+})();
+</script>
+
+</body>
+</html>

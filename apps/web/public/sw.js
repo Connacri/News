@@ -2,6 +2,7 @@ const CACHE_NAME = 'flutternews-cache-v1';
 const PRECACHE_URLS = [
   '/',
   '/index.html',
+  '/security-policy.html',
   '/manifest.json'
 ];
 

@@ -6,6 +6,10 @@
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
         {
+          "source": "/security-policy",
+          "destination": "/security-policy.html"
+        },
+        {
           "source": "**",
           "destination": "/index.html"
         }
@@ -36,6 +40,10 @@
       "public": "apps/mobile/build/web",
       "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
       "rewrites": [
+        {
+          "source": "/security-policy",
+          "destination": "/security-policy.html"
+        },
         {
           "source": "**",
           "destination": "/index.html"

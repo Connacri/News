@@ -18,7 +18,8 @@ import {
   LogOut,
   User,
   CloudCheck,
-  Scroll
+  Scroll,
+  ShieldCheck
 } from 'lucide-react';
 import { CountryCode, Language } from '../types';
 import { COUNTRIES } from '../services/countries';
@@ -240,10 +241,22 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           </div>
         </div>
 
-        {/* Drawer Footer */}
+{/* Drawer Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/80 text-[11px] text-slate-500 flex items-center justify-between">
           <span>Version 1.0.0+1 (APK/AAB/Web)</span>
-          <span className="font-mono text-slate-400">Firebase & Patents</span>
+          <div className="flex items-center gap-3">
+            <a
+              href="/security-policy"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1 text-slate-400 hover:text-sky-400 transition-colors"
+              title="Politique de confidentialité / Privacy policy"
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span className="font-mono">Confidentialité</span>
+            </a>
+            <span className="font-mono text-slate-400">Firebase &amp; Patents</span>
+          </div>
         </div>
       </div>
     </div>

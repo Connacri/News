@@ -11,6 +11,11 @@ Application Flutter Cross-Platform + Web React pour la veille techno (news par p
   Hébergé sur Firebase Hosting (site : `flutter-news-osint`, cible `mobile`)
 - **Releases Android / Web** — `https://github.com/Connacri/News/releases`  
   APK (universal + split per ABI), AAB Play Store, zip Web signés à chaque push sur `main`
+- **Politique de confidentialité (RGPD)** — `https://device-streaming-ccab91bb.web.app/security-policy`  
+  Page statique FR/EN, sans traqueur : `apps/web/public/security-policy.html` (copiée dans
+  `apps/mobile/web/` pour le site Flutter). Servie via la réécriture Firebase
+  `"/security-policy" → "/security-policy.html"`. Sur GitHub Pages, l'URL équivalente est
+  `/security-policy.html` (Pages ne sert pas les URLs sans extension).
 
 ## Architecture du projet
 
