@@ -180,6 +180,26 @@ Chaque push sur `main` déclenche une **pre-release roulante** `build-<n°>` con
 
 Un tag `v*.*.*` publie la même release en version stable.
 
+### Version code Android (Google Play)
+
+Google Play exige un **`versionCode` strictement croissant** par import : renvoyer le même
+numéro est refusé (*« Le code de version 1 a déjà été utilisé »*).
+
+- La CI calcule automatiquement `versionCode = max(build number de pubspec, n° de run GitHub)`
+  et le passe via `--build-number` aux builds AAB et APK.
+- Chaque build de `main` produit donc un code unique et croissant : **utiliser l'AAB de la
+  dernière release** pour un import Play, ne jamais ré-uploader le même artefact.
+- Le build number de `apps/mobile/pubspec.yaml` (`version: 1.0.0+2`) n'est qu'un plancher
+  pour les builds locaux : si le Play Console exige un code supérieur au n° de run,
+  incrémenter ce nombre.
+
+### Compatibilité des actions
+
+Versions épinglées : `actions/checkout@v7`, `actions/setup-node@v7`, `actions/setup-java@v6`,
+`actions/upload-artifact@v7`, `actions/configure-pages@v6`, `actions/upload-pages-artifact@v5`,
+`actions/deploy-pages@v5`, `softprops/action-gh-release@v3`, `subosito/flutter-action@v2`,
+`FirebaseExtended/action-hosting-deploy@v0`.
+
 Secrets requis (GitHub Actions) :
 
 | Secret | Usage |
