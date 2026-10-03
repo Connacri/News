@@ -1,16 +1,29 @@
-name: Flutter Multiplatform Release (APK, AAB & Web)
+name: Release Flutter (APK, AAB signés & Web)
 
 on:
   push:
+    branches:
+      - main
     tags:
       - 'v*.*.*'
+  pull_request:
     branches:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: flutter-release-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+env:
+  FLUTTER_VERSION: '3.44.0'
+
 jobs:
-  flutter-build:
-    name: Build Flutter APK, AAB and Web
+  build:
+    name: Build & Publish (APK / AAB / Web)
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -25,48 +38,144 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
+          cache: gradle
 
       - name: Set up Flutter SDK
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.24.x'
-          channel: 'stable'
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
           cache: true
 
-      - name: Install Flutter dependencies
+      - name: Resolve release version
+        id: version
+        shell: pwsh
+        run: |
+          $pub = Get-Content pubspec.yaml -Raw
+          $ver = ([regex]::Match($pub, '(?m)^version:\s*(\S+)\+(\S+)')).Groups
+          $name = $ver[1].Value
+          $code = $ver[2].Value
+          $tag = if ($env:GITHUB_REF -like 'refs/tags/*') { $env:GITHUB_REF.Replace('refs/tags/','') } else { "v$name+$code" }
+          "name=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "code=$code" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "tag=$tag"   | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          "isTag=$($env:GITHUB_REF -like 'refs/tags/*')" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Flutter doctor
+        run: flutter doctor -v
+
+      - name: Install dependencies
         run: flutter pub get
 
-      - name: Build Android APK (split per ABI + universal)
-        run: |
-          flutter build apk --release --split-per-abi
-          flutter build apk --release
+      - name: Static analysis
+        run: flutter analyze --no-fatal-infos
 
-      - name: Build Android App Bundle (AAB)
+      - name: Restore release keystore
+        shell: pwsh
+        env:
+          KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+        run: |
+          if (-not $env:KEYSTORE_B64) { throw 'ANDROID_KEYSTORE_BASE64 secret manquant' }
+          $bytes = [Convert]::FromBase64String(($env:KEYSTORE_B64 -replace '\s',''))
+          [IO.File]::WriteAllBytes("$PWD/android/app/upload-keystore.jks", $bytes)
+
+      - name: Write key.properties
+        shell: pwsh
+        env:
+          KEYSTORE_PASS: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          KEY_PASS: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          @"
+          storePassword=$env:KEYSTORE_PASS
+          keyPassword=$env:KEY_PASS
+          keyAlias=$env:KEY_ALIAS
+          storeFile=upload-keystore.jks
+          "@ | Out-File -FilePath android/key.properties -Encoding utf8
+
+      - name: Build App Bundle (AAB)
         run: flutter build appbundle --release
 
-      - name: Build Flutter Web
-        run: flutter build web --release
+      - name: Build APKs (universal + split per ABI)
+        run: |
+          flutter build apk --release
+          flutter build apk --release --split-per-abi
 
-      - name: Deploy Flutter Web to Firebase Hosting (mobile)
-        if: github.ref == 'refs/heads/main'
+      - name: Build Flutter Web
+        run: flutter build web --release --wasm
+
+      - name: Collect release artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path dist-release | Out-Null
+          Get-ChildItem build/app/outputs/flutter-apk/*.apk | Copy-Item -Destination dist-release
+          Get-ChildItem build/app/outputs/bundle/release/*.aab | Copy-Item -Destination dist-release
+          Get-ChildItem build/web | Copy-Item -Destination dist-release/web -Recurse -Force
+          Compress-Archive -Path dist-release/web -DestinationPath dist-release/flutter-news-web.zip -Force
+          Get-ChildItem dist-release | Format-Table Name, Length
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: flutter-release-${{ steps.version.outputs.tag }}
+          path: apps/mobile/dist-release
+          retention-days: 30
+
+      - name: Publish GitHub Release
+        if: steps.version.outputs.isTag == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: FlutterNews ${{ steps.version.outputs.tag }}
+          generate_release_notes: true
+          files: |
+            apps/mobile/dist-release/*.apk
+            apps/mobile/dist-release/*.aab
+          body: |
+            ## FlutterNews OSINT and Tech Radar - ${{ steps.version.outputs.tag }}
+
+            Artefacts: APK (universal + split per ABI), AAB (Play Store), web zip (WasmGC).
+
+            Builds signees avec le keystore de release (secret ANDROID_KEYSTORE_BASE64).
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  deploy-hosting:
+    name: Deploy Flutter Web to Firebase Hosting
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Set up Flutter SDK
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        working-directory: apps/mobile
+        run: flutter pub get
+
+      - name: Build Flutter Web
+        working-directory: apps/mobile
+        run: flutter build web --release --wasm
+
+      - name: "Deploy to Firebase Hosting (target mobile)"
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
-          repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEVICE_STREAMING }}'
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           projectId: 'device-streaming-ccab91bb'
           channelId: live
           target: mobile
-
-      - name: Create GitHub Release with APK & AAB
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
-        with:
-          files: |
-            apps/mobile/build/app/outputs/flutter-apk/app-release.apk
-            apps/mobile/build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
-            apps/mobile/build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
-            apps/mobile/build/app/outputs/flutter-apk/app-x86_64-release.apk
-            apps/mobile/build/app/outputs/bundle/release/app-release.aab
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

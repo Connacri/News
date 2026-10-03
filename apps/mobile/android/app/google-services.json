@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "100841671094",
+    "project_id": "device-streaming-ccab91bb",
+    "storage_bucket": "device-streaming-ccab91bb.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:100841671094:android:d590e3e11201f56b315917",
+        "android_client_info": {
+          "package_name": "com.flutternews.osint"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDHGfMfmHTV4KstlS8PJ6cpNaVnsZW6u_I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
