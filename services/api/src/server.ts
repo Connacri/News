@@ -79,7 +79,8 @@ async function startServer() {
         mimeType: part?.inlineData?.mimeType || 'audio/wav',
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to generate audio via Gemini TTS';
+      const message =
+        error instanceof Error ? error.message : 'Failed to generate audio via Gemini TTS';
       console.error('[api/tts]', message);
       return res.status(500).json({ error: message });
     }
