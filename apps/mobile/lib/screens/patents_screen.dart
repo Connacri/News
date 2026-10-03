@@ -51,7 +51,7 @@ class PatentsScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.between,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Chip(
                       avatar: const Icon(Icons.description, size: 16, color: Colors.amber),
