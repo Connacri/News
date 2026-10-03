@@ -1,5 +1,20 @@
 {
   "projects": {
-    "default": "basic-epsilon-lsmzh"
-  }
+    "default": "device-streaming-ccab91bb",
+    "web": "device-streaming-ccab91bb",
+    "flutter": "device-streaming-ccab91bb"
+  },
+  "targets": {
+    "device-streaming-ccab91bb": {
+      "hosting": {
+        "web": [
+          "device-streaming-ccab91bb"
+        ],
+        "mobile": [
+          "flutter-news-osint"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

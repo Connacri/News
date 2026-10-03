@@ -1,8 +1,69 @@
-node_modules/
-build/
-dist/
-coverage/
-.DS_Store
-*.log
-.env*
+# ---------------------------------------------------------------------------
+# Secrets & environment
+# ---------------------------------------------------------------------------
+.env
+.env.*
 !.env.example
+*.pem
+*.p12
+serviceAccountKey.json
+firebase-service-account*.json
+
+# ---------------------------------------------------------------------------
+# Android signing material (NE JAMAIS commiter)
+# ---------------------------------------------------------------------------
+*.jks
+*.keystore
+key.properties
+**/key.properties
+flutter_news_osint.jks
+upload-keystore.jks
+
+# ---------------------------------------------------------------------------
+# Node / Vite / Express
+# ---------------------------------------------------------------------------
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.eslintcache
+
+# ---------------------------------------------------------------------------
+# Flutter / Dart
+# ---------------------------------------------------------------------------
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+build/
+
+# ---------------------------------------------------------------------------
+# Firebase
+# ---------------------------------------------------------------------------
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+firebase-applet-config.json
+firebase-blueprint.json
+
+# ---------------------------------------------------------------------------
+# IDE / OS
+# ---------------------------------------------------------------------------
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ---------------------------------------------------------------------------
+# Misc
+# ---------------------------------------------------------------------------
+*.log
+.envrc

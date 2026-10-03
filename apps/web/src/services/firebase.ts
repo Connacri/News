@@ -1,33 +1,38 @@
-import { initializeApp } from 'firebase/app';
-import { 
-  getAuth, 
-  signInWithPopup, 
-  GoogleAuthProvider, 
+import { initializeApp, FirebaseOptions } from 'firebase/app';
+import {
+  getAuth,
+  signInWithPopup,
+  GoogleAuthProvider,
   signOut,
   onAuthStateChanged,
-  User 
+  User,
 } from 'firebase/auth';
-import { 
-  getFirestore, 
-  doc, 
+import {
+  getFirestore,
+  doc,
   getDocFromServer,
   setDoc,
   deleteDoc,
   collection,
   onSnapshot,
   query,
-  orderBy
+  orderBy,
 } from 'firebase/firestore';
-import firebaseConfig from '../../firebase-applet-config.json';
 import { NewsArticle } from '../types';
 
-// Initialize Firebase App
+const firebaseConfig: FirebaseOptions = {
+  apiKey: 'AIzaSyBFt4Ip5ZMaI6B3ZHHwnKWP7ex8mFv3HjA',
+  authDomain: 'device-streaming-ccab91bb.firebaseapp.com',
+  projectId: 'device-streaming-ccab91bb',
+  storageBucket: 'device-streaming-ccab91bb.firebasestorage.app',
+  messagingSenderId: '100841671094',
+  appId: '1:100841671094:web:7ce6f2e80bfd61ad315917',
+};
+
 const app = initializeApp(firebaseConfig);
 
-// CRITICAL: Initialize Firestore with the provisioned database ID
-export const db = getFirestore(app, firebaseConfig.firestoreDatabaseId);
+export const db = getFirestore(app);
 export const auth = getAuth(app);
-
 export const googleProvider = new GoogleAuthProvider();
 
 export enum OperationType {
@@ -49,10 +54,10 @@ export interface FirestoreErrorInfo {
     emailVerified?: boolean | null;
     isAnonymous?: boolean | null;
     tenantId?: string | null;
-    providerInfo?: {
+    providerInfo?: Array<{
       providerId?: string | null;
       email?: string | null;
-    }[];
+    }>;
   };
 }
 
@@ -60,24 +65,23 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
-      userId: auth.currentUser?.uid,
-      email: auth.currentUser?.email,
-      emailVerified: auth.currentUser?.emailVerified,
-      isAnonymous: auth.currentUser?.isAnonymous,
-      tenantId: auth.currentUser?.tenantId,
-      providerInfo: auth.currentUser?.providerData?.map(provider => ({
+      userId: auth.currentUser?.uid ?? null,
+      email: auth.currentUser?.email ?? null,
+      emailVerified: auth.currentUser?.emailVerified ?? null,
+      isAnonymous: auth.currentUser?.isAnonymous ?? null,
+      tenantId: auth.currentUser?.tenantId ?? null,
+      providerInfo: auth.currentUser?.providerData?.map((provider) => ({
         providerId: provider.providerId,
         email: provider.email,
-      })) || []
+      })) ?? [],
     },
     operationType,
-    path
+    path,
   };
   console.warn('Firestore Operation Notice:', JSON.stringify(errInfo));
   return errInfo;
 }
 
-// Validate connection to Firestore on initialization
 export async function testConnection(): Promise<boolean> {
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
@@ -90,12 +94,10 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-// Initial test connection ping
 if (typeof window !== 'undefined') {
   testConnection().catch(() => {});
 }
 
-// Google Sign In via Popup (works seamlessly inside iframe)
 export async function loginWithGoogle(): Promise<User | null> {
   try {
     const result = await signInWithPopup(auth, googleProvider);
@@ -106,7 +108,6 @@ export async function loginWithGoogle(): Promise<User | null> {
   }
 }
 
-// Google Sign Out
 export async function logoutUser(): Promise<void> {
   try {
     await signOut(auth);
@@ -115,9 +116,8 @@ export async function logoutUser(): Promise<void> {
   }
 }
 
-// Cloud Bookmark Sync Helper
 export async function saveBookmarkToFirestore(userId: string, article: NewsArticle): Promise<void> {
-  const cleanId = article.id.replace(/[^a-zA-Z0-9_\-]/g, '_');
+  const cleanId = (article.id ?? '').replace(/[^a-zA-Z0-9_\-]/g, '_');
   const path = `users/${userId}/bookmarks/${cleanId}`;
   try {
     await setDoc(doc(db, 'users', userId, 'bookmarks', cleanId), {
@@ -126,16 +126,15 @@ export async function saveBookmarkToFirestore(userId: string, article: NewsArtic
       title: (article.title || '').slice(0, 390),
       category: article.category || 'all',
       source: (article.source || '').slice(0, 95),
-      savedAt: new Date().toISOString()
+      savedAt: new Date().toISOString(),
     });
   } catch (err) {
     handleFirestoreError(err, OperationType.WRITE, path);
   }
 }
 
-// Cloud Bookmark Remove Helper
 export async function removeBookmarkFromFirestore(userId: string, articleId: string): Promise<void> {
-  const cleanId = articleId.replace(/[^a-zA-Z0-9_\-]/g, '_');
+  const cleanId = (articleId ?? '').replace(/[^a-zA-Z0-9_\-]/g, '_');
   const path = `users/${userId}/bookmarks/${cleanId}`;
   try {
     await deleteDoc(doc(db, 'users', userId, 'bookmarks', cleanId));

@@ -1,6 +1,0 @@
-{
-  "name": "FlutterNews OSINT & Tech Radar",
-  "description": "Application de news tech quotidiennes par pays, OSINT open-source, multilingue avec FCM, Firebase Hosting et CI/CD GitHub Actions pour APK, AAB et Web.",
-  "requestFramePermissions": [],
-  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
-}
