@@ -5,9 +5,12 @@ Application Flutter Cross-Platform + Web React pour la veille techno (news par p
 ## Liens de déploiement
 
 - **Web React (Vite)** — `https://device-streaming-ccab91bb.web.app`  
-  Hébergé sur Firebase Hosting (site : `device-streaming-ccab91bb`, cible `web`)
-- **Web Flutter** — `https://flutter-news-osint.web.app`  
+  Hébergé sur Firebase Hosting (site : `device-streaming-ccab91bb`, cible `web`)  
+  Miroir : `https://connacri.github.io/News/`
+- **Web Flutter (WasmGC)** — `https://flutter-news-osint.web.app`  
   Hébergé sur Firebase Hosting (site : `flutter-news-osint`, cible `mobile`)
+- **Releases Android / Web** — `https://github.com/Connacri/News/releases`  
+  APK (universal + split per ABI), AAB Play Store, zip Web signés à chaque push sur `main`
 
 ## Architecture du projet
 
@@ -33,7 +36,19 @@ News/
 - Node.js >= 20, npm >= 10
 - Flutter 3.44+ (Dart 3.12+)
 - Firebase CLI (`firebase --version` : 15.32.1+)
-- Git, Java 17 (pour build Android)
+- Git, Java 21 (build Android, AGP 9)
+
+### Build Android
+
+```bash
+cd apps/mobile
+flutter build appbundle --release   # AAB Play Store
+flutter build apk --release         # APK universal
+flutter analyze                    # doit remonter "No issues found!"
+```
+
+Le keystore de release est lu depuis `apps/mobile/android/key.properties`
+(non versionné) ; sans ce fichier le build utilise la clé debug.
 
 ### Installation
 
@@ -84,14 +99,60 @@ firebase deploy --only hosting
 
 ## Firebase
 
-- Projet : `device-streaming-ccab91bb`  
-- Site 1 : `device-streaming-ccab91bb` → React Web (`apps/web/dist`)  
-- Site 2 : `flutter-news-osint` → Flutter Web (`apps/mobile/build/web`)  
-- Apps Android/Web enregistrées (configuration Firebase à synchroniser via `flutterfire configure`/firebase_options).
+- Projet : `device-streaming-ccab91bb`
+- Site 1 : `device-streaming-ccab91bb` → React Web (`apps/web/dist`)
+- Site 2 : `flutter-news-osint` → Flutter Web (`apps/mobile/build/web`)
+- Apps enregistrées :
+  - Web `1:100841671094:web:7ce6f2e80bfd61ad315917`
+  - Android `1:100841671094:android:d590e3e11201f56b315917` (package `com.flutternews.osint`)
+- Certificats SHA-1 / SHA-256 enregistrés (release + debug) pour l'APK signé
+- Configuration embarquée : `apps/mobile/lib/firebase_options.dart` et
+  `apps/mobile/android/app/google-services.json` (régénérable via `flutterfire configure`)
 
 ## CI/CD
 
-Les workflows GitHub Actions sont disponibles dans `.github/workflows/` (déploiement Hosting, Pages, et releases multiplateformes). Les builds de releases APK/AAB/Web signés seront déclenchés sur tags `v*.*.*` ainsi que sur `main` selon le workflow Flutter.
+Trois workflows dans `.github/workflows/` :
+
+| Workflow | Rôle |
+|---|---|
+| `deploy_github_pages.yml` | Build React + publication GitHub Pages |
+| `deploy_firebase_hosting.yml` | Build React + déploiement Firebase (cible `web`) |
+| `flutter_crossplatform_release.yml` | Analyse, APK/AAB/Web signés, GitHub Release, déploiement Firebase (cible `mobile`) |
+
+Chaque push sur `main` déclenche une **pre-release roulante** `build-<n°>` contenant :
+
+- `app-release.apk` (universal) + `app-arm64-v8a` / `app-armeabi-v7a` / `app-x86_64` (split per ABI)
+- `app-release.aab` (App Bundle Play Store)
+- `flutter-news-web.zip` (build WasmGC)
+
+Un tag `v*.*.*` publie la même release en version stable.
+
+Secrets requis (GitHub Actions) :
+
+| Secret | Usage |
+|---|---|
+| `FIREBASE_SERVICE_ACCOUNT` | JSON du service account `github-actions-deployer` (rôle `roles/firebase.admin`) |
+| `ANDROID_KEYSTORE_BASE64` | Keystore de release, encodé en base64 |
+| `ANDROID_KEYSTORE_PASSWORD` / `ANDROID_KEY_PASSWORD` | Mots de passe du keystore |
+| `ANDROID_KEY_ALIAS` | Alias de la clé (`upload`) |
+
+Variables : `FIREBASE_PROJECT_ID`, `FIREBASE_WEB_SITE_ID`, `FIREBASE_MOBILE_SITE_ID`,
+`ANDROID_PACKAGE`, `FLUTTER_VERSION`.
+
+> Le keystore (`apps/mobile/android/app/upload-keystore.jks`) et `key.properties` sont
+> ignorés par Git et ne vivent que dans les secrets CI. En cas de perte, la signature Play
+> est irrécupérable : conserver une sauvegarde hors dépôt.
+
+## Sécurité
+
+- `npm audit` remonte 4 vulnérabilités *high* dans `@grpc/grpc-js`, dépendance
+  **Node uniquement** du SDK Firestore (`~1.9.0` épinglée par `@firebase/firestore`).
+  Le bundle navigateur n'embarque aucun code gRPC (vérifié dans `apps/web/dist`).
+  Le correctif proposé par npm (`npm audit fix --force`) imposerait un retour à
+  `firebase@9` : refusé, la correction amont est made in Firebase.
+- Aucune clé n'est versionnée : keystore, `key.properties` et
+  `google-services.json` sont ignorés par Git. Seuls les Secrets GitHub Actions
+  portent les credentials de signature et le service account de déploiement.
 
 ## Licence
 
