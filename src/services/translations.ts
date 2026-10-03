@@ -144,6 +144,13 @@ export interface TranslationStrings {
   flutterRunCmdLabel: string;
   flutterBuildCmdLabel: string;
   flutterTargetFeatures: string;
+
+  // Offline Caching & PWA Keys
+  categoryOffline: string;
+  offlineMode: string;
+  offlineNotice: string;
+  lastViewedBadge: string;
+  cachedOfflineCount: string;
 }
 
 export const translations: Record<Language, TranslationStrings> = {
@@ -287,7 +294,13 @@ export const translations: Record<Language, TranslationStrings> = {
     flutterPlatformDesktop: "Desktop (macOS, Windows, Linux)",
     flutterRunCmdLabel: "Commande de test en direct",
     flutterBuildCmdLabel: "Compilation du binaire final",
-    flutterTargetFeatures: "Fonctionnalités cibles de la plateforme"
+    flutterTargetFeatures: "Fonctionnalités cibles de la plateforme",
+
+    categoryOffline: "💾 Consultés Hors-ligne",
+    offlineMode: "Mode Hors-ligne",
+    offlineNotice: "Connexion Internet interrompue. Les articles consultés et en cache restent accessibles.",
+    lastViewedBadge: "Enregistré pour lecture hors-ligne",
+    cachedOfflineCount: "articles disponibles hors-ligne"
   },
   en: {
     appTitle: "FlutterNews OSINT & Patents",
@@ -429,7 +442,13 @@ export const translations: Record<Language, TranslationStrings> = {
     flutterPlatformDesktop: "Desktop (macOS, Windows, Linux)",
     flutterRunCmdLabel: "Live run command",
     flutterBuildCmdLabel: "Release build command",
-    flutterTargetFeatures: "Platform target features"
+    flutterTargetFeatures: "Platform target features",
+
+    categoryOffline: "💾 Offline Cached",
+    offlineMode: "Offline Mode",
+    offlineNotice: "No internet connection. Previously viewed and cached articles are available.",
+    lastViewedBadge: "Saved for offline reading",
+    cachedOfflineCount: "articles available offline"
   },
   es: {
     appTitle: "FlutterNews OSINT & Patentes",
@@ -571,7 +590,13 @@ export const translations: Record<Language, TranslationStrings> = {
     flutterPlatformDesktop: "Desktop (macOS, Windows, Linux)",
     flutterRunCmdLabel: "Comando de ejecución en vivo",
     flutterBuildCmdLabel: "Comando de compilación final",
-    flutterTargetFeatures: "Características de la plataforma"
+    flutterTargetFeatures: "Características de la plataforma",
+
+    categoryOffline: "💾 En caché offline",
+    offlineMode: "Modo Fuera de línea",
+    offlineNotice: "Sin conexión a Internet. Los artículos consultados están disponibles sin conexión.",
+    lastViewedBadge: "Guardado para lectura offline",
+    cachedOfflineCount: "artículos disponibles sin conexión"
   },
   de: {
     appTitle: "FlutterNews OSINT & Patente",
@@ -713,7 +738,13 @@ export const translations: Record<Language, TranslationStrings> = {
     flutterPlatformDesktop: "Desktop (macOS, Windows, Linux)",
     flutterRunCmdLabel: "Live-Startbefehl",
     flutterBuildCmdLabel: "Release-Buildbefehl",
-    flutterTargetFeatures: "Plattformspezifische Features"
+    flutterTargetFeatures: "Plattformspezifische Features",
+
+    categoryOffline: "💾 Offline verfügbar",
+    offlineMode: "Offline-Modus",
+    offlineNotice: "Keine Internetverbindung. Zuletzt angesehene und zwischengespeicherte Artikel sind verfügbar.",
+    lastViewedBadge: "Für Offline-Lesen gespeichert",
+    cachedOfflineCount: "Artikel offline verfügbar"
   },
   ar: {
     appTitle: "FlutterNews OSINT وبراءات الاختراع",
@@ -855,7 +886,13 @@ export const translations: Record<Language, TranslationStrings> = {
     flutterPlatformDesktop: "سطح المكتب (ماك، ويندوز ولينكس)",
     flutterRunCmdLabel: "أمر التشغيل التجريبي المباشر",
     flutterBuildCmdLabel: "أمر تجميع النسخة النهائية",
-    flutterTargetFeatures: "الميزات المستهدفة للمنصة"
+    flutterTargetFeatures: "الميزات المستهدفة للمنصة",
+
+    categoryOffline: "💾 المقروءة دون إنترنت",
+    offlineMode: "وضع عدم الاتصال",
+    offlineNotice: "لا يوجد اتصال بالإنترنت. المقالات المقروءة مسبقاً محفوظة ومتاحة للقراءة.",
+    lastViewedBadge: "محفوظ للقراءة دون إنترنت",
+    cachedOfflineCount: "مقالات متوفرة دون اتصال"
   },
   ja: {
     appTitle: "FlutterNews OSINT & 特許",
@@ -997,6 +1034,12 @@ export const translations: Record<Language, TranslationStrings> = {
     flutterPlatformDesktop: "デスクトップ (macOS, Windows, Linux)",
     flutterRunCmdLabel: "実行コマンド",
     flutterBuildCmdLabel: "本番ビルドコマンド",
-    flutterTargetFeatures: "ターゲットプラットフォームの機能"
+    flutterTargetFeatures: "ターゲットプラットフォームの機能",
+
+    categoryOffline: "💾 オフライン閲覧",
+    offlineMode: "オフラインモード",
+    offlineNotice: "インターネット接続がありません。最近閲覧した記事とキャッシュ記事を表示中。",
+    lastViewedBadge: "オフライン用に保存済み",
+    cachedOfflineCount: "件のオフライン記事が利用可能"
   }
 };

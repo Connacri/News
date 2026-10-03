@@ -93,17 +93,48 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
     setTranslationPreference(nextState);
   };
 
-  const handleShare = () => {
-    if (navigator.share) {
-      navigator.share({
-        title,
-        text: description,
-        url: article.googlePatentsUrl || article.url
-      }).catch(() => {});
-    } else {
-      navigator.clipboard.writeText(article.googlePatentsUrl || article.url);
+  const copyLinkToClipboard = async (link: string) => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        await navigator.clipboard.writeText(link);
+      } else {
+        const textarea = document.createElement('textarea');
+        textarea.value = link;
+        textarea.style.position = 'fixed';
+        textarea.style.left = '-9999px';
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+      }
       setHasCopiedShare(true);
-      setTimeout(() => setHasCopiedShare(false), 2000);
+      setTimeout(() => setHasCopiedShare(false), 2500);
+    } catch (err) {
+      console.error('Failed to copy link to clipboard:', err);
+    }
+  };
+
+  const handleShare = async () => {
+    const shareUrl = article.googlePatentsUrl || article.url;
+    const shareText = description ? `${title}\n\n${description}` : title;
+
+    // Use Web Share API if supported
+    if (typeof navigator !== 'undefined' && typeof navigator.share === 'function') {
+      try {
+        await navigator.share({
+          title,
+          text: shareText,
+          url: shareUrl,
+        });
+      } catch (err: unknown) {
+        // Fallback to clipboard if share failed for any reason other than user cancelling
+        if ((err as Error)?.name !== 'AbortError') {
+          await copyLinkToClipboard(shareUrl);
+        }
+      }
+    } else {
+      // Fallback if Web Share API is unsupported
+      await copyLinkToClipboard(shareUrl);
     }
   };
 
@@ -185,6 +216,18 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
               {isSpeaking ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
             </button>
 
+            {/* Share via Web Share API or Clipboard */}
+            <button
+              onClick={handleShare}
+              title={hasCopiedShare ? t.linkCopied : t.share}
+              aria-label={t.share}
+              className={`min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center transition-colors ${
+                hasCopiedShare ? 'text-emerald-400 bg-emerald-500/15' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              {hasCopiedShare ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
+            </button>
+
             {/* Bookmark */}
             <button
               onClick={() => onToggleBookmark(article)}
@@ -195,6 +238,14 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             </button>
           </div>
         </div>
+
+        {/* Floating Copied to Clipboard Notification Toast */}
+        {hasCopiedShare && (
+          <div className="absolute top-16 left-1/2 -translate-x-1/2 bg-slate-900 border border-emerald-500/40 text-emerald-300 px-4 py-1.5 rounded-full text-xs font-semibold flex items-center gap-2 shadow-2xl z-40 animate-fade-in pointer-events-none">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span>{t.linkCopied}</span>
+          </div>
+        )}
 
         {/* Scrollable Article / Patent Body */}
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5 text-slate-200 pb-28">
@@ -406,10 +457,24 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
         <div className="absolute bottom-0 left-0 right-0 h-16 px-4 bg-slate-900/95 backdrop-blur-md border-t border-slate-800 flex items-center justify-between gap-3 z-30">
           <button
             onClick={handleShare}
-            className="min-h-[44px] px-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center gap-2 text-xs font-medium border border-slate-700 active:scale-95 transition-all"
+            aria-label={t.share}
+            className={`min-h-[44px] px-4 rounded-xl flex items-center gap-2 text-xs font-medium border transition-all active:scale-95 shadow-sm shrink-0 ${
+              hasCopiedShare
+                ? 'bg-emerald-500/15 border-emerald-500/40 text-emerald-300 font-semibold'
+                : 'bg-slate-800 hover:bg-slate-700 text-slate-200 border-slate-700'
+            }`}
           >
-            {hasCopiedShare ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-            <span>{hasCopiedShare ? t.linkCopied : t.share}</span>
+            {hasCopiedShare ? (
+              <>
+                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                <span>{t.linkCopied}</span>
+              </>
+            ) : (
+              <>
+                <Share2 className="w-4 h-4 text-sky-400 shrink-0" />
+                <span>{t.share}</span>
+              </>
+            )}
           </button>
 
           {article.googlePatentsUrl ? (

@@ -10,7 +10,7 @@ export interface CountryInfo {
   techHubs: string[];
 }
 
-export type NewsCategory = 'all' | 'ai' | 'cyber' | 'opensource' | 'mobile' | 'cloud' | 'patents' | 'blueprints';
+export type NewsCategory = 'all' | 'ai' | 'cyber' | 'opensource' | 'mobile' | 'cloud' | 'patents' | 'blueprints' | 'offline';
 
 export interface NewsArticle {
   id: string;
@@ -34,6 +34,7 @@ export interface NewsArticle {
   translatedFullContent?: string;
   keyTakeaways?: string[];
   technicalCode?: string;
+  savedOfflineAt?: number;
 
   // Expert Patent & Architectural Blueprint Metadata
   publicationType?: 'patent' | 'blueprint' | 'rfc' | 'arxiv' | 'news';

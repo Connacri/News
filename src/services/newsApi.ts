@@ -1,4 +1,5 @@
 import { CountryCode, NewsArticle, NewsCategory, OsintAlert } from '../types';
+import { getCachedArticles, getLastViewedArticles, saveCachedArticles } from './offlineCache';
 
 // Curated live baseline dataset with rich technical content for each country
 const COUNTRY_TECH_FALLBACKS: NewsArticle[] = [
@@ -1229,18 +1230,29 @@ cd ${repo.name} && ls -la`,
 }
 
 export async function getAggregatedNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
-  const [hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
-    fetchLiveHackerNews(country === 'fr' ? 'france' : country === 'de' ? 'germany' : 'tech'),
-    fetchLiveDevToArticles(),
-    fetchLiveGitHubRepos()
-  ]);
+  const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
-  const liveList: NewsArticle[] = [];
-  if (hnArticles.status === 'fulfilled') liveList.push(...hnArticles.value);
-  if (devtoArticles.status === 'fulfilled') liveList.push(...devtoArticles.value);
-  if (ghArticles.status === 'fulfilled') liveList.push(...ghArticles.value);
+  let liveList: NewsArticle[] = [];
+  if (!isOffline) {
+    try {
+      const [hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
+        fetchLiveHackerNews(country === 'fr' ? 'france' : country === 'de' ? 'germany' : 'tech'),
+        fetchLiveDevToArticles(),
+        fetchLiveGitHubRepos()
+      ]);
 
-  const combined = [...COUNTRY_TECH_FALLBACKS, ...liveList];
+      if (hnArticles.status === 'fulfilled') liveList.push(...hnArticles.value);
+      if (devtoArticles.status === 'fulfilled') liveList.push(...devtoArticles.value);
+      if (ghArticles.status === 'fulfilled') liveList.push(...ghArticles.value);
+    } catch (e) {
+      console.warn('Network fetch error, fallback to cache:', e);
+    }
+  }
+
+  // Combine recently viewed articles, live articles, cached articles, and curated technical fallbacks
+  const cached = getCachedArticles();
+  const lastViewed = getLastViewedArticles();
+  const combined = [...lastViewed, ...liveList, ...cached, ...COUNTRY_TECH_FALLBACKS];
 
   const map = new Map<string, NewsArticle>();
   for (const item of combined) {
@@ -1250,6 +1262,11 @@ export async function getAggregatedNews(country: CountryCode = 'all', category: 
   }
 
   let results = Array.from(map.values());
+
+  // Cache deduplicated results locally so content is available offline
+  if (results.length > 0) {
+    saveCachedArticles(results);
+  }
 
   if (country !== 'all') {
     results = results.filter(a => a.country === country || a.country === 'all');
