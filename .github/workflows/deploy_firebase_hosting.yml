@@ -1,4 +1,4 @@
-name: Deploy to Firebase Hosting
+name: Deploy to Firebase Hosting (web)
 
 on:
   push:
@@ -8,28 +8,32 @@ on:
 
 jobs:
   build_and_deploy:
-    name: Build & Deploy to Firebase Hosting
+    name: Build & Deploy to Firebase Hosting (web)
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .
     steps:
-      - name: 📥 Checkout repository
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🟢 Setup Node.js 20
+      - name: Setup Node.js 20
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
 
-      - name: 📦 Install dependencies
-        run: npm ci || npm install
+      - name: Install dependencies
+        run: npm ci
 
-      - name: 🔨 Build Vite web application
+      - name: Build Vite web application
         run: npm run build
 
-      - name: 🚀 Deploy to Firebase Hosting
+      - name: Deploy to Firebase Hosting (web)
         uses: FirebaseExtended/action-hosting-deploy@v0
         with:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
-          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
-          projectId: 'basic-epsilon-lsmzh'
+          firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT_DEVICE_STREAMING }}'
+          projectId: 'device-streaming-ccab91bb'
           channelId: live
+          target: web
