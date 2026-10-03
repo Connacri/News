@@ -149,6 +149,32 @@ export const NewsCard: React.FC<NewsCardProps> = ({
               </span>
             </>
           )}
+          {article.patentNumber && (
+            <>
+              <span aria-hidden="true" className="text-slate-600">·</span>
+              <span className="text-amber-400 font-mono font-semibold flex items-center gap-1 bg-amber-500/10 px-1.5 py-0.5 rounded border border-amber-500/30">
+                <span>📜</span>
+                <span>{article.patentNumber}</span>
+              </span>
+            </>
+          )}
+          {article.publicationType === 'blueprint' && (
+            <>
+              <span aria-hidden="true" className="text-slate-600">·</span>
+              <span className="text-emerald-400 font-mono font-semibold flex items-center gap-1 bg-emerald-500/10 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                <span>📐</span>
+                <span>Blueprint</span>
+              </span>
+            </>
+          )}
+          {article.assignee && (
+            <>
+              <span aria-hidden="true" className="text-slate-600">·</span>
+              <span className="text-slate-300 font-medium truncate max-w-[140px]">
+                {article.assignee}
+              </span>
+            </>
+          )}
         </div>
 
         {/* Primary Title with text balance */}
@@ -225,13 +251,13 @@ export const NewsCard: React.FC<NewsCardProps> = ({
             <Bookmark className={`w-4 h-4 ${isBookmarked ? 'fill-sky-400' : ''}`} />
           </button>
 
-          {/* External Link */}
+          {/* External Link / Google Patents */}
           <a
-            href={article.url}
+            href={article.googlePatentsUrl || article.url}
             target="_blank"
             rel="noopener noreferrer"
-            title={t.openInBrowser}
-            className="min-w-[40px] min-h-[40px] rounded-lg border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800 flex items-center justify-center transition-colors"
+            title={article.googlePatentsUrl ? t.openInGooglePatents : t.openInBrowser}
+            className="min-w-[40px] min-h-[40px] rounded-lg border border-slate-800 text-slate-400 hover:text-white hover:bg-slate-800 flex items-center justify-center transition-colors"
           >
             <ArrowUpRight className="w-4 h-4" />
           </a>

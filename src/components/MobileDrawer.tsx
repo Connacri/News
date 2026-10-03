@@ -10,10 +10,15 @@ import {
   Globe2, 
   Radio, 
   Check, 
-  ChevronRight,
-  Flame,
-  ExternalLink,
-  Database
+  ChevronRight, 
+  Flame, 
+  ExternalLink, 
+  Database,
+  LogIn,
+  LogOut,
+  User,
+  CloudCheck,
+  Scroll
 } from 'lucide-react';
 import { CountryCode, Language } from '../types';
 import { COUNTRIES } from '../services/countries';
@@ -30,6 +35,9 @@ interface MobileDrawerProps {
   onSelectNavTab: (tab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis') => void;
   onOpenFcmSimulator: () => void;
   bookmarksCount: number;
+  currentUser?: { email?: string | null; displayName?: string | null; photoURL?: string | null } | null;
+  onLogin?: () => void;
+  onLogout?: () => void;
 }
 
 export const MobileDrawer: React.FC<MobileDrawerProps> = ({
@@ -43,6 +51,9 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
   onSelectNavTab,
   onOpenFcmSimulator,
   bookmarksCount,
+  currentUser,
+  onLogin,
+  onLogout,
 }) => {
   const t = translations[currentLang];
 
@@ -66,6 +77,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             </div>
             <button
               onClick={onClose}
+              aria-label={t.close}
               className="w-9 h-9 rounded-full flex items-center justify-center text-slate-400 hover:text-white hover:bg-slate-800 transition-colors"
             >
               <X className="w-5 h-5" />
@@ -73,30 +85,78 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           </div>
 
           <h2 className="text-lg font-bold text-white tracking-tight">
-            FlutterNews OSINT
+            FlutterNews OSINT & Patents
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
-            Flutter 3.24 · Firebase FCM · CI/CD
+            Flutter 3.24 · Firebase Auth/Firestore · Google Patents
           </p>
           <div className="flex items-center gap-2 mt-2.5">
             <span className="inline-flex items-center gap-1 text-[11px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-900/50 px-2 py-0.5 rounded-full">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping" />
-              FCM & APIs Connectées
+              {t.fcmConnected}
             </span>
+          </div>
+
+          {/* Firebase Authentication Box */}
+          <div className="mt-3 pt-3 border-t border-slate-800/80">
+            {currentUser ? (
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 truncate">
+                  {currentUser.photoURL ? (
+                    <img 
+                      src={currentUser.photoURL} 
+                      alt="User avatar" 
+                      className="w-7 h-7 rounded-full border border-sky-400"
+                    />
+                  ) : (
+                    <div className="w-7 h-7 rounded-full bg-sky-500/20 text-sky-300 flex items-center justify-center text-xs font-bold">
+                      {currentUser.email ? currentUser.email[0].toUpperCase() : 'U'}
+                    </div>
+                  )}
+                  <div className="truncate text-left">
+                    <div className="text-xs font-semibold text-white truncate">
+                      {currentUser.displayName || currentUser.email?.split('@')[0]}
+                    </div>
+                    <div className="text-[10px] text-emerald-400 flex items-center gap-1 font-mono">
+                      <span>✓ {t.cloudSyncActive}</span>
+                    </div>
+                  </div>
+                </div>
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    title={t.signOut}
+                    className="p-1.5 rounded-lg text-slate-400 hover:text-rose-400 hover:bg-rose-500/10 transition-colors"
+                  >
+                    <LogOut className="w-4 h-4" />
+                  </button>
+                )}
+              </div>
+            ) : (
+              onLogin && (
+                <button
+                  onClick={onLogin}
+                  className="w-full py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 border border-slate-700/80 text-xs font-semibold text-slate-200 flex items-center justify-center gap-2 transition-all active:scale-98 shadow-sm"
+                >
+                  <LogIn className="w-4 h-4 text-sky-400" />
+                  <span>{t.signInWithGoogle}</span>
+                </button>
+              )
+            )}
           </div>
         </div>
 
         {/* Drawer Navigation List */}
         <div className="flex-1 overflow-y-auto p-3 space-y-1">
           <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-1.5">
-            Navigation Principale
+            {t.mainNavigation}
           </div>
 
           {[
             { id: 'news' as const, label: t.dailyTechNews, icon: Newspaper },
             { id: 'osint' as const, label: t.osintRadar, icon: ShieldAlert },
             { id: 'github' as const, label: t.githubTrending, icon: Code2 },
-            { id: 'apis' as const, label: 'APIs & Ressources Gratuites', icon: Database },
+            { id: 'apis' as const, label: t.navApis, icon: Database },
             { id: 'code' as const, label: t.flutterCodeExport, icon: FolderGit2 },
             { id: 'bookmarks' as const, label: `${t.myBookmarks} (${bookmarksCount})`, icon: Bookmark },
           ].map((item) => {
@@ -126,7 +186,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
           <div className="pt-4 pb-1">
             <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-1.5">
-              Services & Outils
+              {t.toolsAndServices}
             </div>
           </div>
 
@@ -140,7 +200,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           >
             <div className="flex items-center gap-3">
               <Flame className="w-4 h-4 text-amber-400" />
-              <span>Simulateur FCM & Push</span>
+              <span>{t.fcmSimulatorNav}</span>
             </div>
             <span className="text-[10px] bg-amber-500/20 px-2 py-0.5 rounded-full font-mono">
               Test
@@ -150,7 +210,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           {/* Country Selection Section */}
           <div className="pt-4 pb-1">
             <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider px-3 py-1.5">
-              Pays sélectionné
+              {t.selectedCountryLabel}
             </div>
             <div className="space-y-1 mt-1">
               {COUNTRIES.map((c) => {
@@ -183,7 +243,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         {/* Drawer Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/80 text-[11px] text-slate-500 flex items-center justify-between">
           <span>Version 1.0.0+1 (APK/AAB/Web)</span>
-          <span className="font-mono text-slate-400">Open-Source</span>
+          <span className="font-mono text-slate-400">Firebase & Patents</span>
         </div>
       </div>
     </div>

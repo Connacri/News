@@ -3,6 +3,7 @@ import { ShieldAlert, AlertTriangle, ExternalLink, Filter, ShieldCheck, Terminal
 import { Language, OsintAlert } from '../types';
 import { translations } from '../services/translations';
 import { OSINT_ALERTS_DATABASE } from '../services/newsApi';
+import { PRETRANSLATED_OSINT_ALERTS_AR } from '../services/translator';
 
 interface OsintRadarProps {
   currentLang: Language;
@@ -18,6 +19,23 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
     return alert.severity === severityFilter;
   });
 
+  const getAlertData = (alert: OsintAlert): OsintAlert => {
+    if (currentLang === 'ar' && PRETRANSLATED_OSINT_ALERTS_AR[alert.id]) {
+      const ar = PRETRANSLATED_OSINT_ALERTS_AR[alert.id];
+      return {
+        ...alert,
+        title: ar.title || alert.title,
+        summary: ar.summary || alert.summary,
+        affectedSystem: ar.affectedSystem || alert.affectedSystem,
+        mitigation: ar.mitigation || alert.mitigation,
+        countryScope: ar.countryScope || alert.countryScope,
+      };
+    }
+    return alert;
+  };
+
+  const activeAlert = selectedAlert ? getAlertData(selectedAlert) : null;
+
   return (
     <div className="space-y-6">
       {/* Banner Visual Asset with Zero-Broken-Image Fallback */}
@@ -31,13 +49,13 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
         <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/60 to-transparent p-6 flex flex-col justify-end">
           <div className="flex items-center gap-2 text-xs text-sky-400 font-mono mb-1">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-            <span>RADAR OSINT ACTIF · VEILLE ZERO-DAY SOUVERAINE</span>
+            <span>{t.osintBannerBadge}</span>
           </div>
           <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
             {t.osintRadar}
           </h2>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1">
-            Renseignement sur les menaces, bulletin de vulnérabilités CVE, et conformité de sécurité pour les applications mobiles et web.
+          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl mt-1 leading-relaxed">
+            {t.osintSubtitle}
           </p>
         </div>
       </div>
@@ -49,41 +67,41 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
             onClick={() => setSeverityFilter('all')}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               severityFilter === 'all'
-                ? 'bg-slate-800 text-white'
+                ? 'bg-slate-800 text-white font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Toutes ({OSINT_ALERTS_DATABASE.length})
+            {t.categoryAll} ({OSINT_ALERTS_DATABASE.length})
           </button>
           <button
             onClick={() => setSeverityFilter('critical')}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               severityFilter === 'critical'
-                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40 font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Critique
+            {t.critical}
           </button>
           <button
             onClick={() => setSeverityFilter('high')}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               severityFilter === 'high'
-                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
+                ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Élevée
+            {t.high}
           </button>
           <button
             onClick={() => setSeverityFilter('medium')}
             className={`px-3 py-1.5 rounded-md font-medium transition-colors ${
               severityFilter === 'medium'
-                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40'
+                ? 'bg-sky-500/20 text-sky-300 border border-sky-500/40 font-bold'
                 : 'text-slate-400 hover:text-slate-200'
             }`}
           >
-            Moyenne
+            {t.medium}
           </button>
         </div>
 
@@ -96,12 +114,13 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left column: Alerts List */}
         <div className="lg:col-span-5 space-y-3">
-          {filteredAlerts.map((alert) => {
+          {filteredAlerts.map((rawAlert) => {
+            const alert = getAlertData(rawAlert);
             const isSelected = selectedAlert?.id === alert.id;
             return (
               <div
                 key={alert.id}
-                onClick={() => setSelectedAlert(alert)}
+                onClick={() => setSelectedAlert(rawAlert)}
                 className={`p-4 rounded-xl border transition-all cursor-pointer ${
                   isSelected
                     ? 'bg-slate-900 border-sky-500/60 shadow-lg shadow-sky-950/40'
@@ -119,10 +138,13 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
                         : 'text-sky-400'
                     }`}
                   >
-                    {alert.severity}
+                    {alert.severity === 'critical' ? t.critical : alert.severity === 'high' ? t.high : t.medium}
                   </span>
                 </div>
-                <h4 className="text-sm font-semibold text-slate-200 mb-1 leading-snug">
+                <h4 
+                  dir={currentLang === 'ar' ? 'rtl' : 'ltr'} 
+                  className="text-sm font-semibold text-slate-200 mb-1 leading-snug"
+                >
                   {alert.title}
                 </h4>
                 <div className="text-xs text-slate-400 flex items-center justify-between mt-2">
@@ -136,21 +158,24 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
 
         {/* Right column: Inspector & Mitigation Terminal */}
         <div className="lg:col-span-7">
-          {selectedAlert ? (
+          {activeAlert ? (
             <div className="bg-slate-900/90 border border-slate-800 rounded-xl p-6 space-y-5">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <div className="flex items-center gap-2 text-xs font-mono text-slate-400 mb-1">
-                    <span className="text-sky-400 font-semibold">{selectedAlert.cveId}</span>
+                    <span className="text-sky-400 font-semibold">{activeAlert.cveId}</span>
                     <span>·</span>
-                    <span>Périmètre : {selectedAlert.countryScope}</span>
+                    <span>{t.osintScope} : {activeAlert.countryScope}</span>
                   </div>
-                  <h3 className="text-lg font-bold text-white leading-snug">
-                    {selectedAlert.title}
+                  <h3 
+                    dir={currentLang === 'ar' ? 'rtl' : 'ltr'} 
+                    className="text-lg font-bold text-white leading-snug"
+                  >
+                    {activeAlert.title}
                   </h3>
                 </div>
                 <a
-                  href={selectedAlert.sourceUrl}
+                  href={activeAlert.sourceUrl}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs flex items-center gap-1.5 shrink-0"
@@ -162,10 +187,13 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
 
               <div>
                 <h5 className="text-xs uppercase font-semibold text-slate-400 tracking-wider mb-1.5">
-                  Résumé de la vulnérabilité
+                  {t.osintSummaryTitle}
                 </h5>
-                <p className="text-sm text-slate-300 leading-relaxed bg-slate-950/60 p-3.5 rounded-lg border border-slate-800/80">
-                  {selectedAlert.summary}
+                <p 
+                  dir={currentLang === 'ar' ? 'rtl' : 'ltr'} 
+                  className="text-sm text-slate-300 leading-relaxed bg-slate-950/60 p-3.5 rounded-lg border border-slate-800/80"
+                >
+                  {activeAlert.summary}
                 </p>
               </div>
 
@@ -173,12 +201,15 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
                 <h5 className="text-xs uppercase font-semibold text-slate-400 tracking-wider mb-1.5">
                   {t.affectedSystems}
                 </h5>
-                <p className="text-xs text-rose-300 font-mono bg-rose-950/20 border border-rose-900/30 p-2.5 rounded-lg">
-                  {selectedAlert.affectedSystem}
+                <p 
+                  dir={currentLang === 'ar' ? 'rtl' : 'ltr'} 
+                  className="text-xs text-rose-300 font-mono bg-rose-950/20 border border-rose-900/30 p-2.5 rounded-lg"
+                >
+                  {activeAlert.affectedSystem}
                 </p>
               </div>
 
-              {selectedAlert.mitigation && (
+              {activeAlert.mitigation && (
                 <div>
                   <div className="flex items-center gap-1.5 text-xs uppercase font-semibold text-emerald-400 tracking-wider mb-1.5">
                     <ShieldCheck className="w-4 h-4 text-emerald-400" />
@@ -186,16 +217,16 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
                   </div>
                   <div className="bg-slate-950 border border-slate-800 p-3.5 rounded-lg font-mono text-xs text-emerald-300 space-y-1">
                     <div className="text-slate-400 text-[11px] mb-1">
-                      Action recommandée dans votre workflow Flutter / Serveur :
+                      {t.osintWorkflowNote}
                     </div>
-                    <code>{selectedAlert.mitigation}</code>
+                    <code>{activeAlert.mitigation}</code>
                   </div>
                 </div>
               )}
             </div>
           ) : (
             <div className="h-64 flex items-center justify-center border border-dashed border-slate-800 rounded-xl text-slate-500 text-xs">
-              Sélectionnez une alerte pour examiner les détails techniques
+              {t.osintSelectPrompt}
             </div>
           )}
         </div>

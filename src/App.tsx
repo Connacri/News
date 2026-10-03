@@ -17,15 +17,32 @@ import { FlutterExportHub } from './components/FlutterExportHub';
 import { FreeApisHub } from './components/FreeApisHub';
 import { FcmSimulatorModal } from './components/FcmSimulatorModal';
 import { ArticleDetailModal } from './components/ArticleDetailModal';
-import { CountryCode, FcmPayload, Language, NewsArticle, NewsCategory } from './types';
+import { CountryCode, FcmPayload, FlutterPlatform, Language, NewsArticle, NewsCategory } from './types';
 import { getAggregatedNews } from './services/newsApi';
 import { translations } from './services/translations';
 import { COUNTRIES } from './services/countries';
 import { getSavedLanguage, setSavedLanguage } from './services/translator';
+import { 
+  auth, 
+  loginWithGoogle, 
+  logoutUser, 
+  saveBookmarkToFirestore, 
+  removeBookmarkFromFirestore 
+} from './services/firebase';
+import { onAuthStateChanged, User } from 'firebase/auth';
 import { Bell, RefreshCw, X, Check, Radio, Sparkles } from 'lucide-react';
 
 export default function App() {
   const [currentLang, setCurrentLang] = useState<Language>(() => getSavedLanguage());
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [previewPlatform, setPreviewPlatform] = useState<FlutterPlatform>('android');
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setCurrentUser(user);
+    });
+    return () => unsubscribe();
+  }, []);
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>(() => {
     try {
       const saved = localStorage.getItem('flutternews_country');
@@ -144,6 +161,16 @@ export default function App() {
       try {
         localStorage.setItem('flutternews_bookmarks', JSON.stringify(updated));
       } catch (_) {}
+
+      // Realtime Firebase Firestore synchronization
+      if (currentUser?.uid) {
+        if (exists) {
+          removeBookmarkFromFirestore(currentUser.uid, article.id).catch(() => {});
+        } else {
+          saveBookmarkToFirestore(currentUser.uid, article).catch(() => {});
+        }
+      }
+
       return updated;
     });
   };
@@ -175,9 +202,82 @@ export default function App() {
       dir={currentLang === 'ar' ? 'rtl' : 'ltr'}
       className="min-h-screen bg-slate-950 text-slate-100 flex justify-center antialiased selection:bg-sky-500/30 selection:text-sky-200"
     >
-      {/* Centered Mobile Container Frame - Ensures Mobile UI Integrity on Any Screen */}
-      <div className="w-full max-w-lg min-h-screen bg-slate-950 border-x border-slate-800/80 shadow-2xl flex flex-col relative pb-20">
+      {/* Centered Mobile Container Frame - Ensures Mobile & Desktop Cross-Platform Integrity */}
+      <div className={`w-full ${previewPlatform === 'desktop' ? 'max-w-4xl' : previewPlatform === 'ios' ? 'max-w-[420px]' : 'max-w-lg'} min-h-screen bg-slate-950 border-x border-slate-800/80 shadow-2xl flex flex-col relative pb-20 transition-all duration-300`}>
         
+        {/* Flutter Cross-Platform Runtime Switcher Bar */}
+        <div className="bg-slate-900 border-b border-slate-800/80 px-3 py-1.5 flex items-center justify-between text-[11px] text-slate-300 shrink-0">
+          <div className="flex items-center gap-1.5 font-mono text-[10px]">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="text-white font-semibold">Flutter 3.24 Multiplateforme</span>
+          </div>
+
+          <div className="flex items-center gap-1 bg-slate-950 p-0.5 rounded-lg border border-slate-800">
+            <button
+              onClick={() => setPreviewPlatform('android')}
+              className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors flex items-center gap-1 ${
+                previewPlatform === 'android'
+                  ? 'bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>🤖</span>
+              <span>Android M3</span>
+            </button>
+            <button
+              onClick={() => setPreviewPlatform('ios')}
+              className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors flex items-center gap-1 ${
+                previewPlatform === 'ios'
+                  ? 'bg-sky-500/20 text-sky-300 font-bold border border-sky-500/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>🍎</span>
+              <span>iOS</span>
+            </button>
+            <button
+              onClick={() => setPreviewPlatform('desktop')}
+              className={`px-2 py-0.5 rounded text-[10px] font-medium transition-colors flex items-center gap-1 ${
+                previewPlatform === 'desktop'
+                  ? 'bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40'
+                  : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <span>🌐</span>
+              <span>Web / Desktop</span>
+            </button>
+          </div>
+        </div>
+
+        {/* Dynamic Island for iOS preview */}
+        {previewPlatform === 'ios' && (
+          <div className="pt-2 px-6 pb-1 bg-slate-950 text-[10px] text-slate-300 font-medium flex items-center justify-between z-30 select-none border-b border-slate-900">
+            <span className="font-semibold">09:41</span>
+            <div className="w-24 h-3.5 bg-black rounded-full flex items-center justify-center border border-slate-800 shadow-inner">
+              <div className="w-2 h-2 rounded-full bg-slate-900 mr-2" />
+              <div className="w-1.5 h-1.5 rounded-full bg-sky-950" />
+            </div>
+            <div className="flex items-center gap-1.5 font-mono text-[10px]">
+              <span>5G</span>
+              <span>100%</span>
+            </div>
+          </div>
+        )}
+
+        {/* Web / Desktop WasmGC & CanvasKit Banner */}
+        {previewPlatform === 'desktop' && (
+          <div className="bg-sky-950/40 border-b border-sky-500/20 px-3 py-1 flex items-center justify-between text-[11px] text-sky-300">
+            <div className="flex items-center gap-1.5">
+              <span>⚡ WebAssembly (WasmGC) & CanvasKit Activé</span>
+              <span className="text-slate-500">·</span>
+              <span className="text-slate-400">Navigation Rail & Affichage Large</span>
+            </div>
+            <span className="text-[10px] bg-sky-500/20 px-1.5 py-0.2 rounded font-mono text-sky-200">
+              Multi-Pane Mode
+            </span>
+          </div>
+        )}
+
         {/* 1. Mobile Top App Bar (Always Respected) */}
         <MobileTopBar
           currentLang={currentLang}
@@ -198,12 +298,14 @@ export default function App() {
         {activeNavTab === 'news' && (
           <div className="sticky top-14 z-30 bg-slate-950/95 backdrop-blur border-b border-slate-800/80 py-2.5 px-3 overflow-x-auto no-scrollbar flex items-center gap-1.5 shrink-0">
             {[
-              { id: 'all', label: 'Toutes' },
-              { id: 'ai', label: '🤖 IA' },
-              { id: 'cyber', label: '🛡️ Cyber/OSINT' },
-              { id: 'opensource', label: '⭐ OpenSource' },
-              { id: 'mobile', label: '📱 Flutter' },
-              { id: 'cloud', label: '☁️ Cloud' },
+              { id: 'all', label: t.categoryAll },
+              { id: 'patents', label: t.categoryPatents },
+              { id: 'blueprints', label: t.categoryBlueprints },
+              { id: 'ai', label: t.categoryAi },
+              { id: 'cyber', label: t.categoryCyber },
+              { id: 'opensource', label: t.categoryOpenSource },
+              { id: 'mobile', label: t.categoryMobile },
+              { id: 'cloud', label: t.categoryCloud },
             ].map((cat) => {
               const isSelected = selectedCategory === cat.id;
               return (
@@ -264,7 +366,7 @@ export default function App() {
                   <span>{activeCountry.flag}</span>
                   <span className="text-slate-200">{activeCountry.name}</span>
                   <span>·</span>
-                  <span>{displayedArticles.length} actualités</span>
+                  <span>{displayedArticles.length} {t.newsCountSuffix}</span>
                 </div>
                 <button
                   onClick={loadNews}
@@ -296,7 +398,7 @@ export default function App() {
                   <p className="text-xs">{t.noArticlesFound}</p>
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className={previewPlatform === 'desktop' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-3'}>
                   {displayedArticles.map((article) => (
                     <NewsCard
                       key={article.id}
@@ -349,11 +451,11 @@ export default function App() {
                 </span>
               </div>
               {bookmarks.length === 0 ? (
-                <div className="text-center py-16 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-400 text-xs">
-                  Aucun article sauvegardé pour le moment. Cliquez sur l'icône marque-page pour enregistrer un article.
+                <div className="text-center py-16 bg-slate-900/40 rounded-2xl border border-dashed border-slate-800 text-slate-400 text-xs px-4">
+                  {t.noBookmarksYet}
                 </div>
               ) : (
-                <div className="space-y-3">
+                <div className={previewPlatform === 'desktop' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-3'}>
                   {bookmarks.map((article) => (
                     <NewsCard
                       key={article.id}
@@ -378,6 +480,13 @@ export default function App() {
           currentLang={currentLang}
         />
 
+        {/* iOS Home Indicator Bar */}
+        {previewPlatform === 'ios' && (
+          <div className="fixed bottom-1 left-0 right-0 flex justify-center pointer-events-none z-50">
+            <div className="w-28 h-1 bg-slate-500/80 rounded-full" />
+          </div>
+        )}
+
         {/* 5. Mobile Drawer Menu (Flutter Material 3 Drawer) */}
         <MobileDrawer
           isOpen={isDrawerOpen}
@@ -390,6 +499,9 @@ export default function App() {
           onSelectNavTab={setActiveNavTab}
           onOpenFcmSimulator={() => setIsFcmModalOpen(true)}
           bookmarksCount={bookmarks.length}
+          currentUser={currentUser}
+          onLogin={loginWithGoogle}
+          onLogout={logoutUser}
         />
 
         {/* 6. Mobile Bottom Sheet for Country Filter */}
@@ -434,7 +546,7 @@ export default function App() {
         <MobileBottomSheet
           isOpen={isLanguageSheetOpen}
           onClose={() => setIsLanguageSheetOpen(false)}
-          title="Sélectionner la Langue (Gratuit)"
+          title={t.selectLanguageTitle}
         >
           <div className="space-y-1">
             {[

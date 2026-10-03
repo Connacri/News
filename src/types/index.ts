@@ -10,7 +10,7 @@ export interface CountryInfo {
   techHubs: string[];
 }
 
-export type NewsCategory = 'all' | 'ai' | 'cyber' | 'opensource' | 'mobile' | 'cloud';
+export type NewsCategory = 'all' | 'ai' | 'cyber' | 'opensource' | 'mobile' | 'cloud' | 'patents' | 'blueprints';
 
 export interface NewsArticle {
   id: string;
@@ -20,7 +20,7 @@ export interface NewsArticle {
   translatedDescription?: string;
   url: string;
   source: string;
-  sourceType: 'hackernews' | 'devto' | 'github' | 'osint' | 'reddit' | 'opensource' | 'ai' | 'cloud';
+  sourceType: 'hackernews' | 'devto' | 'github' | 'osint' | 'reddit' | 'opensource' | 'ai' | 'cloud' | 'patents' | 'blueprint' | 'arxiv';
   publishedAt: string;
   author?: string;
   country: CountryCode;
@@ -34,6 +34,17 @@ export interface NewsArticle {
   translatedFullContent?: string;
   keyTakeaways?: string[];
   technicalCode?: string;
+
+  // Expert Patent & Architectural Blueprint Metadata
+  publicationType?: 'patent' | 'blueprint' | 'rfc' | 'arxiv' | 'news';
+  patentNumber?: string;
+  googlePatentsUrl?: string;
+  assignee?: string;
+  inventors?: string[];
+  filingDate?: string;
+  grantDate?: string;
+  blueprintArchitecture?: string;
+  claimsSummary?: string[];
 }
 
 export interface OsintAlert {
@@ -65,6 +76,8 @@ export interface FlutterCodeFile {
   language: string;
   content: string;
 }
+
+export type FlutterPlatform = 'android' | 'ios' | 'web' | 'desktop';
 
 export interface FreeApiResource {
   id: string;

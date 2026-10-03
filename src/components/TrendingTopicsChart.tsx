@@ -11,6 +11,7 @@ import {
 } from 'recharts';
 import { TrendingUp, ChevronDown, ChevronUp, Tag, Sparkles } from 'lucide-react';
 import { NewsArticle, Language } from '../types';
+import { translations } from '../services/translations';
 
 interface TrendingTopicsChartProps {
   articles: NewsArticle[];
@@ -29,6 +30,7 @@ export const TrendingTopicsChart: React.FC<TrendingTopicsChartProps> = ({
   articles,
   currentLang,
 }) => {
+  const t = translations[currentLang];
   const [isExpanded, setIsExpanded] = useState(true);
   const [hiddenTopics, setHiddenTopics] = useState<Record<string, boolean>>({});
 
@@ -64,12 +66,12 @@ export const TrendingTopicsChart: React.FC<TrendingTopicsChartProps> = ({
       d.setDate(d.getDate() - i);
       const dateStr = d.toISOString().split('T')[0];
 
-      // Formatted label (e.g., "26 Sep", "02 Oct", or "Aujourd'hui")
+      // Formatted label (e.g., "26 Sep", "02 Oct", or "Aujourd'hui" / "اليوم")
       const dayLabel = i === 0
-        ? (currentLang === 'fr' ? "Aujourd'hui" : 'Today')
+        ? t.today
         : i === 1
-        ? (currentLang === 'fr' ? 'Hier' : 'Yesterday')
-        : d.toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {
+        ? t.yesterday
+        : d.toLocaleDateString(currentLang === 'ar' ? 'ar-EG' : currentLang === 'fr' ? 'fr-FR' : 'en-US', {
             day: 'numeric',
             month: 'short',
           });
@@ -142,15 +144,13 @@ export const TrendingTopicsChart: React.FC<TrendingTopicsChartProps> = ({
           </div>
           <div>
             <div className="font-bold text-white tracking-tight flex items-center gap-1.5">
-              <span>{currentLang === 'fr' ? 'Tendances des Sujets (7 jours)' : 'Trending Topics Volume (7 Days)'}</span>
+              <span>{t.trendingTopicsTitle}</span>
               <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-full bg-sky-500/20 text-sky-300 border border-sky-500/30">
                 Recharts
               </span>
             </div>
             <p className="text-[11px] text-slate-400">
-              {currentLang === 'fr'
-                ? 'Volume quotidien basé sur les tags des articles analysés'
-                : 'Daily volume based on analyzed article tags'}
+              {t.trendingTopicsSubtitle}
             </p>
           </div>
         </div>

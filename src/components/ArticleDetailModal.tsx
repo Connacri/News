@@ -14,7 +14,11 @@ import {
   CheckCircle2, 
   Sparkles,
   BookOpen,
-  Clock
+  Clock,
+  Scroll,
+  Layers,
+  FileText,
+  UserCheck
 } from 'lucide-react';
 import { Language, NewsArticle } from '../types';
 import { translations } from '../services/translations';
@@ -42,6 +46,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
   const [showTranslated, setShowTranslated] = useState(() => getTranslationPreference());
   const [hasCopiedShare, setHasCopiedShare] = useState(false);
   const [hasCopiedCode, setHasCopiedCode] = useState(false);
+  const [hasCopiedBlueprint, setHasCopiedBlueprint] = useState(false);
   const [isSpeaking, setIsSpeaking] = useState(false);
   const [, setTransVersion] = useState(0);
 
@@ -71,6 +76,10 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
     ? (persistentTrans.content || article.translatedFullContent || article.fullContent || article.description) 
     : (article.fullContent || article.description);
 
+  const displayedTakeaways = (currentLang === 'ar' || showTranslated) && persistentTrans.keyTakeaways
+    ? persistentTrans.keyTakeaways
+    : (article.keyTakeaways || []);
+
   const readingTimeText = useMemo(() => {
     const contentToAnalyze = content || `${title} ${description}`;
     const wordCount = contentToAnalyze.trim().split(/\s+/).filter(Boolean).length;
@@ -87,12 +96,12 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
   const handleShare = () => {
     if (navigator.share) {
       navigator.share({
-        title: article.title,
-        text: article.description,
-        url: article.url
+        title,
+        text: description,
+        url: article.googlePatentsUrl || article.url
       }).catch(() => {});
     } else {
-      navigator.clipboard.writeText(article.url);
+      navigator.clipboard.writeText(article.googlePatentsUrl || article.url);
       setHasCopiedShare(true);
       setTimeout(() => setHasCopiedShare(false), 2000);
     }
@@ -105,12 +114,18 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
     setTimeout(() => setHasCopiedCode(false), 2000);
   };
 
+  const handleCopyBlueprint = () => {
+    if (!article.blueprintArchitecture) return;
+    navigator.clipboard.writeText(article.blueprintArchitecture);
+    setHasCopiedBlueprint(true);
+    setTimeout(() => setHasCopiedBlueprint(false), 2000);
+  };
+
   const handleSpeech = () => {
     if (isSpeaking) {
       stopSpeaking();
       setIsSpeaking(false);
     } else {
-      // Guarantee the spoken text and voice match currentLang
       const textToRead = `${title}. ${content}`;
       const success = speakText(
         textToRead,
@@ -123,22 +138,20 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
     }
   };
 
-  // Split content paragraphs
   const paragraphs = content.split('\n\n').filter(p => p.trim().length > 0);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md animate-fade-in">
-      {/* Full-Screen Mobile Reader View on Mobile, max-w-lg container on Desktop */}
       <div className="w-full max-w-lg h-full max-h-screen bg-slate-950 flex flex-col shadow-2xl relative overflow-hidden border-x border-slate-800">
         
-        {/* Mobile Top App Bar (56px) with Back Button */}
+        {/* Top App Bar (56px) */}
         <div className="h-14 px-3 bg-slate-900/95 backdrop-blur-md border-b border-slate-800 flex items-center justify-between shrink-0 z-20">
           <button
             onClick={() => {
               if (isSpeaking) window.speechSynthesis.cancel();
               onClose();
             }}
-            aria-label="Retour"
+            aria-label={t.back}
             className="min-w-[44px] min-h-[44px] -ml-2 rounded-full flex items-center justify-center text-slate-300 hover:text-white active:bg-slate-800 transition-colors"
           >
             <ArrowLeft className="w-5 h-5" />
@@ -151,17 +164,15 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
 
           <div className="flex items-center gap-1">
             {/* Instant translation toggle */}
-            {article.translatedTitle && (
-              <button
-                onClick={handleToggleTranslate}
-                title={showTranslated ? t.showOriginal : t.translateHeadline}
-                className={`min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center transition-colors ${
-                  showTranslated ? 'text-sky-400 bg-sky-500/10' : 'text-slate-400 hover:text-white'
-                }`}
-              >
-                <Languages className="w-4 h-4" />
-              </button>
-            )}
+            <button
+              onClick={handleToggleTranslate}
+              title={showTranslated ? t.showOriginal : t.translateHeadline}
+              className={`min-w-[40px] min-h-[40px] rounded-full flex items-center justify-center transition-colors ${
+                showTranslated ? 'text-sky-400 bg-sky-500/10' : 'text-slate-400 hover:text-white'
+              }`}
+            >
+              <Languages className="w-4 h-4" />
+            </button>
 
             {/* Read aloud */}
             <button
@@ -185,7 +196,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
           </div>
         </div>
 
-        {/* Scrollable Article Body */}
+        {/* Scrollable Article / Patent Body */}
         <div className="flex-1 overflow-y-auto px-4 py-5 space-y-5 text-slate-200 pb-28">
           {/* Metadata Row */}
           <div className="flex items-center flex-wrap gap-2 text-xs text-slate-400">
@@ -207,15 +218,9 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
                 <span>{article.author}</span>
               </>
             )}
-            {article.upvotes !== undefined && (
-              <>
-                <span aria-hidden="true">·</span>
-                <span className="font-mono text-slate-300">▲ {article.upvotes}</span>
-              </>
-            )}
           </div>
 
-          {/* Full Article Headline */}
+          {/* Full Headline */}
           <h1 
             dir={currentLang === 'ar' ? 'rtl' : 'ltr'} 
             className={`text-xl sm:text-2xl font-extrabold text-white leading-snug tracking-tight ${
@@ -225,13 +230,71 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             {title}
           </h1>
 
+          {/* 📜 Dedicated Google Patents Card */}
+          {article.patentNumber && (
+            <div className="p-4 rounded-xl bg-amber-950/20 border border-amber-500/40 text-xs text-amber-200 space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2 font-bold text-amber-300">
+                  <Scroll className="w-4 h-4 text-amber-400" />
+                  <span>{t.patentDetails} — {article.patentNumber}</span>
+                </div>
+                {article.googlePatentsUrl && (
+                  <a
+                    href={article.googlePatentsUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 text-[11px] font-semibold transition-colors"
+                  >
+                    <span>Google Patents</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                )}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-[11px] pt-1 border-t border-amber-500/20">
+                {article.assignee && (
+                  <div>
+                    <span className="text-amber-400/80 font-medium">{t.assigneeLabel} : </span>
+                    <span className="text-white font-semibold">{article.assignee}</span>
+                  </div>
+                )}
+                {article.filingDate && (
+                  <div>
+                    <span className="text-amber-400/80 font-medium">{t.filingDateLabel} : </span>
+                    <span className="text-white font-mono">{article.filingDate}</span>
+                  </div>
+                )}
+                {article.inventors && article.inventors.length > 0 && (
+                  <div className="sm:col-span-2">
+                    <span className="text-amber-400/80 font-medium">{t.inventorsLabel} : </span>
+                    <span className="text-slate-300">{article.inventors.join(', ')}</span>
+                  </div>
+                )}
+              </div>
+
+              {article.claimsSummary && article.claimsSummary.length > 0 && (
+                <div className="pt-2 border-t border-amber-500/20">
+                  <div className="font-semibold text-amber-300 mb-1.5">{t.claimsLabel} :</div>
+                  <ul className="space-y-1 text-slate-300 text-[11px]">
+                    {article.claimsSummary.map((claim, idx) => (
+                      <li key={idx} className="flex items-start gap-1.5">
+                        <span className="text-amber-400 font-bold shrink-0">§</span>
+                        <span>{claim}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          )}
+
           {/* CVE Banner if present */}
           {article.cveId && (
             <div className="p-3.5 rounded-xl bg-rose-950/30 border border-rose-900/40 text-xs text-rose-300 flex items-start gap-2.5">
               <ShieldAlert className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
               <div>
-                <div className="font-bold text-rose-200">{article.cveId} · Sévérité {article.osintSeverity?.toUpperCase() || 'CRITIQUE'}</div>
-                <div className="text-[11px] text-rose-300/80 mt-0.5">Alerte de vulnérabilité répertoriée par les observatoires OSINT et CERT.</div>
+                <div className="font-bold text-rose-200">{article.cveId} · {t.severity} {article.osintSeverity?.toUpperCase() || t.critical}</div>
+                <div className="text-[11px] text-rose-300/80 mt-0.5">{t.cveAlertBadge}</div>
               </div>
             </div>
           )}
@@ -246,6 +309,28 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             {description}
           </div>
 
+          {/* 📐 Blueprint Architecture Visual Schema if present */}
+          {article.blueprintArchitecture && (
+            <div className="p-4 rounded-xl bg-slate-900 border border-emerald-500/30 space-y-2">
+              <div className="flex items-center justify-between text-xs text-emerald-400">
+                <span className="font-bold flex items-center gap-1.5">
+                  <Layers className="w-4 h-4 text-emerald-400" />
+                  <span>{t.blueprintLabel}</span>
+                </span>
+                <button
+                  onClick={handleCopyBlueprint}
+                  className="flex items-center gap-1 text-[11px] text-emerald-400 hover:text-emerald-300 font-medium"
+                >
+                  {hasCopiedBlueprint ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
+                  <span>{hasCopiedBlueprint ? t.copiedSuccess : t.copyCode}</span>
+                </button>
+              </div>
+              <pre className="p-3 bg-slate-950 border border-slate-800 rounded-lg font-mono text-[11px] text-emerald-300 overflow-x-auto leading-relaxed select-text">
+                <code>{article.blueprintArchitecture}</code>
+              </pre>
+            </div>
+          )}
+
           {/* Full Article Text Body Paragraphs */}
           <div 
             dir={currentLang === 'ar' ? 'rtl' : 'ltr'} 
@@ -257,7 +342,7 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
               currentLang === 'ar' ? 'justify-end' : 'justify-start'
             }`}>
               <BookOpen className="w-3.5 h-3.5 text-sky-400" />
-              <span>{currentLang === 'ar' ? 'النص الكامل للمقال' : "Contenu Intégral de l'Article"}</span>
+              <span>{t.fullArticleContent}</span>
             </div>
 
             {paragraphs.map((p, idx) => (
@@ -268,14 +353,14 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
           </div>
 
           {/* Key Takeaways Section */}
-          {article.keyTakeaways && article.keyTakeaways.length > 0 && (
+          {displayedTakeaways && displayedTakeaways.length > 0 && (
             <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 space-y-2">
               <div className="text-xs uppercase font-bold tracking-wider text-sky-400 flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-sky-400" />
-                <span>Points Clés & Enjeux Techniques</span>
+                <span>{t.keyTakeaways}</span>
               </div>
               <ul className="space-y-1.5 text-xs text-slate-300">
-                {article.keyTakeaways.map((point, idx) => (
+                {displayedTakeaways.map((point, idx) => (
                   <li key={idx} className="flex items-start gap-2">
                     <span className="text-sky-400 shrink-0 font-bold">•</span>
                     <span>{point}</span>
@@ -291,14 +376,14 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
               <div className="flex items-center justify-between text-xs text-slate-400">
                 <span className="font-semibold flex items-center gap-1.5">
                   <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Commandes & Implémentation</span>
+                  <span>{t.commandsAndImpl}</span>
                 </span>
                 <button
                   onClick={handleCopyCode}
                   className="flex items-center gap-1 text-[11px] text-sky-400 hover:text-sky-300"
                 >
                   {hasCopiedCode ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                  <span>{hasCopiedCode ? 'Copié !' : 'Copier'}</span>
+                  <span>{hasCopiedCode ? t.copiedSuccess : t.copyCode}</span>
                 </button>
               </div>
               <pre className="p-3.5 bg-slate-950 border border-slate-800 rounded-xl font-mono text-xs text-emerald-300 overflow-x-auto leading-relaxed select-text">
@@ -324,18 +409,30 @@ export const ArticleDetailModal: React.FC<ArticleDetailModalProps> = ({
             className="min-h-[44px] px-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 flex items-center gap-2 text-xs font-medium border border-slate-700 active:scale-95 transition-all"
           >
             {hasCopiedShare ? <Check className="w-4 h-4 text-emerald-400" /> : <Share2 className="w-4 h-4" />}
-            <span>{hasCopiedShare ? 'Lien copié' : t.share}</span>
+            <span>{hasCopiedShare ? t.linkCopied : t.share}</span>
           </button>
 
-          <a
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex-1 min-h-[44px] px-4 rounded-xl bg-sky-500 hover:bg-sky-400 active:scale-[0.98] text-slate-950 font-bold flex items-center justify-center gap-2 text-xs shadow-lg shadow-sky-500/20 transition-all"
-          >
-            <span>{t.openInBrowser}</span>
-            <ExternalLink className="w-4 h-4" />
-          </a>
+          {article.googlePatentsUrl ? (
+            <a
+              href={article.googlePatentsUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-h-[44px] px-4 rounded-xl bg-amber-500 hover:bg-amber-400 active:scale-[0.98] text-slate-950 font-bold flex items-center justify-center gap-2 text-xs shadow-lg shadow-amber-500/20 transition-all"
+            >
+              <span>{t.openInGooglePatents}</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          ) : (
+            <a
+              href={article.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex-1 min-h-[44px] px-4 rounded-xl bg-sky-500 hover:bg-sky-400 active:scale-[0.98] text-slate-950 font-bold flex items-center justify-center gap-2 text-xs shadow-lg shadow-sky-500/20 transition-all"
+            >
+              <span>{t.openInBrowser}</span>
+              <ExternalLink className="w-4 h-4" />
+            </a>
+          )}
         </div>
 
       </div>

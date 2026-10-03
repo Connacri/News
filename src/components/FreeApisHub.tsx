@@ -88,24 +88,24 @@ export const FreeApisHub: React.FC<FreeApisHubProps> = ({ currentLang }) => {
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6">
         <div className="flex items-center gap-2 text-xs font-mono text-emerald-400 mb-1">
           <Database className="w-4 h-4" />
-          <span>100% GRATUIT · OPEN SOURCE & ZERO CLÉ D'API REQUISE</span>
+          <span>{t.freeApisBadge}</span>
         </div>
         <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight">
-          Catalogue des APIs & Ressources Publiques Gratuites
+          {t.freeApisTitle}
         </h2>
         <p className="text-xs sm:text-sm text-slate-300 mt-1 leading-relaxed max-w-2xl">
-          Toutes les sources de données ouvertes utilisées par l'application pour agréger en direct les actualités technologiques par pays, le renseignement cyber OSINT et les projets open-source.
+          {t.freeApisSubtitle}
         </p>
       </div>
 
       {/* Category Filter Tabs */}
       <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar text-xs">
         {[
-          { id: 'all', label: 'Toutes les APIs' },
-          { id: 'news', label: '📰 Actualités & Tech' },
-          { id: 'osint', label: '🛡️ Cyber & OSINT' },
-          { id: 'code', label: '⭐ GitHub & Code' },
-          { id: 'science', label: '🔬 Recherche & ArXiv' },
+          { id: 'all', label: t.categoryAll },
+          { id: 'news', label: currentLang === 'ar' ? '📰 الأخبار والتقنية' : '📰 Actualités & Tech' },
+          { id: 'osint', label: currentLang === 'ar' ? '🛡️ أوسينت والسيبراني' : '🛡️ Cyber & OSINT' },
+          { id: 'code', label: currentLang === 'ar' ? '⭐ جيت هب والبرمجيات' : '⭐ GitHub & Code' },
+          { id: 'science', label: currentLang === 'ar' ? '🔬 الأبحاث وبراءات الاختراع' : '🔬 Recherche & ArXiv' },
         ].map((cat) => (
           <button
             key={cat.id}

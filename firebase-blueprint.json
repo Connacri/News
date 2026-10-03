@@ -1,0 +1,74 @@
+{
+  "entities": {
+    "Bookmark": {
+      "title": "Bookmark",
+      "description": "User bookmarked article or patent publication",
+      "type": "object",
+      "properties": {
+        "articleId": {
+          "type": "string",
+          "description": "Unique identifier of the bookmarked item"
+        },
+        "userId": {
+          "type": "string",
+          "description": "Firebase Authentication user ID of the owner"
+        },
+        "title": {
+          "type": "string",
+          "description": "Article or patent title"
+        },
+        "category": {
+          "type": "string",
+          "description": "Category: news, patent, blueprint, cyber, ai, etc."
+        },
+        "source": {
+          "type": "string",
+          "description": "Source publisher or patent office"
+        },
+        "savedAt": {
+          "type": "string",
+          "description": "ISO timestamp when the item was bookmarked"
+        }
+      },
+      "required": ["articleId", "userId", "title", "savedAt"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "User preference settings and language choice",
+      "type": "object",
+      "properties": {
+        "userId": {
+          "type": "string",
+          "description": "Firebase Auth user ID"
+        },
+        "selectedLanguage": {
+          "type": "string",
+          "description": "Preferred UI and translation language"
+        },
+        "selectedCountry": {
+          "type": "string",
+          "description": "Preferred country radar filter"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Last updated timestamp"
+        }
+      },
+      "required": ["userId", "selectedLanguage"]
+    }
+  },
+  "firestore": {
+    "/users/{userId}/bookmarks/{bookmarkId}": {
+      "schema": {
+        "$ref": "#/entities/Bookmark"
+      },
+      "description": "Bookmarked articles, patents, and blueprints per authenticated user"
+    },
+    "/users/{userId}/preferences/settings": {
+      "schema": {
+        "$ref": "#/entities/UserProfile"
+      },
+      "description": "User language and regional radar preferences"
+    }
+  }
+}

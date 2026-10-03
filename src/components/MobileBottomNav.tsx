@@ -16,12 +16,13 @@ export const MobileBottomNav: React.FC<MobileBottomNavProps> = ({
   bookmarksCount,
   currentLang,
 }) => {
+  const t = translations[currentLang];
   const tabs = [
-    { id: 'news' as const, label: 'News', icon: Newspaper },
-    { id: 'osint' as const, label: 'OSINT', icon: ShieldAlert },
-    { id: 'github' as const, label: 'GitHub', icon: Code2 },
-    { id: 'code' as const, label: 'Export', icon: FolderGit2 },
-    { id: 'bookmarks' as const, label: 'Favoris', icon: Bookmark, badge: bookmarksCount > 0 ? bookmarksCount : undefined },
+    { id: 'news' as const, label: t.navNews, icon: Newspaper },
+    { id: 'osint' as const, label: t.navOsint, icon: ShieldAlert },
+    { id: 'github' as const, label: t.navGithub, icon: Code2 },
+    { id: 'code' as const, label: t.navExport, icon: FolderGit2 },
+    { id: 'bookmarks' as const, label: t.navBookmarks, icon: Bookmark, badge: bookmarksCount > 0 ? bookmarksCount : undefined },
   ];
 
   return (

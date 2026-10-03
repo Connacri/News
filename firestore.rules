@@ -1,0 +1,83 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Global Safety Net: Default-deny catch-all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Hardened Global Helpers
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() > 0 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    // Validation helper for Bookmark
+    function isValidBookmark(data, userId) {
+      return data.keys().hasAll(['articleId', 'userId', 'title', 'savedAt'])
+        && data.keys().hasOnly(['articleId', 'userId', 'title', 'category', 'source', 'savedAt'])
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.articleId is string && data.articleId.size() > 0 && data.articleId.size() <= 150
+        && data.title is string && data.title.size() > 0 && data.title.size() <= 400
+        && (!('category' in data) || (data.category is string && data.category.size() <= 50))
+        && (!('source' in data) || (data.source is string && data.source.size() <= 100))
+        && data.savedAt is string && data.savedAt.size() <= 50;
+    }
+
+    // Validation helper for User Profile Preferences
+    function isValidProfile(data, userId) {
+      return data.keys().hasAll(['userId', 'selectedLanguage'])
+        && data.keys().hasOnly(['userId', 'selectedLanguage', 'selectedCountry', 'updatedAt'])
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.selectedLanguage is string && data.selectedLanguage.size() <= 10
+        && (!('selectedCountry' in data) || (data.selectedCountry is string && data.selectedCountry.size() <= 20))
+        && (!('updatedAt' in data) || (data.updatedAt is string && data.updatedAt.size() <= 50));
+    }
+
+    // Per-User Sandboxed Storage for Bookmarks and App Settings
+    match /users/{userId} {
+      allow get: if isOwner(userId);
+
+      match /bookmarks/{bookmarkId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && isValidId(bookmarkId)
+          && isValidBookmark(incoming(), userId);
+        allow update: if isOwner(userId)
+          && isValidId(bookmarkId)
+          && isValidBookmark(incoming(), userId)
+          && incoming().userId == existing().userId;
+        allow delete: if isOwner(userId)
+          && isValidId(bookmarkId);
+      }
+
+      match /preferences/{docId} {
+        allow get: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && isValidId(docId)
+          && isValidProfile(incoming(), userId);
+        allow delete: if isOwner(userId)
+          && isValidId(docId);
+      }
+    }
+  }
+}
