@@ -32,7 +32,7 @@ le navigateur sur ordinateur **et** sur téléphone Android, avec la même inter
 |---|---|
 | 🌐 **Web (ordinateur / mobile)** | `https://device-streaming-ccab91bb.web.app` — rien à installer |
 | 📱 **Android** | Télécharger l'APK depuis la [page Releases](https://github.com/Connacri/News/releases) |
-| 🛒 **Google Play** | Version AAB préparée pour le Play Store (dépôt en cours de validation) |
+| 🛒 **Google Play** | Non publiée — l'identifiant `com.flutternews.osint` est conservé tel quel (pas de migration) |
 
 ### Démarrer en 30 secondes
 
@@ -58,7 +58,8 @@ reste dans votre navigateur. Détails complets :
 - **Web Flutter (WasmGC)** — `https://flutter-news-osint.web.app`  
   Hébergé sur Firebase Hosting (site : `flutter-news-osint`, cible `mobile`)
 - **Releases Android / Web** — `https://github.com/Connacri/News/releases`  
-  APK (universal + split per ABI), AAB Play Store, zip Web signés à chaque push sur `main`
+  APK (universal + split per ABI), AAB, zip Web signés à chaque push sur `main`.  
+  Distribution utilisateur par **APK** : Play Store n'est pas utilisé.
 - **Politique de confidentialité (RGPD)** — `https://device-streaming-ccab91bb.web.app/security-policy`  
   Page statique FR/EN, sans traqueur : `apps/web/public/security-policy.html` (copiée dans
   `apps/mobile/web/` pour le site Flutter). Servie via la réécriture Firebase
