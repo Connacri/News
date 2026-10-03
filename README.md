@@ -125,6 +125,28 @@ cd apps/mobile
 flutter run -d chrome
 ```
 
+### Traduction du podcast audio
+
+Les scripts du podcast (édition FR / AR) sont traduits par un service de traduction
+réel, et non par substitution de mots :
+
+| `VITE_TRANSLATE_PROVIDER` | Comportement |
+|---|---|
+| `mymemory` | **Défaut** — endpoint public gratuit, sans clé, appelé depuis le navigateur. Titres/résumés d'articles publics uniquement, résultat mis en cache en local. |
+| `gemini` | Utilise `POST /api/translate` (API Express). Nécessite l'API hébergée **et** `GEMINI_API_KEY`. |
+| `off` | Aucune traduction réseau : seuls les scripts vérifiés du dictionnaire sont lus. |
+
+Ordre de résolution d'un article du podcast :
+
+1. script vérifié (`FRENCH_SCRIPTS` / `ARABIC_SCRIPTS`) → 100 % natif, hors ligne ;
+2. sinon traduction réelle du titre et du résumé, avec nettoyage des préfixes de flux
+   (`[HN Traduction]`, `Show HN:`, …) avant passage dans le moteur ;
+3. en cas d'échec, le texte source est conservé et l'interface affiche un avertissement —
+   aucun texte à moitié traduit n'est lu à la voix.
+
+Le texte lu par la voix de synthèse est désormais coupé à une frontière de phrase
+(4 000 caractères max) au lieu d'être tronqué brutalement.
+
 ### Build
 
 ```bash

@@ -34,6 +34,15 @@ const TRANSLATION_MODELS = [
 
 const TTS_MODEL = 'gemini-3.8-flash-lite-tts';
 const TTS_VOICES: Record<string, string> = { ar: 'Zephyr' };
+const TTS_MAX_CHARS = 4000;
+
+const ALLOWED_ORIGINS = new Set([
+  'https://device-streaming-ccab91bb.web.app',
+  'https://flutter-news-osint.web.app',
+  'https://connacri.github.io',
+  'http://localhost:3000',
+  'http://localhost:5173'
+]);
 
 let ai: GoogleGenAI | null = null;
 
@@ -42,9 +51,69 @@ function getClient(): GoogleGenAI {
   return ai;
 }
 
+/**
+ * Caps the text sent to the TTS model without ever cutting a sentence in half
+ */
+function clampForTts(text: string): string {
+  if (text.length <= TTS_MAX_CHARS) return text;
+
+  const head = text.slice(0, TTS_MAX_CHARS);
+  const lastBoundary = Math.max(
+    head.lastIndexOf('. '),
+    head.lastIndexOf('! '),
+    head.lastIndexOf('? '),
+    head.lastIndexOf('؟'),
+    head.lastIndexOf('۔'),
+    head.lastIndexOf('。'),
+    head.lastIndexOf('\n')
+  );
+
+  if (lastBoundary > TTS_MAX_CHARS * 0.6) {
+    return head.slice(0, lastBoundary + 1);
+  }
+
+  const lastSpace = head.lastIndexOf(' ');
+  return lastSpace > 0 ? head.slice(0, lastSpace) : head;
+}
+
+/**
+ * Iterates over TRANSLATION_MODELS until one returns text
+ */
+async function generateText(prompt: string, responseMimeType?: string): Promise<string | null> {
+  for (const modelName of TRANSLATION_MODELS) {
+    try {
+      const response = await getClient().models.generateContent({
+        model: modelName,
+        contents: prompt,
+        config: responseMimeType ? { responseMimeType } : undefined
+      });
+      if (response.text) return response.text;
+    } catch (modelErr) {
+      const msg = modelErr instanceof Error ? modelErr.message : String(modelErr);
+      console.warn(`[api/translate] model ${modelName} unavailable, trying next: ${msg}`);
+    }
+  }
+  return null;
+}
+
 async function startServer() {
   const app = express();
   app.use(express.json({ limit: '10mb' }));
+
+  // The web app may be hosted separately from this API
+  app.use('/api', (req, res, next) => {
+    const origin = req.headers.origin;
+    if (origin && ALLOWED_ORIGINS.has(origin)) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Vary', 'Origin');
+      res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+      res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
+    }
+    if (req.method === 'OPTIONS') {
+      return res.sendStatus(204);
+    }
+    return next();
+  });
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', env: IS_PROD ? 'production' : 'development' });
@@ -61,7 +130,7 @@ async function startServer() {
 
       const response = await getClient().models.generateContent({
         model: TTS_MODEL,
-        contents: text.slice(0, 1500),
+        contents: clampForTts(text),
         config: {
           responseModalities: ['AUDIO'],
           speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName } } },
@@ -88,9 +157,28 @@ async function startServer() {
 
   app.post('/api/translate', async (req, res) => {
     try {
-      const { title, description, content, targetLang } = req.body ?? {};
+      const { title, description, content, text, targetLang } = req.body ?? {};
+
+      // Plain text mode: used by the podcast generator (title/description are optional)
+      if (typeof text === 'string' && text.trim()) {
+        const langName = LANG_NAMES[targetLang as string] ?? LANG_NAMES.ar;
+        const plainPrompt = [
+          `Translate the following text into ${langName}.`,
+          'Keep technical terms (Flutter, CVE, Linux, API, LLM, CUDA, etc.) untranslated.',
+          'Return ONLY the translated text, with no preamble, no quotes and no commentary.',
+          '',
+          text.slice(0, 4000),
+        ].join('\n');
+
+        const translated = await generateText(plainPrompt);
+        if (!translated) {
+          return res.status(502).json({ error: 'Empty response from translation models' });
+        }
+        return res.json({ text: translated });
+      }
+
       if (!title || typeof title !== 'string') {
-        return res.status(400).json({ error: 'Title is required' });
+        return res.status(400).json({ error: 'Title or text is required' });
       }
 
       const langName = LANG_NAMES[targetLang as string] ?? LANG_NAMES.ar;
@@ -108,24 +196,7 @@ async function startServer() {
         '{ "title": "translated title", "description": "translated description", "content": "translated content" }',
       ].join('\n');
 
-      let responseText: string | null = null;
-      for (const modelName of TRANSLATION_MODELS) {
-        try {
-          const response = await getClient().models.generateContent({
-            model: modelName,
-            contents: prompt,
-            config: { responseMimeType: 'application/json' },
-          });
-          if (response.text) {
-            responseText = response.text;
-            break;
-          }
-        } catch (modelErr) {
-          const msg = modelErr instanceof Error ? modelErr.message : String(modelErr);
-          console.warn(`[api/translate] model ${modelName} unavailable, trying next: ${msg}`);
-        }
-      }
-
+      const responseText = await generateText(prompt, 'application/json');
       if (!responseText) {
         return res.status(502).json({ error: 'Empty response from translation models' });
       }

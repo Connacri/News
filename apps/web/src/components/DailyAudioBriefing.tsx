@@ -19,6 +19,7 @@ import { CountryCode, Language, NewsArticle } from '../types';
 import { COUNTRIES } from '../services/countries';
 import { 
   generatePodcastEpisode, 
+  translatePodcastItems,
   PodcastLanguage, 
   PodcastEpisode 
 } from '../services/podcastScript';
@@ -91,9 +92,39 @@ export const DailyAudioBriefing: React.FC<DailyAudioBriefingProps> = ({
   }, [currentLang]);
 
   // Build the current bilingual episode (100% French or 100% Arabic)
-  const episode: PodcastEpisode = useMemo(() => {
+  const baseEpisode: PodcastEpisode = useMemo(() => {
     return generatePodcastEpisode(articles, podcastLang, selectedCountry);
   }, [articles, podcastLang, selectedCountry]);
+
+  const [episode, setEpisode] = useState<PodcastEpisode>(baseEpisode);
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  useEffect(() => {
+    setEpisode(baseEpisode);
+  }, [baseEpisode]);
+
+  // Real translation pass for live feed articles (no more word-by-word substitution)
+  useEffect(() => {
+    const hasPending = baseEpisode.items.some((item) => item.pending);
+    if (!hasPending) return;
+
+    let cancelled = false;
+    setIsTranslating(true);
+
+    translatePodcastItems(baseEpisode.items, articles, podcastLang)
+      .then((items) => {
+        if (!cancelled) setEpisode({ ...baseEpisode, items });
+      })
+      .finally(() => {
+        if (!cancelled) setIsTranslating(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [baseEpisode, articles, podcastLang]);
+
+  const untranslatedCount = episode.items.filter((item) => item.pending).length;
 
   const countryInfo = COUNTRIES.find((c) => c.code === selectedCountry) || COUNTRIES[0];
 
@@ -273,6 +304,29 @@ export const DailyAudioBriefing: React.FC<DailyAudioBriefingProps> = ({
             <span className="font-semibold">Pack vocal arabe non détecté sur votre système : </span>
             <span>La lecture vocale utilise la voix de synthèse disponible. Vous pouvez lire le script complet rédigé en arabe ci-dessous.</span>
           </div>
+        </div>
+      )}
+
+      {/* Translation status for live feed articles */}
+      {isTranslating && (
+        <div className="p-2.5 rounded-xl bg-sky-500/10 border border-sky-500/25 text-sky-300 flex items-center gap-2 text-[11px]">
+          <Sparkles className="w-3.5 h-3.5 shrink-0 animate-pulse" />
+          <span>
+            {podcastLang === 'ar'
+              ? 'جاري ترجمة الأخبار إلى العربية…'
+              : 'Traduction automatique des actualités en cours...'}
+          </span>
+        </div>
+      )}
+
+      {!isTranslating && untranslatedCount > 0 && (
+        <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-500/25 text-amber-300 flex items-start gap-2 text-[11px]">
+          <AlertCircle className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+          <span>
+            {podcastLang === 'ar'
+              ? `تعذّر ترجمة ${untranslatedCount} خبر — يتم عرض النص الأصلي. تحقق من الاتصال بالإنترنت.`
+              : `Traduction indisponible pour ${untranslatedCount} actu(s) : texte original affiché.`}
+          </span>
         </div>
       )}
 

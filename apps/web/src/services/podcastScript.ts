@@ -1,5 +1,6 @@
 import { NewsArticle, CountryCode } from '../types';
 import { COUNTRIES } from './countries';
+import { cleanSourceText, translateText } from './translateApi';
 
 export type PodcastLanguage = 'fr' | 'ar';
 
@@ -8,6 +9,8 @@ export interface PodcastItem {
   title: string;
   body: string;
   source: string;
+  /** true when the script still needs a real translation pass */
+  pending?: boolean;
 }
 
 export interface PodcastEpisode {
@@ -135,56 +138,22 @@ const ARABIC_SCRIPTS: Record<string, { title: string; body: string }> = {
 };
 
 /**
- * Clean English-to-French translator for external or dynamic articles
+ * True when a text is already written in the target language (no translation needed)
  */
-function translateToFrench(text: string): string {
-  if (!text) return '';
-  return text
-    .replace(/unveils/gi, 'dévoile')
-    .replace(/releases/gi, 'publie')
-    .replace(/announces/gi, 'annonce')
-    .replace(/breakthrough/gi, 'avancée majeure')
-    .replace(/vulnerability/gi, 'vulnérabilité')
-    .replace(/vulnerabilities/gi, 'vulnérabilités')
-    .replace(/open-source/gi, 'open-source')
-    .replace(/machine learning/gi, 'apprentissage automatique')
-    .replace(/artificial intelligence/gi, 'intelligence artificielle')
-    .replace(/security/gi, 'sécurité')
-    .replace(/update/gi, 'mise à jour')
-    .replace(/cloud/gi, 'cloud')
-    .replace(/kernel/gi, 'noyau')
-    .replace(/mobile/gi, 'mobile')
-    .replace(/framework/gi, 'framework')
-    .replace(/critical/gi, 'critique')
-    .replace(/patch/gi, 'correctif')
-    .replace(/performance/gi, 'performance');
+function isNativeFrench(text: string): boolean {
+  if (!text) return false;
+  if (/[\u0600-\u06FF]/.test(text)) return false;
+  return /[àâçéèêëîïôûùüÿœæÀÂÇÉÈÊËÎÏÔÛÙÜŸŒÆ]/.test(text) ||
+    /\b(le|la|les|des|une|dans|pour|avec|nouveau|nouvelle|sur|est|par|plus|dévoile|annonce)\b/i.test(text);
 }
 
 /**
- * Clean English-to-Arabic translator for external or dynamic articles
- */
-function translateToArabic(text: string): string {
-  if (!text) return '';
-  return text
-    .replace(/unveils/gi, 'يكشف عن')
-    .replace(/releases/gi, 'يطلق')
-    .replace(/announces/gi, 'يعلن عن')
-    .replace(/breakthrough/gi, 'إنجاز تقني كبير')
-    .replace(/vulnerability/gi, 'ثغرة أمنية')
-    .replace(/vulnerabilities/gi, 'ثغرات أمنية')
-    .replace(/open-source/gi, 'مفتوح المصدر')
-    .replace(/artificial intelligence/gi, 'الذكاء الاصطناعي')
-    .replace(/security/gi, 'الأمان الرقمي')
-    .replace(/update/gi, 'تحديث برمجيات')
-    .replace(/cloud/gi, 'الحوسبة السحابية')
-    .replace(/mobile/gi, 'تطبيقات الهواتف المحمولة')
-    .replace(/critical/gi, 'حرج')
-    .replace(/patch/gi, 'ترقيع أمني')
-    .replace(/performance/gi, 'كفاءة الأداء');
-}
-
-/**
- * Builds a structured, 100% French or 100% Arabic podcast episode
+ * Builds a structured podcast episode.
+ *
+ * Curated scripts (FRENCH_SCRIPTS / ARABIC_SCRIPTS) are 100% native and used as-is.
+ * Every other article is emitted from its cleaned source text and flagged `pending`,
+ * so nothing is ever half-translated by word substitution: `translatePodcastItems`
+ * performs the real translation pass afterwards.
  */
 export function generatePodcastEpisode(
   articles: NewsArticle[],
@@ -221,14 +190,17 @@ export function generatePodcastEpisode(
         };
       }
 
-      // 2. Fallback: generate Arabic title and body without ANY English words
-      const rawTitle = art.translatedTitle || art.title;
-      const rawBody = art.translatedDescription || art.description;
+      // 2. Fallback: cleaned source text, translated afterwards by translatePodcastItems
+      const rawTitle = cleanSourceText(art.title || art.translatedTitle || '');
+      const rawBody = cleanSourceText(art.description || art.translatedDescription || '');
+      const isNativeArabic = /[\u0600-\u06FF]/.test(rawTitle);
+
       return {
         id: art.id,
-        title: `تطور تقني جديد: ${translateToArabic(rawTitle)}`,
-        body: `تفاصيل التقرير التقني: ${translateToArabic(rawBody)}`,
-        source: art.source
+        title: isNativeArabic ? rawTitle : `تطور تقني جديد: ${rawTitle}`,
+        body: isNativeArabic ? rawBody : `تفاصيل التقرير التقني: ${rawBody}`,
+        source: art.source,
+        pending: !isNativeArabic
       };
     });
 
@@ -241,7 +213,7 @@ export function generatePodcastEpisode(
     };
   }
 
-  // French Edition (100% Guaranteed French)
+  // French Edition
   const items: PodcastItem[] = selectedArticles.map((art) => {
     // 1. Check verified French script dictionary
     if (FRENCH_SCRIPTS[art.id]) {
@@ -253,23 +225,17 @@ export function generatePodcastEpisode(
       };
     }
 
-    // 2. Check if title is already in French
-    const hasFrenchMarkers = /[éèêàùçôîïÉÈÊÀÇÔ]/.test(art.title);
-    if (hasFrenchMarkers) {
-      return {
-        id: art.id,
-        title: art.title,
-        body: art.description,
-        source: art.source
-      };
-    }
+    // 2. Keep natively French content untouched
+    const title = cleanSourceText(art.title || art.translatedTitle || '');
+    const body = cleanSourceText(art.description || art.translatedDescription || '');
+    const needsTranslation = !isNativeFrench(title);
 
-    // 3. Fallback: translate English title & description into French
     return {
       id: art.id,
-      title: translateToFrench(art.title),
-      body: translateToFrench(art.description),
-      source: art.source
+      title,
+      body,
+      source: art.source,
+      pending: needsTranslation
     };
   });
 
@@ -280,4 +246,50 @@ export function generatePodcastEpisode(
     outro: `C'était votre point info technologique du jour. Retrouvez tous les détails, le code open-source et les bulletins de sécurité complets dans l'application. À très bientôt pour un nouveau flash info !`,
     items
   };
+}
+
+/**
+ * Runs the real translation pass on every item still flagged `pending`.
+ * Items that fail keep their source text so the voice never reads mixed languages.
+ */
+export async function translatePodcastItems(
+  items: PodcastItem[],
+  articles: NewsArticle[],
+  language: PodcastLanguage
+): Promise<PodcastItem[]> {
+  const byId = new Map(articles.map((art) => [art.id, art]));
+
+  return Promise.all(
+    items.map(async (item) => {
+      if (!item.pending) return item;
+
+      const art = byId.get(item.id);
+      const sourceTitle = cleanSourceText(art?.title || art?.translatedTitle || '');
+      const sourceBody = cleanSourceText(art?.description || art?.translatedDescription || '');
+
+      const [titleResult, bodyResult] = await Promise.all([
+        translateText(sourceTitle, language),
+        translateText(sourceBody, language)
+      ]);
+
+      const translatedTitle = titleResult.text;
+      const translatedBody = bodyResult.text;
+
+      if (language === 'ar') {
+        return {
+          ...item,
+          title: translatedTitle ? `تطور تقني جديد: ${translatedTitle}` : item.title,
+          body: translatedBody ? `تفاصيل التقرير التقني: ${translatedBody}` : item.body,
+          pending: !translatedTitle || !translatedBody
+        };
+      }
+
+      return {
+        ...item,
+        title: translatedTitle || item.title,
+        body: translatedBody || item.body,
+        pending: !translatedTitle || !translatedBody
+      };
+    })
+  );
 }
