@@ -2,6 +2,54 @@
 
 Application Flutter Cross-Platform + Web React pour la veille techno (news par pays, OSINT open-source, Google Patents, Blueprints) avec Firebase (Firestore, Auth, FCM), Vite/Express, CI/CD GitHub Actions.
 
+---
+
+## ✨ Présentation — pour les utilisateurs
+
+**FlutterNews OSINT & Tech Radar** est une application **gratuite, sans publicité et sans
+suivi** qui rassemble toute la veille technologique au même endroit : actualités, failles de
+sécurité, tendances de développement et ressources prêtes à l'emploi. Elle fonctionne dans
+le navigateur sur ordinateur **et** sur téléphone Android, avec la même interface.
+
+### Ce que vous pouvez faire
+
+| Fonctionnalité | Ce qu'elle apporte |
+|---|---|
+| **Fil d'actualité par pays** | Les dernières actualités techno filtrées par zone : Monde, France, Algérie, Maghreb, Chine, États-Unis, Allemagne, Royaume-Uni, Japon, Canada. |
+| **Radar OSINT** | Veille sécurité ouverte : avis CISA, vulnérabilités exploitées, attaques supply-chain, incidents réseau. |
+| **Tendances GitHub & Hacker News** | Les dépôts et discussions qui montent, avec les liens directs vers les projets. |
+| **Hub d'API gratuites** | Un catalogue d'API utiles (news, recherche, données) à tester directement depuis l'app. |
+| **Export de code Flutter** | Extraits et intégrations prêts à l'emploi : API, modèles IA, tunnels, configuration Firebase. |
+| **Briefing audio quotidien** | Votre veille résumée **en audio** pour l'écouter dans les transports ou en multitâche. |
+| **Favoris synchronisés** | Enregistrez un article et retrouvez-le sur tous vos appareils via votre compte Google. |
+| **Notifications push** | Soyez alerté des sujets importants (activables ou désactivables à tout moment). |
+| **Fonctionne hors ligne** | Les articles déjà consultés restent lisibles sans connexion grâce au cache local. |
+| **6 langues / 10 zones** | Interface en français, anglais, espagnol, allemand, arabe et japonais. |
+
+### Sur quelles plateformes
+
+| Plateforme | Comment y accéder |
+|---|---|
+| 🌐 **Web (ordinateur / mobile)** | `https://device-streaming-ccab91bb.web.app` — rien à installer |
+| 📱 **Android** | Télécharger l'APK depuis la [page Releases](https://github.com/Connacri/News/releases) |
+| 🛒 **Google Play** | Version AAB préparée pour le Play Store (dépôt en cours de validation) |
+
+### Démarrer en 30 secondes
+
+1. Ouvrez `https://device-streaming-ccab91bb.web.app` — ou installez l'APK sur Android.
+2. Choisissez votre pays et votre langue dans le menu latéral (☰).
+3. *(Facultatif)* Connectez-vous avec **Google** pour synchroniser vos favoris.
+4. *(Facultatif)* Activez les notifications push : vous ne partagez aucune donnée personnelle sans votre accord.
+
+### Vos données
+
+Aucune publicité, aucun cookie de suivi, aucun profilage. **Rien n'est enregistré sur nos
+serveurs si vous n'utilisez ni le compte Google, ni les notifications push** ; tout le reste
+reste dans votre navigateur. Détails complets :
+[`/security-policy`](https://device-streaming-ccab91bb.web.app/security-policy).
+
+---
+
 ## Liens de déploiement
 
 - **Web React (Vite)** — `https://device-streaming-ccab91bb.web.app`  
