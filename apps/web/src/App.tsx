@@ -22,6 +22,7 @@ import { getAggregatedNews } from './services/newsApi';
 import { translations } from './services/translations';
 import { COUNTRIES } from './services/countries';
 import { NEWS_CATEGORIES } from './services/newsCategories';
+import { detectCountryFromNetwork } from './services/geolocation';
 import { getSavedLanguage, setSavedLanguage } from './services/translator';
 import { 
   auth, 
@@ -47,12 +48,23 @@ export default function App() {
   const [selectedCountry, setSelectedCountry] = useState<CountryCode>(() => {
     try {
       const saved = localStorage.getItem('flutternews_country');
-      if (saved && COUNTRIES.some(c => c.code === saved)) {
-        return saved as CountryCode;
-      }
+      if (saved && COUNTRIES.some(c => c.code === saved)) return saved as CountryCode;
     } catch {}
     return 'all';
   });
+
+  useEffect(() => {
+    let cancelled = false;
+    const hasSavedCountry = (() => {
+      try { return Boolean(localStorage.getItem('flutternews_country')); } catch { return false; }
+    })();
+    if (!hasSavedCountry) {
+      detectCountryFromNetwork().then((country) => {
+        if (!cancelled && country !== 'all') setSelectedCountry(country);
+      });
+    }
+    return () => { cancelled = true; };
+  }, []);
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
