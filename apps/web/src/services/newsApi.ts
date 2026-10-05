@@ -1261,6 +1261,7 @@ function gdeltCountryQuery(country: CountryCode): string {
     us: 'sourcecountry:US', de: 'sourcecountry:GM', gb: 'sourcecountry:UK',
     jp: 'sourcecountry:JA', ca: 'sourcecountry:CA'
   };
+  if (country === 'maghreb') return '(sourcecountry:AG OR sourcecountry:MO OR sourcecountry:TS)';
   return terms[country] || '';
 }
 
