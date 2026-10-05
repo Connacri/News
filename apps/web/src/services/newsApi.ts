@@ -1359,7 +1359,7 @@ async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory
           description: value('description').slice(0, 500),
           url,
           source: domain,
-          sourceType: 'gdelt' as const,
+          sourceType: 'rss' as const,
           publishedAt: (() => { const d = Date.parse(value('pubDate')); return Number.isNaN(d) ? new Date().toISOString() : new Date(d).toISOString(); })(),
           country: 'dz' as CountryCode,
           category: topic as NewsCategory,
