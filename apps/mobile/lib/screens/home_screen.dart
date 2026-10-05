@@ -39,7 +39,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final news = context.watch<NewsApiService>();
-    final isDesktop = MediaQuery.of(context).size.width > 800;
 
     return Scaffold(
       appBar: AppBar(
@@ -47,11 +46,16 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.radar, color: Color(0xFF38BDF8)),
             SizedBox(width: 8),
-            Text('FlutterNews Multiplateforme', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Flexible(
+              child: Text(
+                'FlutterNews Multiplateforme',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+              ),
+            ),
           ],
         ),
         actions: [
-          // Sélecteur de Langue (Support RTL Arabe & Européen)
           PopupMenuButton<String>(
             icon: const Icon(Icons.language),
             tooltip: 'Changer la langue',
@@ -68,46 +72,64 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh),
-            onPressed: () => news.fetchNews(country: _selectedCountry, category: _selectedCategory),
+            tooltip: 'Actualiser',
+            onPressed: news.isLoading
+                ? null
+                : () => news.fetchNews(country: _selectedCountry, category: _selectedCategory),
           ),
         ],
       ),
-      body: Row(
-        children: [
-          // Navigation Rail pour Desktop & Web Large
-          if (isDesktop)
-            NavigationRail(
-              selectedIndex: _currentTabIndex,
-              onDestinationSelected: (idx) => setState(() => _currentTabIndex = idx),
-              labelType: NavigationRailLabelType.all,
-              destinations: const [
-                NavigationRailDestination(icon: Icon(Icons.newspaper), label: Text('News')),
-                NavigationRailDestination(icon: Icon(Icons.menu_book), label: Text('Brevets')),
-                NavigationRailDestination(icon: Icon(Icons.shield), label: Text('OSINT')),
-              ],
-            ),
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          final width = constraints.maxWidth;
+          final useRail = width >= 1000;
+          final contentWidth = width >= 1200 ? 1120.0 : width;
 
-          // Contenu principal
-          Expanded(
-            child: _currentTabIndex == 1
-                ? const PatentsScreen()
-                : _currentTabIndex == 2
-                    ? const OsintScreen()
-                    : _buildNewsList(news),
-          ),
-        ],
-      ),
-      bottomNavigationBar: isDesktop
-          ? null
-          : NavigationBar(
-              selectedIndex: _currentTabIndex,
-              onDestinationSelected: (idx) => setState(() => _currentTabIndex = idx),
-              destinations: const [
-                NavigationDestination(icon: Icon(Icons.newspaper), label: 'News'),
-                NavigationDestination(icon: Icon(Icons.menu_book), label: 'Brevets'),
-                NavigationDestination(icon: Icon(Icons.shield), label: 'OSINT'),
-              ],
+          Widget content = _currentTabIndex == 1
+              ? const PatentsScreen()
+              : _currentTabIndex == 2
+                  ? const OsintScreen()
+                  : _buildNewsList(news);
+
+          content = Align(
+            alignment: Alignment.topCenter,
+            child: ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: contentWidth),
+              child: content,
             ),
+          );
+
+          return Row(
+            children: [
+              if (useRail)
+                NavigationRail(
+                  selectedIndex: _currentTabIndex,
+                  onDestinationSelected: (idx) => setState(() => _currentTabIndex = idx),
+                  labelType: NavigationRailLabelType.all,
+                  destinations: const [
+                    NavigationRailDestination(icon: Icon(Icons.newspaper), label: Text('News')),
+                    NavigationRailDestination(icon: Icon(Icons.menu_book), label: Text('Brevets')),
+                    NavigationRailDestination(icon: Icon(Icons.shield), label: Text('OSINT')),
+                  ],
+                ),
+              Expanded(child: content),
+            ],
+          );
+        },
+      ),
+      bottomNavigationBar: LayoutBuilder(
+        builder: (context, constraints) => constraints.maxWidth < 1000
+            ? NavigationBar(
+                selectedIndex: _currentTabIndex,
+                onDestinationSelected: (idx) => setState(() => _currentTabIndex = idx),
+                destinations: const [
+                  NavigationDestination(icon: Icon(Icons.newspaper), label: 'News'),
+                  NavigationDestination(icon: Icon(Icons.menu_book), label: 'Brevets'),
+                  NavigationDestination(icon: Icon(Icons.shield), label: 'OSINT'),
+                ],
+              )
+            : null,
+      ),
     );
   }
 
