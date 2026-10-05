@@ -19,15 +19,31 @@ class _HomeScreenState extends State<HomeScreen> {
   String _selectedCategory = 'all';
 
   final List<Map<String, String>> _categories = [
-    {'id': 'all', 'label': 'Toutes'},
-    {'id': 'patents', 'label': '📜 Brevets Google'},
+    {'id': 'all', 'label': '🌐 À la une'},
+    {'id': 'world', 'label': '🌍 Monde'},
+    {'id': 'local', 'label': '📍 Local'},
+    {'id': 'politics', 'label': '🏛️ Politique'},
+    {'id': 'business', 'label': '💼 Entreprises'},
+    {'id': 'economy', 'label': '📈 Économie'},
+    {'id': 'society', 'label': '👥 Société'},
+    {'id': 'sports', 'label': '⚽ Sports'},
+    {'id': 'culture', 'label': '🎭 Culture'},
+    {'id': 'entertainment', 'label': '🎬 Divertissement'},
+    {'id': 'science', 'label': '🔬 Science'},
+    {'id': 'health', 'label': '🩺 Santé'},
+    {'id': 'environment', 'label': '🌱 Environnement'},
+    {'id': 'education', 'label': '🎓 Éducation'},
+    {'id': 'technology', 'label': '💻 Technologie'},
+    {'id': 'ai', 'label': '🤖 IA'},
+    {'id': 'cyber', 'label': '🛡️ Cybersécurité'},
+    {'id': 'travel', 'label': '✈️ Voyage'},
+    {'id': 'lifestyle', 'label': '✨ Lifestyle'},
+    {'id': 'opensource', 'label': '⭐ Open Source'},
+    {'id': 'mobile', 'label': '📱 Mobile'},
+    {'id': 'cloud', 'label': '☁️ Cloud'},
+    {'id': 'patents', 'label': '📜 Brevets'},
     {'id': 'blueprints', 'label': '📐 Blueprints'},
-    {'id': 'ai', 'label': '🤖 IA & LLM'},
-    {'id': 'cyber', 'label': '🛡️ Cyber/OSINT'},
-    {'id': 'opensource', 'label': '⭐ OpenSource'},
-    {'id': 'mobile', 'label': '📱 Flutter 3.24'},
   ];
-
   @override
   void initState() {
     super.initState();
