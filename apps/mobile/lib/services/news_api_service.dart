@@ -108,6 +108,7 @@ class NewsApiService extends ChangeNotifier {
       'jp': 'JA',
       'ca': 'CA',
     };
+    if (country == 'maghreb') return 'AG OR sourcecountry:MO OR sourcecountry:TS';
     return codes[country] ?? '';
   }
 }
