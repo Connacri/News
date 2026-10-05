@@ -206,7 +206,79 @@ Before creating a new component:
 
 ---
 
-# 8. MARKETING — GUERRILLA MARKETING
+# 8. MULTI-PLATFORM / MULTI-DEVICE LAYOUT
+
+Treat responsive and cross-platform layout as a first-class architectural requirement.
+
+Every UI change MUST be evaluated across all platforms and device classes supported by the project, including when applicable:
+
+* Android phones
+* Android tablets
+* iOS phones
+* iOS tablets
+* Web desktop
+* Web laptop
+* Web tablet
+* Web mobile
+* small screens
+* medium screens
+* large screens
+* portrait
+* landscape
+
+Do not design for one screen size and assume it will scale correctly.
+
+Before creating or modifying a layout:
+
+1. Inspect the existing responsive/layout system.
+2. Identify existing breakpoints, adaptive components, navigation patterns and sizing utilities.
+3. Reuse existing responsive abstractions whenever possible.
+4. Prefer fluid layouts over fixed dimensions.
+5. Avoid hardcoded widths/heights that can cause overflow or unusable whitespace.
+6. Account for safe areas, system bars, browser UI and keyboard insets where relevant.
+7. Ensure text, buttons, dialogs, menus, cards, lists and forms remain usable at different sizes.
+8. Test long translations and dynamic content without clipping or overflow.
+9. Support both portrait and landscape when the platform permits it.
+10. Preserve touch-friendly interaction on mobile and efficient pointer/keyboard interaction on desktop.
+11. Verify navigation remains understandable when screen space changes.
+12. Verify loading, empty, error and offline states at each important responsive layout.
+
+Responsive behavior should be intentional:
+
+* mobile-first where appropriate
+* adaptive navigation when screen width changes
+* breakpoint-aware grids and columns
+* flexible typography
+* scalable spacing
+* responsive images/media
+* accessible touch targets
+* no accidental horizontal scrolling
+* no clipped content
+* no overlapping controls
+* no layout shift caused by late-loaded content
+
+For Flutter:
+
+* use MediaQuery, LayoutBuilder, adaptive widgets and platform-aware patterns when appropriate
+* avoid device-specific hacks unless justified
+* do not assume a single logical pixel size
+* keep widgets reusable across Android, iOS and Web
+
+For React/Web:
+
+* use responsive CSS/Tailwind patterns already present in the project
+* use semantic HTML and accessible responsive controls
+* account for browser viewport differences
+* verify narrow and wide layouts
+* avoid desktop-only assumptions
+
+A feature is NOT considered UI-complete until its behavior is coherent across the relevant supported platforms and device sizes.
+
+Never sacrifice accessibility, readability or usability merely to preserve a desktop/mobile visual composition.
+
+---
+
+# 9. MARKETING — GUERRILLA MARKETING
 
 When creating advertising, landing pages, promotional content or growth experiences, use Guerrilla Marketing principles:
 
@@ -262,7 +334,7 @@ Design layouts so translations can become longer without breaking the UI.
 
 ---
 
-# 10. PERFORMANCE
+# 30. PERFORMANCE
 
 Prioritize:
 
