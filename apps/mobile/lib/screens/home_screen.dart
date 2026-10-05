@@ -143,8 +143,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   NavigationDestination(icon: Icon(Icons.menu_book), label: 'Brevets'),
                   NavigationDestination(icon: Icon(Icons.shield), label: 'OSINT'),
                 ],
-              )
-            : null,
+               )
+            : const SizedBox.shrink(),
       ),
     );
   }

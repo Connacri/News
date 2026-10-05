@@ -24,7 +24,7 @@ class NewsApiService extends ChangeNotifier {
             [topic, if (countryCode.isNotEmpty) 'sourcecountry:$countryCode'].join(' '),
           );
           final uri = Uri.parse(
-            'https://api.gdeltproject.org/api/v2/doc/doc?query=$query&mode=artlist&maxrecords=\${category == 'all' ? 12 : 50}&format=json&sort=datedesc',
+            'https://api.gdeltproject.org/api/v2/doc/doc?query=$query&mode=artlist&maxrecords=${category == 'all' ? 12 : 50}&format=json&sort=datedesc',
           );
           try {
             final res = await http.get(uri).timeout(const Duration(seconds: 10));
