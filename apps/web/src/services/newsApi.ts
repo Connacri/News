@@ -1326,6 +1326,55 @@ function parseGdeltDate(value: unknown): string {
   return Number.isNaN(parsed) ? new Date().toISOString() : new Date(parsed).toISOString();
 }
 
+async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory): Promise<NewsArticle[]> {
+  if (country !== 'dz' && country !== 'all' && country !== 'maghreb') return [];
+  const topics: Record<string, string> = {
+    world: 'monde international', politics: 'politique gouvernement élections',
+    business: 'entreprises business', economy: 'économie emploi inflation',
+    society: 'société', local: 'local wilaya', sports: 'sport football',
+    culture: 'culture arts patrimoine', entertainment: 'cinéma musique télévision',
+    science: 'science recherche', health: 'santé médecine',
+    environment: 'environnement climat', education: 'éducation université',
+    technology: 'technologie numérique innovation', ai: 'intelligence artificielle',
+    cyber: 'cybersécurité', travel: 'voyage tourisme', lifestyle: 'lifestyle',
+  };
+  const topicList = category === 'all' ? Object.keys(topics) : [category];
+  const domains = ['aps.dz', 'tsa-algerie.com', 'algerie360.com', 'lexpression.dz', 'elwatan.dz'];
+  const results = await Promise.allSettled(
+    topicList.flatMap((topic) => domains.map(async (domain) => {
+      const q = encodeURIComponent(`site:${domain} ${topics[topic] || topic} Algérie`);
+      const res = await fetch(`https://news.google.com/rss/search?q=${q}&hl=fr&gl=DZ&ceid=DZ:fr`);
+      if (!res.ok) throw new Error(`RSS ${res.status}`);
+      const xml = await res.text();
+      const items = xml.match(/<item>[\\s\\S]*?<\\/item>/gi) || [];
+      return items.map((item, index) => {
+        const value = (tag: string) => {
+          const m = item.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+          return m ? m[1].replace(/<!\\[CDATA\\[|\\]>/g, '').replace(/<[^>]+>/g, '').trim() : '';
+        };
+        const url = value('link');
+        return {
+          id: `rss-${domain}-${url || index}`,
+          title: value('title'),
+          description: value('description').slice(0, 500),
+          url,
+          source: domain,
+          sourceType: 'gdelt' as const,
+          publishedAt: (() => { const d = Date.parse(value('pubDate')); return Number.isNaN(d) ? new Date().toISOString() : new Date(d).toISOString(); })(),
+          country: 'dz' as CountryCode,
+          category: topic as NewsCategory,
+          tags: ['RSS', domain, topic],
+        } as NewsArticle;
+      });
+    }))
+  );
+  const map = new Map<string, NewsArticle>();
+  for (const batch of results) if (batch.status === 'fulfilled') for (const article of batch.value) {
+    if (article.title && article.url) map.set(article.url.replace(/#.*$/, '').replace(/\\/$/, ''), article);
+  }
+  return Array.from(map.values());
+}
+
 export async function getAggregatedNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
   const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
@@ -1334,6 +1383,7 @@ export async function getAggregatedNews(country: CountryCode = 'all', category: 
     try {
       const [generalArticles, hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
         fetchGeolocatedGeneralNews(country, category),
+        fetchAlgerianRssNews(country, category),
         fetchLiveHackerNews(country === 'fr' ? 'france' : country === 'de' ? 'germany' : 'tech'),
         fetchLiveDevToArticles(),
         fetchLiveGitHubRepos()
