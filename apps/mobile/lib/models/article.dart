@@ -68,6 +68,21 @@ class NewsArticle {
     );
   }
 
+  factory NewsArticle.fromGdelt(Map<String, dynamic> json, {String country = 'all', String category = 'world'}) {
+    return NewsArticle(
+      id: 'gdelt-${json['url'] ?? DateTime.now().microsecondsSinceEpoch}',
+      title: json['title'] ?? 'Actualité',
+      description: 'Actualité géolocalisée publiée par ${json['domain'] ?? 'source locale'}.',
+      url: json['url'] ?? '',
+      source: json['domain'] ?? 'GDELT',
+      sourceType: 'gdelt',
+      publishedAt: DateTime.tryParse(json['seendate']?.toString() ?? '') ?? DateTime.now(),
+      country: country,
+      category: category,
+      tags: ['GDELT', category],
+    );
+  }
+
   factory NewsArticle.fromFirestore(Map<String, dynamic> json) {
     return NewsArticle(
       id: json['articleId'] ?? '',
