@@ -1229,18 +1229,81 @@ cd ${repo.name} && ls -la`,
   }
 }
 
+const GENERAL_NEWS_QUERIES: Record<string, string> = {
+  world: 'world OR international',
+  politics: 'politics OR government OR election',
+  business: 'business OR companies OR markets',
+  economy: 'economy OR inflation OR employment',
+  society: 'society OR community',
+  local: 'local OR regional',
+  sports: 'sports OR football OR soccer OR olympics',
+  culture: 'culture OR arts OR heritage',
+  entertainment: 'entertainment OR cinema OR music OR television',
+  science: 'science OR research OR discovery',
+  health: 'health OR medicine OR public-health',
+  environment: 'environment OR climate OR biodiversity',
+  education: 'education OR university OR school',
+  technology: 'technology OR digital OR innovation',
+  ai: 'artificial intelligence OR AI OR machine learning',
+  cyber: 'cybersecurity OR cyberattack OR vulnerability',
+  opensource: 'open source OR GitHub',
+  mobile: 'smartphone OR Android OR iOS OR mobile',
+  cloud: 'cloud computing OR data center OR Kubernetes',
+  patents: 'patent OR intellectual property',
+  blueprints: 'architecture OR infrastructure OR technical design',
+  travel: 'travel OR tourism OR aviation',
+  lifestyle: 'lifestyle OR food OR fashion OR wellness',
+};
+
+function gdeltCountryQuery(country: CountryCode): string {
+  const terms: Record<string, string> = {
+    fr: 'sourcecountry:FR', dz: 'sourcecountry:AG', cn: 'sourcecountry:CH',
+    us: 'sourcecountry:US', de: 'sourcecountry:GM', gb: 'sourcecountry:UK',
+    jp: 'sourcecountry:JA', ca: 'sourcecountry:CA'
+  };
+  return terms[country] || '';
+}
+
+export async function fetchGeolocatedGeneralNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
+  const topic = category === 'all' ? 'news OR latest OR breaking' : (GENERAL_NEWS_QUERIES[category] || 'news');
+  const query = encodeURIComponent([topic, gdeltCountryQuery(country)].filter(Boolean).join(' '));
+  const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&maxrecords=50&format=json&sort=datedesc`;
+  try {
+    const res = await fetch(url, { headers: { Accept: 'application/json' } });
+    if (!res.ok) throw new Error(`GDELT HTTP ${res.status}`);
+    const data = await res.json();
+    return (data.articles || []).map((item: any, index: number): NewsArticle => ({
+      id: `gdelt-${item.url || index}`,
+      title: item.title || 'Untitled article',
+      description: item.seendate ? `Published ${item.seendate}` : 'Latest news',
+      url: item.url,
+      source: item.domain || 'GDELT',
+      sourceType: 'gdelt',
+      publishedAt: new Date().toISOString(),
+      country: country === 'all' ? 'all' : country,
+      category: category === 'all' ? 'world' : category,
+      tags: ['GDELT', category === 'all' ? 'world' : category]
+    }));
+  } catch (error) {
+    console.warn('Could not fetch geolocated general news:', error);
+    return [];
+  }
+}
+
 export async function getAggregatedNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
   const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
   let liveList: NewsArticle[] = [];
   if (!isOffline) {
     try {
-      const [hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
+      const [generalArticles, hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
+        fetchGeolocatedGeneralNews(country, category),
         fetchLiveHackerNews(country === 'fr' ? 'france' : country === 'de' ? 'germany' : 'tech'),
         fetchLiveDevToArticles(),
         fetchLiveGitHubRepos()
       ]);
 
+      if (generalArticles.status === 'fulfilled') liveList.push(...generalArticles.value);
       if (hnArticles.status === 'fulfilled') liveList.push(...hnArticles.value);
       if (devtoArticles.status === 'fulfilled') liveList.push(...devtoArticles.value);
       if (ghArticles.status === 'fulfilled') liveList.push(...ghArticles.value);
