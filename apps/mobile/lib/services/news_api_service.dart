@@ -15,45 +15,81 @@ class NewsApiService extends ChangeNotifier {
     notifyListeners();
 
     try {
-      final queryParam = category == 'patents' ? 'patent' : (country == 'fr' ? 'france' : 'tech');
-      final uri = Uri.parse('https://hn.algolia.com/api/v1/search_by_date?tags=story&query=$queryParam&hitsPerPage=20');
-      final res = await http.get(uri).timeout(const Duration(seconds: 8));
+      final topic = _generalTopic(category);
+      final countryCode = _gdeltCountryCode(country);
+      final query = Uri.encodeQueryComponent([topic, if (countryCode.isNotEmpty) 'sourcecountry:$countryCode'].join(' '));
+      final uri = Uri.parse(
+        'https://api.gdeltproject.org/api/v2/doc/doc?query=$query&mode=artlist&maxrecords=50&format=json&sort=datedesc',
+      );
+      final res = await http.get(uri).timeout(const Duration(seconds: 10));
 
-      List<NewsArticle> fetched = [];
+      final fetched = <NewsArticle>[];
       if (res.statusCode == 200) {
-        final data = json.decode(res.body);
-        final hits = data['hits'] as List? ?? [];
-        for (var item in hits) {
-          if (item['title'] != null) {
-            fetched.add(NewsArticle.fromHackerNews(item, country: country));
+        final data = json.decode(res.body) as Map<String, dynamic>;
+        final articles = data['articles'] as List? ?? [];
+        for (final item in articles) {
+          if (item is Map<String, dynamic> && item['title'] != null && item['url'] != null) {
+            fetched.add(
+              NewsArticle.fromGdelt(
+                item,
+                country: country,
+                category: category == 'all' ? 'world' : category,
+              ),
+            );
           }
         }
       }
 
-      // Ajout de brevets Google Patents de référence
-      fetched.insert(
-        0,
-        NewsArticle(
-          id: 'patent-google-impeller',
-          title: 'Google Patent US2026009812A1: Rendu Neural et AOT Shaders Impeller',
-          description: 'Brevet officiel délivré à Google LLC sur le moteur de rendu vectoriel haute performance de Flutter.',
-          url: 'https://patents.google.com/patent/US2026009812A1/en',
-          googlePatentsUrl: 'https://patents.google.com/patent/US2026009812A1/en',
-          patentNumber: 'US-2026-009812-A1',
-          source: 'Google Patents USPTO',
-          publishedAt: DateTime.now(),
-          country: 'us',
-          category: 'patents',
-          publicationType: 'patent',
-        ),
-      );
-
       _articles = fetched;
     } catch (e) {
-      debugPrint("NewsApiService note: $e");
+      debugPrint('NewsApiService note: $e');
+      _articles = [];
     } finally {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  String _generalTopic(String category) {
+    const topics = {
+      'world': 'world OR international',
+      'politics': 'politics OR government OR election',
+      'business': 'business OR companies OR markets',
+      'economy': 'economy OR inflation OR employment',
+      'society': 'society OR community',
+      'local': 'local OR regional',
+      'sports': 'sports OR football OR soccer OR olympics',
+      'culture': 'culture OR arts OR heritage',
+      'entertainment': 'entertainment OR cinema OR music OR television',
+      'science': 'science OR research OR discovery',
+      'health': 'health OR medicine OR public-health',
+      'environment': 'environment OR climate OR biodiversity',
+      'education': 'education OR university OR school',
+      'technology': 'technology OR digital OR innovation',
+      'ai': 'artificial intelligence OR AI OR machine learning',
+      'cyber': 'cybersecurity OR cyberattack OR vulnerability',
+      'opensource': 'open source OR GitHub',
+      'mobile': 'smartphone OR Android OR iOS OR mobile',
+      'cloud': 'cloud computing OR data center OR Kubernetes',
+      'patents': 'patent OR intellectual property',
+      'blueprints': 'architecture OR infrastructure OR technical design',
+      'travel': 'travel OR tourism OR aviation',
+      'lifestyle': 'lifestyle OR food OR fashion OR wellness',
+    };
+    return topics[category] ?? 'news OR latest OR breaking';
+  }
+
+  String _gdeltCountryCode(String country) {
+    const codes = {
+      'fr': 'FR',
+      'dz': 'AG',
+      'cn': 'CH',
+      'us': 'US',
+      'de': 'GM',
+      'gb': 'UK',
+      'jp': 'JA',
+      'ca': 'CA',
+    };
+    return codes[country] ?? '';
   }
 }
