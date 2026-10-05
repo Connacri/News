@@ -21,6 +21,7 @@ import { CountryCode, FcmPayload, FlutterPlatform, Language, NewsArticle, NewsCa
 import { getAggregatedNews } from './services/newsApi';
 import { translations } from './services/translations';
 import { COUNTRIES } from './services/countries';
+import { NEWS_CATEGORIES } from './services/newsCategories';
 import { getSavedLanguage, setSavedLanguage } from './services/translator';
 import { 
   auth, 
@@ -297,16 +298,8 @@ export default function App() {
         {/* 2. Mobile Horizontal Category Chip Bar (When on News Tab) */}
         {activeNavTab === 'news' && (
           <div className="sticky top-14 z-30 bg-slate-950/95 backdrop-blur border-b border-slate-800/80 py-2.5 px-3 overflow-x-auto no-scrollbar flex items-center gap-1.5 shrink-0">
-            {[
-              { id: 'all', label: t.categoryAll },
-              { id: 'patents', label: t.categoryPatents },
-              { id: 'blueprints', label: t.categoryBlueprints },
-              { id: 'ai', label: t.categoryAi },
-              { id: 'cyber', label: t.categoryCyber },
-              { id: 'opensource', label: t.categoryOpenSource },
-              { id: 'mobile', label: t.categoryMobile },
-              { id: 'cloud', label: t.categoryCloud },
-            ].map((cat) => {
+            {NEWS_CATEGORIES.map((cat) => {
+              const label = currentLang === 'en' ? cat.en : cat.fr;
               const isSelected = selectedCategory === cat.id;
               return (
                 <button
@@ -318,7 +311,7 @@ export default function App() {
                       : 'bg-slate-900 text-slate-400 hover:text-slate-200 border border-slate-800'
                   }`}
                 >
-                  {cat.label}
+                  {cat.icon} {label}
                 </button>
               );
             })}
