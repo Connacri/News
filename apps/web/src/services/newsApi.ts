@@ -1371,7 +1371,7 @@ async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory
   );
   const map = new Map<string, NewsArticle>();
   for (const batch of results) if (batch.status === 'fulfilled') for (const article of batch.value) {
-    if (article.title && article.url) map.set(article.url.replace(/#.*$/, '').replace(/\\/$/, ''), article);
+    if (article.title && article.url) map.set(article.url.replace(/#.*$/, '').replace(/\/$/, ''), article);
   }
   return Array.from(map.values());
 }
