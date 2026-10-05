@@ -1,5 +1,6 @@
 import { CountryCode, NewsArticle, NewsCategory, OsintAlert } from '../types';
 import { getCachedArticles, getLastViewedArticles, saveCachedArticles } from './offlineCache';
+import { ALGERIAN_NEWS_SOURCES } from './algerianSources';
 
 // Curated live baseline dataset with rich technical content for each country
 const COUNTRY_TECH_FALLBACKS: NewsArticle[] = [
@@ -1339,7 +1340,7 @@ async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory
     cyber: 'cybersécurité', travel: 'voyage tourisme', lifestyle: 'lifestyle',
   };
   const topicList = category === 'all' ? Object.keys(topics) : [category];
-  const domains = ['aps.dz', 'tsa-algerie.com', 'algerie360.com', 'lexpression.dz', 'elwatan.dz'];
+  const domains = ALGERIAN_NEWS_SOURCES.filter((source) => source.enabled && source.domain).map((source) => source.domain as string);
   const results = await Promise.allSettled(
     topicList.flatMap((topic) => domains.map(async (domain) => {
       const q = encodeURIComponent(`site:${domain} ${topics[topic] || topic} Algérie`);
