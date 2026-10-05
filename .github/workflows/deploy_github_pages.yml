@@ -37,6 +37,8 @@ jobs:
 
       - name: Build application
         run: npm run build
+        env:
+          BASE_PATH: /News/
 
       - name: Setup GitHub Pages
         uses: actions/configure-pages@v6

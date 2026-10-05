@@ -6,6 +6,7 @@ const host = process.env.HOST || '0.0.0.0';
 const port = Number(process.env.PORT) || 5173;
 
 export default defineConfig(({ mode }) => ({
+  base: process.env.BASE_PATH || '/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
