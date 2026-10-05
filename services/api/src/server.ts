@@ -36,6 +36,84 @@ const TTS_MODEL = 'gemini-3.8-flash-lite-tts';
 const TTS_VOICES: Record<string, string> = { ar: 'Zephyr' };
 const TTS_MAX_CHARS = 4000;
 
+// Public RSS/Atom sources used as a discovery layer. Article content is not copied;
+// News stores title, metadata and the canonical source URL.
+const RSS_SOURCES = [
+  { id: 'aps', name: 'APS', query: 'site:aps.dz Algérie' },
+  { id: 'tsa', name: 'TSA Algérie', query: 'site:tsa-algerie.com Algérie' },
+  { id: 'algerie360', name: 'Algérie360', query: 'site:algerie360.com Algérie' },
+  { id: 'lexpression', name: "L'Expression", query: 'site:lexpression.dz Algérie' },
+  { id: 'elwatan', name: 'El Watan', query: 'site:elwatan.dz Algérie' },
+  { id: 'international', name: 'International', query: 'Algérie international' },
+];
+
+const RSS_TOPICS: Record<string, string> = {
+  world: 'monde international',
+  politics: 'politique gouvernement élections',
+  business: 'entreprises business',
+  economy: 'économie emploi inflation marchés',
+  society: 'société social',
+  local: 'local wilaya commune',
+  sports: 'sport football',
+  culture: 'culture arts patrimoine',
+  entertainment: 'cinéma musique télévision divertissement',
+  science: 'science recherche',
+  health: 'santé médecine',
+  environment: 'environnement climat',
+  education: 'éducation université école',
+  technology: 'technologie numérique innovation',
+  ai: 'intelligence artificielle IA',
+  cyber: 'cybersécurité cyberattaque',
+  travel: 'voyage tourisme',
+  lifestyle: 'lifestyle mode cuisine',
+};
+
+function decodeXml(value: string): string {
+  return value
+    .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
+    .replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/&#39;/g, "'")
+    .replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+    .replace(/<[^>]+>/g, '').trim();
+}
+
+function parseRss(xml: string, sourceName: string, category: string) {
+  const items = xml.match(/<(item|entry)[^>]*>[\s\S]*?<\/(item|entry)>/gi) || [];
+  return items.map((item, index) => {
+    const get = (tag: string) => {
+      const match = item.match(new RegExp(`<${tag}(?:[^>]*)>([\\s\\S]*?)<\\/${tag}>`, 'i'));
+      return match ? decodeXml(match[1]) : '';
+    };
+    const linkMatch = item.match(/<link[^>]*href=["']([^"']+)["'][^>]*\/?\s*>/i);
+    const url = linkMatch?.[1] || get('link');
+    const title = get('title');
+    const description = get('description') || get('summary');
+    const date = get('pubDate') || get('published') || get('updated');
+    return {
+      id: `rss-${sourceName}-${url || index}`,
+      title,
+      description: description.slice(0, 500),
+      url,
+      source: sourceName,
+      sourceType: 'rss',
+      publishedAt: date ? new Date(date).toISOString() : new Date().toISOString(),
+      country: 'dz',
+      category,
+      tags: ['RSS', sourceName, category],
+    };
+  }).filter((item) => item.title && item.url);
+}
+
+async function fetchRssSource(source: typeof RSS_SOURCES[number], topic: string) {
+  const q = encodeURIComponent(`${source.query} ${topic}`);
+  // Google News provides RSS while preserving the original article link in its items.
+  const url = `https://news.google.com/rss/search?q=${q}&hl=fr&gl=DZ&ceid=DZ:fr`;
+  const response = await fetch(url, { headers: { 'User-Agent': 'NewsAggregator/1.0' } });
+  if (!response.ok) throw new Error(`RSS HTTP ${response.status}`);
+  return parseRss(await response.text(), source.name, topic || 'world');
+}
+
+
+
 const ALLOWED_ORIGINS = new Set([
   'https://device-streaming-ccab91bb.web.app',
   'https://flutter-news-osint.web.app',
@@ -117,6 +195,28 @@ async function startServer() {
 
   app.get('/api/health', (_req, res) => {
     res.json({ status: 'ok', env: IS_PROD ? 'production' : 'development' });
+  });
+
+  app.get('/api/news/aggregate', async (req, res) => {
+    try {
+      const country = String(req.query.country || 'all');
+      const category = String(req.query.category || 'all');
+      const topics = category === 'all' ? Object.keys(RSS_TOPICS) : [category];
+      const batches = await Promise.allSettled(
+        topics.flatMap((topic) => RSS_SOURCES.map((source) => fetchRssSource(source, RSS_TOPICS[topic] || topic)))
+      );
+      const articles = batches.flatMap((batch) => batch.status === 'fulfilled' ? batch.value : []);
+      const unique = new Map<string, any>();
+      for (const article of articles) {
+        if (country !== 'all' && article.country !== country) continue;
+        const key = article.url.replace(/#.*$/, '').replace(/\/$/, '');
+        if (!unique.has(key)) unique.set(key, article);
+      }
+      res.json(Array.from(unique.values()).sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt)));
+    } catch (error) {
+      console.error('[api/news/aggregate]', error);
+      res.status(502).json({ error: 'News aggregation unavailable' });
+    }
   });
 
   app.post('/api/tts', async (req, res) => {
