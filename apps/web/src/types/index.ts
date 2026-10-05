@@ -10,7 +10,7 @@ export interface CountryInfo {
   techHubs: string[];
 }
 
-export type NewsCategory = 'all' | 'ai' | 'cyber' | 'opensource' | 'mobile' | 'cloud' | 'patents' | 'blueprints' | 'offline';
+export type NewsCategory = 'all' | 'world' | 'politics' | 'business' | 'economy' | 'society' | 'local' | 'sports' | 'culture' | 'entertainment' | 'science' | 'health' | 'environment' | 'education' | 'technology' | 'ai' | 'cyber' | 'opensource' | 'mobile' | 'cloud' | 'patents' | 'blueprints' | 'travel' | 'lifestyle' | 'offline';
 
 export interface NewsArticle {
   id: string;
@@ -20,7 +20,7 @@ export interface NewsArticle {
   translatedDescription?: string;
   url: string;
   source: string;
-  sourceType: 'hackernews' | 'devto' | 'github' | 'osint' | 'reddit' | 'opensource' | 'ai' | 'cloud' | 'patents' | 'blueprint' | 'arxiv';
+  sourceType: 'hackernews' | 'devto' | 'github' | 'gdelt' | 'osint' | 'reddit' | 'opensource' | 'ai' | 'cloud' | 'patents' | 'blueprint' | 'arxiv';
   publishedAt: string;
   author?: string;
   country: CountryCode;
