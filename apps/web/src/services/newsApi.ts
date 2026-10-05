@@ -1265,29 +1265,64 @@ function gdeltCountryQuery(country: CountryCode): string {
 }
 
 export async function fetchGeolocatedGeneralNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
-  const topic = category === 'all' ? 'news OR latest OR breaking' : (GENERAL_NEWS_QUERIES[category] || 'news');
-  const query = encodeURIComponent([topic, gdeltCountryQuery(country)].filter(Boolean).join(' '));
-  const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&maxrecords=50&format=json&sort=datedesc`;
-  try {
-    const res = await fetch(url, { headers: { Accept: 'application/json' } });
-    if (!res.ok) throw new Error(`GDELT HTTP ${res.status}`);
-    const data = await res.json();
-    return (data.articles || []).map((item: any, index: number): NewsArticle => ({
-      id: `gdelt-${item.url || index}`,
-      title: item.title || 'Untitled article',
-      description: item.seendate ? `Published ${item.seendate}` : 'Latest news',
-      url: item.url,
-      source: item.domain || 'GDELT',
-      sourceType: 'gdelt',
-      publishedAt: new Date().toISOString(),
-      country: country === 'all' ? 'all' : country,
-      category: category === 'all' ? 'world' : category,
-      tags: ['GDELT', category === 'all' ? 'world' : category]
-    }));
-  } catch (error) {
-    console.warn('Could not fetch geolocated general news:', error);
-    return [];
+  const categories = category === 'all'
+    ? Object.keys(GENERAL_NEWS_QUERIES)
+    : [category];
+
+  const countryFilter = gdeltCountryQuery(country);
+
+  // "All" is a true multi-theme aggregation: each editorial category gets
+  // its own GDELT query, then the result set is merged and de-duplicated.
+  const batches = await Promise.allSettled(
+    categories.map(async (editorialCategory) => {
+      const topic = GENERAL_NEWS_QUERIES[editorialCategory] || 'news';
+      const query = encodeURIComponent([topic, countryFilter].filter(Boolean).join(' '));
+      const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&maxrecords=${category === 'all' ? 12 : 50}&format=json&sort=datedesc`;
+      const res = await fetch(url, { headers: { Accept: 'application/json' } });
+      if (!res.ok) throw new Error(`GDELT HTTP ${res.status}`);
+      const data = await res.json();
+      return (data.articles || []).map((item: any, index: number): NewsArticle => ({
+        id: `gdelt-${item.url || editorialCategory + '-' + index}`,
+        title: item.title || 'Untitled article',
+        description: item.seendate ? `Published ${item.seendate}` : 'Latest news',
+        url: item.url,
+        source: item.domain || 'GDELT',
+        sourceType: 'gdelt',
+        publishedAt: parseGdeltDate(item.seendate),
+        country: country === 'all' ? 'all' : country,
+        category: editorialCategory as NewsCategory,
+        tags: ['GDELT', editorialCategory],
+      }));
+    })
+  );
+
+  const articles: NewsArticle[] = [];
+  for (const batch of batches) {
+    if (batch.status === 'fulfilled') articles.push(...batch.value);
   }
+
+  const unique = new Map<string, NewsArticle>();
+  for (const article of articles) {
+    const normalizedUrl = article.url.trim().replace(/#.*$/, '').replace(/\/$/, '');
+    const key = normalizedUrl || article.id;
+    if (!unique.has(key)) unique.set(key, article);
+  }
+
+  return Array.from(unique.values())
+    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+}
+
+function parseGdeltDate(value: unknown): string {
+  if (typeof value !== 'string' || !value) return new Date().toISOString();
+  const match = value.match(/^(\\d{8})T(\\d{6})Z$/);
+  if (match) {
+    const [, date, time] = match;
+    return new Date(
+      `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}T${time.slice(0, 2)}:${time.slice(2, 4)}:${time.slice(4, 6)}Z`
+    ).toISOString();
+  }
+  const parsed = Date.parse(value);
+  return Number.isNaN(parsed) ? new Date().toISOString() : new Date(parsed).toISOString();
 }
 
 export async function getAggregatedNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
