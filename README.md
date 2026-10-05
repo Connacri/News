@@ -1,22 +1,21 @@
-# FlutterNews OSINT & Tech Radar
+# News — Actualités géolocalisées & veille spécialisée
 
-Application Flutter Cross-Platform + Web React pour la veille techno (news par pays, OSINT open-source, Google Patents, Blueprints) avec Firebase (Firestore, Auth, FCM), Vite/Express, CI/CD GitHub Actions.
+Application Flutter Cross-Platform + Web React d'actualités généralistes géolocalisées : monde, local, politique, économie, entreprises, société, sports, culture, divertissement, science, santé, environnement, éducation, voyage et lifestyle — avec des rubriques spécialisées technologie, IA, cybersécurité, open source, brevets et cloud. La technologie n'est qu'un thème parmi les autres.
 
 ---
 
 ## ✨ Présentation — pour les utilisateurs
 
 **FlutterNews OSINT & Tech Radar** est une application **gratuite, sans publicité et sans
-suivi** qui rassemble toute la veille technologique au même endroit : actualités, failles de
-sécurité, tendances de développement et ressources prêtes à l'emploi. Elle fonctionne dans
+suivi** qui rassemble les actualités par **géographie et thème** : l'utilisateur choisit un pays/région et un sujet, puis reçoit un flux adapté à cette zone. Les rubriques technologiques spécialisées restent disponibles, mais elles ne limitent plus le fil principal. Elle fonctionne dans
 le navigateur sur ordinateur **et** sur téléphone Android, avec la même interface.
 
 ### Ce que vous pouvez faire
 
 | Fonctionnalité | Ce qu'elle apporte |
 |---|---|
-| **Fil d'actualité par pays** | Les dernières actualités techno filtrées par zone : Monde, France, Algérie, Maghreb, Chine, États-Unis, Allemagne, Royaume-Uni, Japon, Canada. |
-| **Radar OSINT** | Veille sécurité ouverte : avis CISA, vulnérabilités exploitées, attaques supply-chain, incidents réseau. |
+| **Actualités géolocalisées** | Flux généraliste filtré par zone : Monde, France, Algérie, Maghreb, Chine, États-Unis, Allemagne, Royaume-Uni, Japon, Canada, avec sources géolocalisées. |
+| **Thèmes complets** | Monde, politique, économie, entreprises, société, local, sports, culture, divertissement, science, santé, environnement, éducation, voyage, lifestyle, puis technologie et sous-thèmes spécialisés. |
 | **Tendances GitHub & Hacker News** | Les dépôts et discussions qui montent, avec les liens directs vers les projets. |
 | **Hub d'API gratuites** | Un catalogue d'API utiles (news, recherche, données) à tester directement depuis l'app. |
 | **Export de code Flutter** | Extraits et intégrations prêts à l'emploi : API, modèles IA, tunnels, configuration Firebase. |
@@ -37,7 +36,7 @@ le navigateur sur ordinateur **et** sur téléphone Android, avec la même inter
 ### Démarrer en 30 secondes
 
 1. Ouvrez `https://device-streaming-ccab91bb.web.app` — ou installez l'APK sur Android.
-2. Choisissez votre pays et votre langue dans le menu latéral (☰).
+2. Choisissez votre zone et votre thème dans le menu latéral (☰). Le flux général est géolocalisé ; la technologie n'est qu'une catégorie parmi toutes les autres.
 3. *(Facultatif)* Connectez-vous avec **Google** pour synchroniser vos favoris.
 4. *(Facultatif)* Activez les notifications push : vous ne partagez aucune donnée personnelle sans votre accord.
 
