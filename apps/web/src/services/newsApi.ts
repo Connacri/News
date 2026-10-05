@@ -1347,7 +1347,7 @@ async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory
       const res = await fetch(`https://news.google.com/rss/search?q=${q}&hl=fr&gl=DZ&ceid=DZ:fr`);
       if (!res.ok) throw new Error(`RSS ${res.status}`);
       const xml = await res.text();
-      const items = xml.match(/<item>[\\s\\S]*?<\\/item>/gi) || [];
+      const items = xml.match(/<item>[\s\S]*?<\/item>/gi) || [];
       return items.map((item, index) => {
         const value = (tag: string) => {
           const m = item.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
