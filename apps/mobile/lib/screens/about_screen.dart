@@ -7,11 +7,11 @@ class AboutScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('À propos')),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(20),
+      body: const SingleChildScrollView(
+        padding: EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
-          children: const [
+          children: [
             Text('DZ News', style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold)),
             SizedBox(height: 8),
             Text(
