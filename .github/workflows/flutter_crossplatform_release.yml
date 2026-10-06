@@ -162,6 +162,7 @@ jobs:
           retention-days: 30
 
       - name: Publish GitHub Release
+        if: steps.version.outputs.isTag == 'true'
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}

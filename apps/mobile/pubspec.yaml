@@ -1,7 +1,7 @@
 name: flutter_news_osint
 description: "Application Flutter Cross-Platform de News Tech Quotidiennes, Google Patents, Blueprints et OSINT avec Firebase."
 publish_to: "none"
-version: 1.0.0+2
+version: 1.0.1+15
 
 environment:
   sdk: ">=3.12.0 <4.0.0"
