@@ -58,7 +58,7 @@ self.addEventListener('fetch', (event) => {
           if (cachedResponse) return cachedResponse;
           const fallback = await caches.match('/index.html');
           if (fallback) return fallback;
-          return new Response('Mode Hors-ligne — FlutterNews OSINT', {
+          return new Response('Mode Hors-ligne — DZ News', {
             headers: { 'Content-Type': 'text/plain; charset=utf-8' }
           });
         })

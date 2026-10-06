@@ -1,7 +1,7 @@
 {
   "id": "/",
-  "name": "FlutterNews OSINT & Patents",
-  "short_name": "FlutterNews",
+  "name": "DZ News",
+  "short_name": "DZ News",
   "description": "Application Flutter et Web de News Tech Quotidiennes, Google Patents & Radar OSINT avec cache hors-ligne.",
   "start_url": "/",
   "scope": "/",
@@ -11,9 +11,9 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "/icon.svg",
-      "sizes": "any",
-      "type": "image/svg+xml",
+      "src": "/icon.png",
+      "sizes": "1030x934",
+      "type": "image/png",
       "purpose": "any"
     }
   ]

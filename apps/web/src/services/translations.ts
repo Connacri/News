@@ -155,7 +155,7 @@ export interface TranslationStrings {
 
 export const translations: Record<Language, TranslationStrings> = {
   fr: {
-    appTitle: "FlutterNews OSINT & Patents",
+    appTitle: "DZ News",
     appSubtitle: "Veille Technologique, Renseignement Open-Source & Brevets Mondiaux",
     dailyTechNews: "News Tech & Brevets du Jour",
     osintRadar: "Radar OSINT & Cyber",
@@ -303,7 +303,7 @@ export const translations: Record<Language, TranslationStrings> = {
     cachedOfflineCount: "articles disponibles hors-ligne"
   },
   en: {
-    appTitle: "FlutterNews OSINT & Patents",
+    appTitle: "DZ News",
     appSubtitle: "Daily Tech Intelligence, Open-Source Radar & Global Patents",
     dailyTechNews: "Daily Tech News & Patents",
     osintRadar: "OSINT & Cyber Radar",
@@ -451,7 +451,7 @@ export const translations: Record<Language, TranslationStrings> = {
     cachedOfflineCount: "articles available offline"
   },
   es: {
-    appTitle: "FlutterNews OSINT & Patentes",
+    appTitle: "DZ News & Patentes",
     appSubtitle: "Inteligencia Tecnológica, Radar de Código Abierto y Patentes",
     dailyTechNews: "Noticias Tech y Patentes",
     osintRadar: "Radar OSINT y Ciberseguridad",
@@ -599,7 +599,7 @@ export const translations: Record<Language, TranslationStrings> = {
     cachedOfflineCount: "artículos disponibles sin conexión"
   },
   de: {
-    appTitle: "FlutterNews OSINT & Patente",
+    appTitle: "DZ News & Patente",
     appSubtitle: "Tägliche Tech-Nachrichten, Open-Source-Radar & Globale Patente",
     dailyTechNews: "Tägliche Tech-News & Patente",
     osintRadar: "OSINT & Cyber-Radar",
@@ -747,7 +747,7 @@ export const translations: Record<Language, TranslationStrings> = {
     cachedOfflineCount: "Artikel offline verfügbar"
   },
   ar: {
-    appTitle: "FlutterNews OSINT وبراءات الاختراع",
+    appTitle: "DZ News وبراءات الاختراع",
     appSubtitle: "الرصد التقني اليومي، استخبارات المصادر المفتوحة وبراءات الاختراع العالمية",
     dailyTechNews: "الأخبار التقنية وبراءات الاختراع اليومية",
     osintRadar: "رادار أوسينت والأمن السيبراني",
@@ -895,7 +895,7 @@ export const translations: Record<Language, TranslationStrings> = {
     cachedOfflineCount: "مقالات متوفرة دون اتصال"
   },
   ja: {
-    appTitle: "FlutterNews OSINT & 特許",
+    appTitle: "DZ News & 特許",
     appSubtitle: "日刊テクノロジーニュース、オープンソース情報レーダー ＆ 世界の特許情報",
     dailyTechNews: "本日のテックニュース ＆ 特許情報",
     osintRadar: "OSINT・サイバーセキュリティ",

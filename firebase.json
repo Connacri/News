@@ -10,6 +10,18 @@
           "destination": "/security-policy.html"
         },
         {
+          "source": "/contact",
+          "destination": "/contact.html"
+        },
+        {
+          "source": "/about",
+          "destination": "/about.html"
+        },
+        {
+          "source": "/mentions-legales",
+          "destination": "/mentions-legales.html"
+        },
+        {
           "source": "**",
           "destination": "/index.html"
         }
@@ -43,6 +55,18 @@
         {
           "source": "/security-policy",
           "destination": "/security-policy.html"
+        },
+        {
+          "source": "/contact",
+          "destination": "/contact.html"
+        },
+        {
+          "source": "/about",
+          "destination": "/about.html"
+        },
+        {
+          "source": "/mentions-legales",
+          "destination": "/mentions-legales.html"
         },
         {
           "source": "**",

@@ -6,6 +6,18 @@ class NewsArticle {
   final String source;
   final String sourceType;
   final DateTime publishedAt;
+  final String? author;
+
+  static DateTime? _parseGdeltDate(String? raw) {
+    if (raw == null || raw.isEmpty) return null;
+    final iso = DateTime.tryParse(raw);
+    if (iso != null) return iso;
+    final match = RegExp(r'^(\d{4})(\d{2})(\d{2})[T ]?(\d{2})(\d{2})(\d{2})').firstMatch(raw);
+    if (match != null) {
+      return DateTime.tryParse('${match.group(1)}-${match.group(2)}-${match.group(3)}T${match.group(4)}:${match.group(5)}:${match.group(6)}Z');
+    }
+    return null;
+  }
   final String country;
   final String category;
   final int upvotes;
@@ -34,6 +46,7 @@ class NewsArticle {
     required this.source,
     this.sourceType = 'news',
     required this.publishedAt,
+    this.author,
     required this.country,
     required this.category,
     this.upvotes = 0,
@@ -60,6 +73,7 @@ class NewsArticle {
       source: 'Hacker News',
       sourceType: 'hackernews',
       publishedAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
+      author: json['author'],
       country: country,
       category: 'tech',
       upvotes: json['points'] ?? 0,
@@ -76,7 +90,8 @@ class NewsArticle {
       url: json['url'] ?? '',
       source: json['domain'] ?? 'GDELT',
       sourceType: 'gdelt',
-      publishedAt: DateTime.tryParse(json['seendate']?.toString() ?? '') ?? DateTime.now(),
+      publishedAt: _parseGdeltDate(json['seendate']?.toString()) ?? DateTime.now(),
+      author: json['author'],
       country: country,
       category: category,
       tags: ['GDELT', category],

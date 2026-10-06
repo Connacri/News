@@ -1,4 +1,4 @@
-# 🚀 FlutterNews OSINT & Patents — Projet Flutter Cross-Platform
+# 🚀 DZ News — Projet Flutter Cross-Platform
 
 Ce dossier contient l'application Flutter native multiplateforme pour Android, iOS, Web et Desktop.
 

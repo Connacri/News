@@ -6,7 +6,7 @@ Application Flutter Cross-Platform + Web React d'actualités généralistes géo
 
 ## ✨ Présentation — pour les utilisateurs
 
-**FlutterNews OSINT & Tech Radar** est une application **gratuite, sans publicité et sans
+**DZ News** est une application **gratuite, sans publicité et sans
 suivi** qui rassemble les actualités par **géographie et thème** : l'utilisateur choisit un pays/région et un sujet, puis reçoit un flux adapté à cette zone. Les rubriques technologiques spécialisées restent disponibles, mais elles ne limitent plus le fil principal. Elle fonctionne dans
 le navigateur sur ordinateur **et** sur téléphone Android, avec la même interface.
 

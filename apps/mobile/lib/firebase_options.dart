@@ -1,4 +1,4 @@
-// Firebase configuration auto-generated for FlutterNews.
+// Firebase configuration auto-generated for DZ News.
 // Generated for project device-streaming-ccab91bb.
 // Regenerate with: flutterfire configure
 

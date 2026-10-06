@@ -86,7 +86,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           </div>
 
           <h2 className="text-lg font-bold text-white tracking-tight">
-            FlutterNews OSINT & Patents
+            DZ News
           </h2>
           <p className="text-xs text-slate-400 mt-0.5">
             Flutter 3.24 · Firebase Auth/Firestore · Google Patents
@@ -255,7 +255,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               <ShieldCheck className="w-3.5 h-3.5" />
               <span className="font-mono">Confidentialité</span>
             </a>
-            <span className="font-mono text-slate-400">Firebase &amp; Patents</span>
+            <a href="/contact" target="_blank" rel="noopener noreferrer" className="font-mono text-slate-400 hover:text-sky-400 transition-colors">Contact</a>
+            <a href="/about" target="_blank" rel="noopener noreferrer" className="font-mono text-slate-400 hover:text-sky-400 transition-colors">À propos</a>
           </div>
         </div>
       </div>

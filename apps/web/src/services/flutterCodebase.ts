@@ -98,19 +98,19 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NewsApiService()),
         ChangeNotifierProvider(create: (_) => FirestoreSyncService()),
       ],
-      child: const FlutterNewsCrossPlatformApp(),
+      child: const DZNewsApp(),
     ),
   );
 }
 
-class FlutterNewsCrossPlatformApp extends StatefulWidget {
-  const FlutterNewsCrossPlatformApp({super.key});
+class DZNewsApp extends StatefulWidget {
+  const DZNewsApp({super.key});
 
   @override
-  State<FlutterNewsCrossPlatformApp> createState() => _FlutterNewsCrossPlatformAppState();
+  State<DZNewsApp> createState() => _DZNewsAppState();
 }
 
-class _FlutterNewsCrossPlatformAppState extends State<FlutterNewsCrossPlatformApp> {
+class _DZNewsAppState extends State<DZNewsApp> {
   Locale _currentLocale = const Locale('fr', 'FR');
 
   void setLocale(Locale newLocale) {
@@ -125,7 +125,7 @@ class _FlutterNewsCrossPlatformAppState extends State<FlutterNewsCrossPlatformAp
     final isRtl = _currentLocale.languageCode == 'ar';
 
     return MaterialApp(
-      title: 'FlutterNews OSINT & Patents',
+      title: 'DZ News',
       debugShowCheckedModeBanner: false,
       locale: _currentLocale,
       themeMode: ThemeMode.dark, // Mode Dark par défaut pour la veille OSINT & tech
@@ -335,7 +335,7 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             Icon(Icons.radar, color: Color(0xFF38BDF8)),
             SizedBox(width: 8),
-            Text('FlutterNews Multiplateforme', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+            Text('DZ News Multiplateforme', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ],
         ),
         actions: [
@@ -883,9 +883,9 @@ jobs:
   <base href="$FLUTTER_BASE_HREF">
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
-  <meta name="description" content="FlutterNews OSINT, Google Patents & Tech Radar Cross-Platform">
+  <meta name="description" content="DZ News, Google Patents & Tech Radar Cross-Platform">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>FlutterNews OSINT Multiplateforme</title>
+  <title>DZ News Multiplateforme</title>
   <link rel="manifest" href="manifest.json">
 </head>
 <body style="background-color: #020617; margin: 0; padding: 0;">
@@ -912,7 +912,7 @@ jobs:
     path: 'README.md',
     description: 'Documentation d\'exécution multiplateforme (Android, iOS, Web, Windows, macOS, Linux)',
     language: 'markdown',
-    content: `# 🚀 FlutterNews OSINT & Patents — Multiplateforme (Android, iOS, Web, Desktop)
+    content: `# 🚀 DZ News — Multiplateforme (Android, iOS, Web, Desktop)
 
 Une seule base de code Flutter 3.24 moderne et performante, exécutable nativement sur :
 - 📱 **Android** (APK optimisé, AAB Google Play Store, moteur Impeller Vulkan)

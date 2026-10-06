@@ -4,6 +4,8 @@ import 'package:url_launcher/url_launcher.dart';
 import '../services/news_api_service.dart';
 import 'patents_screen.dart';
 import 'osint_screen.dart';
+import 'about_screen.dart';
+import 'contact_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   final Function(Locale) onLocaleChange;
@@ -64,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen> {
             SizedBox(width: 8),
             Flexible(
               child: Text(
-                'FlutterNews Multiplateforme',
+                'DZ News',
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
               ),
@@ -92,6 +94,24 @@ class _HomeScreenState extends State<HomeScreen> {
             onPressed: news.isLoading
                 ? null
                 : () => news.fetchNews(country: _selectedCountry, category: _selectedCategory),
+          ),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            tooltip: 'Menu',
+            onSelected: (value) {
+              if (value == 'about') {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AboutScreen()));
+              } else if (value == 'contact') {
+                Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ContactScreen()));
+              } else if (value == 'privacy') {
+                launchUrl(Uri.parse('https://device-streaming-ccab91bb.web.app/security-policy'));
+              }
+            },
+            itemBuilder: (_) => const [
+              PopupMenuItem(value: 'about', child: Text('À propos')),
+              PopupMenuItem(value: 'contact', child: Text('Nous contacter')),
+              PopupMenuItem(value: 'privacy', child: Text('Confidentialité')),
+            ],
           ),
         ],
       ),
@@ -189,7 +209,20 @@ class _HomeScreenState extends State<HomeScreen> {
                       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                       child: ListTile(
                         title: Text(article.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Text(article.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+                        subtitle: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const SizedBox(height: 4),
+                            Text(article.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+                            const SizedBox(height: 6),
+                            Text(
+                              'Source : ${article.source}'
+                              '${article.author != null && article.author!.isNotEmpty ? ' · ${article.author}' : ''}'
+                              ' · ${article.publishedAt.day}/${article.publishedAt.month}/${article.publishedAt.year}',
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.cyanAccent),
+                            ),
+                          ],
+                        ),
                         trailing: IconButton(
                           icon: const Icon(Icons.open_in_new),
                           onPressed: () async {

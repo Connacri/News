@@ -60,7 +60,7 @@ export const MobileDeviceFrame: React.FC<MobileDeviceFrameProps> = ({
         <div className="bg-slate-900 border-b border-slate-800 px-4 py-2.5 flex items-center justify-between z-40">
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="font-bold text-sm text-white">FlutterNews</span>
+              <span className="font-bold text-sm text-white">DZ News</span>
               <span className="text-[10px] text-sky-400 font-mono">v1.0.0</span>
             </div>
             <div className="text-[10px] text-slate-400">

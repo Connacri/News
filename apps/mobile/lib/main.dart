@@ -40,19 +40,19 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NewsApiService()),
         ChangeNotifierProvider(create: (_) => FirestoreSyncService()),
       ],
-      child: const FlutterNewsCrossPlatformApp(),
+      child: const DZNewsApp(),
     ),
   );
 }
 
-class FlutterNewsCrossPlatformApp extends StatefulWidget {
-  const FlutterNewsCrossPlatformApp({super.key});
+class DZNewsApp extends StatefulWidget {
+  const DZNewsApp({super.key});
 
   @override
-  State<FlutterNewsCrossPlatformApp> createState() => _FlutterNewsCrossPlatformAppState();
+  State<DZNewsApp> createState() => _DZNewsAppState();
 }
 
-class _FlutterNewsCrossPlatformAppState extends State<FlutterNewsCrossPlatformApp> {
+class _DZNewsAppState extends State<DZNewsApp> {
   Locale _currentLocale = const Locale('fr', 'FR');
 
   void setLocale(Locale newLocale) {
@@ -66,7 +66,7 @@ class _FlutterNewsCrossPlatformAppState extends State<FlutterNewsCrossPlatformAp
     final isRtl = _currentLocale.languageCode == 'ar';
 
     return MaterialApp(
-      title: 'FlutterNews OSINT & Patents',
+      title: 'DZ News',
       debugShowCheckedModeBanner: false,
       locale: _currentLocale,
       themeMode: ThemeMode.dark, // Mode Dark par défaut pour la veille OSINT & tech

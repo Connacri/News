@@ -59,7 +59,7 @@ export const FREE_APIS_DIRECTORY: FreeApiResource[] = [
     requiresKey: false,
     rateLimit: '60 requêtes / minute (User-Agent personnalisé requis)',
     documentationUrl: 'https://www.reddit.com/dev/api/',
-    sampleCurl: `curl -s -A "FlutterNewsApp/1.0" "https://www.reddit.com/r/netsec/hot.json?limit=3" | jq '.data.children[].data.title'`
+    sampleCurl: `curl -s -A "DZ NewsApp/1.0" "https://www.reddit.com/r/netsec/hot.json?limit=3" | jq '.data.children[].data.title'`
   },
   {
     id: 'api-arxiv',

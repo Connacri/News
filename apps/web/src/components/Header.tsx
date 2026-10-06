@@ -36,7 +36,7 @@ export const Header: React.FC<HeaderProps> = ({
             <Radio className="w-4 h-4 animate-pulse" />
           </div>
           <span className="font-semibold text-lg tracking-tight text-white">
-            FlutterNews OSINT
+            DZ News
           </span>
         </div>
 

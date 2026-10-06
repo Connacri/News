@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Application web React 19 + Vite + Tailwind : FlutterNews OSINT & Tech Radar.",
+  "description": "Application web React 19 + Vite + Tailwind : DZ News.",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
