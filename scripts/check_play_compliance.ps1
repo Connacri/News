@@ -1,7 +1,6 @@
 # Contrôle de conformité Google Play pour DZ News.
 # Vérifications statiques uniquement — aucun build local n'est exécuté.
 $ErrorActionPreference = 'Stop'
-Add-Type -AssemblyName System.Drawing
 $fail = 0
 
 function Check($ok, $label) {
@@ -18,9 +17,9 @@ if (Test-Path $icon) {
 
 # 2. Dimensions >= 512 (lecture PNG directe)
 if (Test-Path $icon) {
-  $psi = New-Object System.Drawing.Bitmap $icon
-  $w, $h = $psi.Width, $psi.Height
-  $psi.Dispose()
+  $bytes = [IO.File]::ReadAllBytes($icon)
+  $w = ([int]$bytes[16] -shl 24) -bor ([int]$bytes[17] -shl 16) -bor ([int]$bytes[18] -shl 8) -bor [int]$bytes[19]
+  $h = ([int]$bytes[20] -shl 24) -bor ([int]$bytes[21] -shl 16) -bor ([int]$bytes[22] -shl 8) -bor [int]$bytes[23]
   Check ($w -ge 512 -and $h -ge 512) "dimensions icone >= 512px (${w}x${h})"
 }
 
