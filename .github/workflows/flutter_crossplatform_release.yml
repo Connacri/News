@@ -52,6 +52,11 @@ jobs:
       - name: Static analysis
         run: flutter analyze
 
+      - name: Vérification conformité Google Play
+        shell: pwsh
+        working-directory: ${{ github.workspace }}
+        run: ./scripts/check_play_compliance.ps1
+
   build:
     name: Build & Publish (APK / AAB / Web)
     needs: verify
@@ -160,7 +165,7 @@ jobs:
         uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.version.outputs.tag }}
-          name: FlutterNews ${{ steps.version.outputs.version }}
+          name: DZ News ${{ steps.version.outputs.version }}
           prerelease: ${{ steps.version.outputs.isTag == 'false' }}
           generate_release_notes: true
           files: |
@@ -168,7 +173,7 @@ jobs:
             apps/mobile/dist-release/*.aab
             apps/mobile/dist-release/flutter-news-web.zip
           body: |
-            FlutterNews OSINT & Tech Radar - ${{ steps.version.outputs.version }}
+            DZ News - ${{ steps.version.outputs.version }}
 
             Artefacts: APK (universal + split per ABI), AAB (Play Store), web zip (WasmGC).
             Builds Android signees avec le keystore de release.
