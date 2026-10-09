@@ -40,6 +40,7 @@ export default function App() {
   const [previewPlatform, setPreviewPlatform] = useState<FlutterPlatform>('android');
 
   useEffect(() => {
+    if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       setCurrentUser(user);
     });

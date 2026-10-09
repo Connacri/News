@@ -20,8 +20,10 @@ import {
 } from 'firebase/firestore';
 import { NewsArticle } from '../types';
 
+const apiKey = (import.meta as { env?: Record<string, string> }).env?.VITE_FIREBASE_API_KEY || '';
+
 const firebaseConfig: FirebaseOptions = {
-  apiKey: 'AIzaSyBFt4Ip5ZMaI6B3ZHHwnKWP7ex8mFv3HjA',
+  apiKey,
   authDomain: 'device-streaming-ccab91bb.firebaseapp.com',
   projectId: 'device-streaming-ccab91bb',
   storageBucket: 'device-streaming-ccab91bb.firebasestorage.app',
@@ -29,10 +31,10 @@ const firebaseConfig: FirebaseOptions = {
   appId: '1:100841671094:web:7ce6f2e80bfd61ad315917',
 };
 
-const app = initializeApp(firebaseConfig);
+const app = apiKey ? initializeApp(firebaseConfig) : null;
 
-export const db = getFirestore(app);
-export const auth = getAuth(app);
+export const db = app ? getFirestore(app) : null;
+export const auth = app ? getAuth(app) : null;
 export const googleProvider = new GoogleAuthProvider();
 
 export enum OperationType {
@@ -65,12 +67,12 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
   const errInfo: FirestoreErrorInfo = {
     error: error instanceof Error ? error.message : String(error),
     authInfo: {
-      userId: auth.currentUser?.uid ?? null,
-      email: auth.currentUser?.email ?? null,
-      emailVerified: auth.currentUser?.emailVerified ?? null,
-      isAnonymous: auth.currentUser?.isAnonymous ?? null,
-      tenantId: auth.currentUser?.tenantId ?? null,
-      providerInfo: auth.currentUser?.providerData?.map((provider) => ({
+      userId: auth?.currentUser?.uid ?? null,
+      email: auth?.currentUser?.email ?? null,
+      emailVerified: auth?.currentUser?.emailVerified ?? null,
+      isAnonymous: auth?.currentUser?.isAnonymous ?? null,
+      tenantId: auth?.currentUser?.tenantId ?? null,
+      providerInfo: auth?.currentUser?.providerData?.map((provider) => ({
         providerId: provider.providerId,
         email: provider.email,
       })) ?? [],
@@ -83,6 +85,7 @@ export function handleFirestoreError(error: unknown, operationType: OperationTyp
 }
 
 export async function testConnection(): Promise<boolean> {
+  if (!db) return false;
   try {
     await getDocFromServer(doc(db, 'test', 'connection'));
     return true;
@@ -94,11 +97,12 @@ export async function testConnection(): Promise<boolean> {
   }
 }
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && db) {
   testConnection().catch(() => {});
 }
 
 export async function loginWithGoogle(): Promise<User | null> {
+  if (!auth) return null;
   try {
     const result = await signInWithPopup(auth, googleProvider);
     return result.user;
@@ -109,6 +113,7 @@ export async function loginWithGoogle(): Promise<User | null> {
 }
 
 export async function logoutUser(): Promise<void> {
+  if (!auth) return;
   try {
     await signOut(auth);
   } catch (error) {
@@ -117,6 +122,7 @@ export async function logoutUser(): Promise<void> {
 }
 
 export async function saveBookmarkToFirestore(userId: string, article: NewsArticle): Promise<void> {
+  if (!db) return;
   const cleanId = (article.id ?? '').replace(/[^a-zA-Z0-9_\-]/g, '_');
   const path = `users/${userId}/bookmarks/${cleanId}`;
   try {
@@ -134,6 +140,7 @@ export async function saveBookmarkToFirestore(userId: string, article: NewsArtic
 }
 
 export async function removeBookmarkFromFirestore(userId: string, articleId: string): Promise<void> {
+  if (!db) return;
   const cleanId = (articleId ?? '').replace(/[^a-zA-Z0-9_\-]/g, '_');
   const path = `users/${userId}/bookmarks/${cleanId}`;
   try {

@@ -13,12 +13,21 @@ export interface NewsSourceDefinition {
   enabled: boolean;
 }
 
+type RawSourceTuple = [
+  string,
+  string,
+  'ar' | 'fr' | 'mixed',
+  NewsSourceKind,
+  'dz' | 'maghreb' | 'world',
+  string?,
+];
+
 /**
  * Master registry of Algerian press sources.
  * "enabled" only means the source is part of the editorial registry; the
  * collector must verify an RSS/API endpoint before using it as a direct feed.
  */
-export const ALGERIAN_NEWS_SOURCES: NewsSourceDefinition[] = [
+const RAW_ALGERIAN_NEWS_SOURCES: RawSourceTuple[] = [
   // Arabic — general / high-circulation
   ['elkhabar','El Khabar','ar','web','dz'],
   ['echorouk','Echourouk El Youmi','ar','web','dz'],
@@ -70,9 +79,15 @@ const generalCategories: NewsCategory[] = [
   'ai','cyber','travel','lifestyle'
 ];
 
-export const ALGERIAN_EDITORIAL_SOURCES = ALGERIAN_NEWS_SOURCES.map((source) => ({
-  id: source[0], name: source[1], language: source[2], kind: source[3],
-  country: source[4], domain: source[5],
+export const ALGERIAN_NEWS_SOURCES: NewsSourceDefinition[] = RAW_ALGERIAN_NEWS_SOURCES.map((source) => ({
+  id: source[0],
+  name: source[1],
+  language: source[2],
+  kind: source[3],
+  country: source[4],
+  domain: source[5],
   categories: generalCategories,
-  enabled: true
-} as NewsSourceDefinition));
+  enabled: true,
+}));
+
+export const ALGERIAN_EDITORIAL_SOURCES = ALGERIAN_NEWS_SOURCES;

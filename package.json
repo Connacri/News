@@ -11,7 +11,7 @@
   "scripts": {
     "dev": "npm run dev --workspace @news/api",
     "dev:web": "npm run dev --workspace @news/web",
-    "build": "npm run build --workspace @news/web",
+    "build": "npm run build --workspace @news/web && npm run build --workspace @news/api",
     "build:api": "npm run build --workspace @news/api",
     "start": "npm run start --workspace @news/api",
     "preview": "npm run preview --workspace @news/web",

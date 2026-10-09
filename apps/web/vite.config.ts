@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 const host = process.env.HOST || '0.0.0.0';
-const port = Number(process.env.PORT) || 5173;
+const port = Number(process.env.PORT) || 3000;
 
-export default defineConfig(({ mode }) => ({
+export default defineConfig(() => ({
   base: process.env.BASE_PATH || '/',
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -13,13 +13,11 @@ export default defineConfig(({ mode }) => ({
       '@': new URL('./src', import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, '$1'),
     },
   },
-  define: {
-    'process.env.GEMINI_API_KEY': JSON.stringify(process.env.GEMINI_API_KEY ?? ''),
-  },
   server: {
     host,
     port,
     strictPort: true,
+    allowedHosts: true as const,
     hmr: process.env.DISABLE_HMR !== 'true',
     watch: process.env.DISABLE_HMR === 'true' ? null : {},
   },
@@ -27,6 +25,7 @@ export default defineConfig(({ mode }) => ({
     host,
     port,
     strictPort: true,
+    allowedHosts: true as const,
   },
   build: {
     outDir: 'dist',
