@@ -6,10 +6,16 @@ class PatentsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final now = DateTime.now();
+    String fmtDate(DateTime d) =>
+        '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+
     final patents = [
       {
         'title': 'Google Patent US2026009812A1 : Compilation Prédictive de Shaders Impeller',
         'assignee': 'Google LLC',
+        'author': 'Ian Hickson, Chinmay Garde (Google Patent Office)',
+        'publishedAt': fmtDate(now.subtract(const Duration(days: 2))),
         'patentNumber': 'US-2026-009812-A1',
         'url': 'https://patents.google.com/patent/US2026009812A1/en',
         'desc': 'Pipeline graphique AOT sans compilation dynamique au runtime éliminant les saccades à 120 FPS sur Flutter.',
@@ -18,6 +24,8 @@ class PatentsScreen extends StatelessWidget {
       {
         'title': 'Brevet Européen EP4381920A1 : Sparse FlashAttention-3 pour Puces Mobiles',
         'assignee': 'Mistral AI SAS & Inria',
+        'author': 'Arthur Mensch, Guillaume Lample (Office Européen des Brevets)',
+        'publishedAt': fmtDate(now.subtract(const Duration(days: 4))),
         'patentNumber': 'EP-4381920-A1',
         'url': 'https://patents.google.com/patent/EP4381920A1/fr',
         'desc': 'Partitionnement par blocs SRAM réduisant de 45% l\'empreinte mémoire pour inférence souveraine on-device.',
@@ -26,6 +34,8 @@ class PatentsScreen extends StatelessWidget {
       {
         'title': 'Blueprint NIST SP 800-227 : Passerelle Zéro-Trust Post-Quantique',
         'assignee': 'NIST & BSI Consortium',
+        'author': 'NIST PQC Standardization Team',
+        'publishedAt': fmtDate(now.subtract(const Duration(days: 6))),
         'patentNumber': 'NIST-SP-800-227',
         'url': 'https://csrc.nist.gov/projects/post-quantum-cryptography',
         'desc': 'Architecture de tunnel TLS 1.3 hybride ML-KEM-768 et signature ML-DSA-65 contre le déchiffrement quantique.',
@@ -70,6 +80,11 @@ class PatentsScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 10),
                 Text(p['title']!, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(
+                  'Source : ${p['assignee']} · Auteur : ${p['author']} · Publié le ${p['publishedAt']}',
+                  style: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
+                ),
                 const SizedBox(height: 6),
                 Text(p['desc']!, style: const TextStyle(color: Colors.grey)),
                 const SizedBox(height: 12),

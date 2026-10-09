@@ -102,12 +102,30 @@ export const NewsCard: React.FC<NewsCardProps> = ({
     setTranslationPreference(nextState); // Persist across the whole app & future visits
   };
 
-  const formattedDate = new Date(article.publishedAt).toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {
+  const pubDate = new Date(article.publishedAt);
+  const formattedDate = pubDate.toLocaleDateString(currentLang === 'fr' ? 'fr-FR' : 'en-US', {
     day: 'numeric',
     month: 'short',
+    year: 'numeric',
     hour: '2-digit',
     minute: '2-digit'
   });
+
+  const relativeAge = useMemo(() => {
+    const diffMs = Math.max(0, Date.now() - pubDate.getTime());
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+    if (currentLang === 'fr') {
+      if (diffHours < 1) return 'À l\'instant';
+      if (diffHours < 24) return `Il y a ${diffHours}h`;
+      return `Il y a ${diffDays}j`;
+    }
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours}h ago`;
+    return `${diffDays}d ago`;
+  }, [article.publishedAt, currentLang]);
+
+  const authorDisplay = article.author || `Rédaction ${article.source}`;
 
   return (
     <article
@@ -122,7 +140,11 @@ export const NewsCard: React.FC<NewsCardProps> = ({
             <span>{article.source}</span>
           </span>
           <span aria-hidden="true" className="text-slate-600">·</span>
-          <span>{formattedDate}</span>
+          <span className="text-sky-300 font-medium">{authorDisplay}</span>
+          <span aria-hidden="true" className="text-slate-600">·</span>
+          <time dateTime={article.publishedAt} className="text-emerald-400 font-medium">
+            {relativeAge} ({formattedDate})
+          </time>
           <span aria-hidden="true" className="text-slate-600">·</span>
           <span className="flex items-center gap-1 text-slate-400 font-medium">
             <Clock className="w-3.5 h-3.5 text-slate-500" />

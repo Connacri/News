@@ -65,15 +65,18 @@ class NewsArticle {
   });
 
   factory NewsArticle.fromHackerNews(Map<String, dynamic> json, {String country = 'all'}) {
+    final authorName = (json['author']?.toString().trim().isNotEmpty ?? false)
+        ? json['author'].toString()
+        : 'Rédaction Hacker News';
     return NewsArticle(
       id: 'hn-${json['objectID']}',
       title: json['title'] ?? 'Titre inconnu',
-      description: json['story_text'] ?? 'Discussion et analyse technique de la communauté Hacker News.',
+      description: json['story_text'] ?? 'Discussion et analyse technique publiée par $authorName sur Hacker News.',
       url: json['url'] ?? 'https://news.ycombinator.com/item?id=${json['objectID']}',
       source: 'Hacker News',
       sourceType: 'hackernews',
       publishedAt: DateTime.tryParse(json['created_at'] ?? '') ?? DateTime.now(),
-      author: json['author'],
+      author: authorName,
       country: country,
       category: 'tech',
       upvotes: json['points'] ?? 0,
@@ -83,15 +86,21 @@ class NewsArticle {
   }
 
   factory NewsArticle.fromGdelt(Map<String, dynamic> json, {String country = 'all', String category = 'world'}) {
+    final domain = (json['domain']?.toString().trim().isNotEmpty ?? false)
+        ? json['domain'].toString()
+        : 'GDELT Press';
+    final authorName = (json['author']?.toString().trim().isNotEmpty ?? false)
+        ? json['author'].toString()
+        : 'Rédaction $domain';
     return NewsArticle(
       id: 'gdelt-${json['url'] ?? DateTime.now().microsecondsSinceEpoch}',
       title: json['title'] ?? 'Actualité',
-      description: 'Actualité géolocalisée publiée par ${json['domain'] ?? 'source locale'}.',
+      description: 'Actualité géolocalisée publiée par $domain ($authorName).',
       url: json['url'] ?? '',
-      source: json['domain'] ?? 'GDELT',
+      source: domain,
       sourceType: 'gdelt',
       publishedAt: _parseGdeltDate(json['seendate']?.toString()) ?? DateTime.now(),
-      author: json['author'],
+      author: authorName,
       country: country,
       category: category,
       tags: ['GDELT', category],

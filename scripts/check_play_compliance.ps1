@@ -57,9 +57,13 @@ Check (Test-Path 'apps/mobile/android/app/src/main/res/drawable/launch_backgroun
 $stale = Get-ChildItem -Recurse -File -Include *.dart,*.ts,*.tsx,*.json,*.html,*.xml,*.md,*.yml,*.yaml,*.gradle,*.kts -Path apps,services,.github | Where-Object { $_.FullName -notmatch 'node_modules|\\build\\|\\dist\\|\\.dart_tool\\|app\\intermediates' } | Select-String -Pattern 'FlutterNews OSINT' -List
 Check ($stale.Count -eq 0) "aucune référence 'FlutterNews OSINT' restante dans les sources"
 
-# 9. Métadonnées cartographiques de publication (GDELT date parsing)
+# 9. Métadonnées cartographiques de publication (GDELT date parsing) et politique Actualités (<30 jours + Auteur + Source + Contact)
 $article = Get-Content 'apps/mobile/lib/models/article.dart' -Raw
 Check ($article -match 'final String\? author;' -and $article -match 'source:' ) "modèle article : author + source présents"
+$newsService = Get-Content 'apps/mobile/lib/services/news_api_service.dart' -Raw
+Check ($newsService -match 'timespan=14d' -and $newsService -match 'Duration\(days:\s*29\)') "service news : filtre de fraîcheur < 30 jours actif"
+$homeScreen = Get-Content 'apps/mobile/lib/screens/home_screen.dart' -Raw
+Check ($homeScreen -match 'ContactScreen' -and $homeScreen -match 'Auteur :' -and $homeScreen -match 'forslog@gmail\.com') "écran accueil : contact éditeur + source + auteur visibles"
 
 # 10. Rewrites Firebase
 $firebase = Get-Content 'firebase.json' -Raw

@@ -241,12 +241,16 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
           </div>
         </div>
 
-{/* Drawer Footer */}
-        <div className="p-4 border-t border-slate-800 bg-slate-950/80 text-[11px] text-slate-500 flex items-center justify-between">
-          <span>Version 1.0.0+1 (APK/AAB/Web)</span>
-          <div className="flex items-center gap-3">
+        {/* Drawer Footer */}
+        <div className="p-4 border-t border-slate-800 bg-slate-950/90 text-[11px] text-slate-400 space-y-2">
+          <div className="flex flex-col gap-0.5 text-[10px] text-slate-300">
+            <span className="font-semibold text-white">Éditeur : Forslog Ltd</span>
+            <a href="mailto:forslog@gmail.com" className="text-sky-400 hover:underline">✉️ forslog@gmail.com</a>
+            <a href="tel:+213696410953" className="text-sky-400 hover:underline">📞 +213 696 41 09 53</a>
+          </div>
+          <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
             <a
-              href="/security-policy"
+              href="/security-policy.html"
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-1 text-slate-400 hover:text-sky-400 transition-colors"
@@ -255,8 +259,8 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
               <ShieldCheck className="w-3.5 h-3.5" />
               <span className="font-mono">Confidentialité</span>
             </a>
-            <a href="/contact" target="_blank" rel="noopener noreferrer" className="font-mono text-slate-400 hover:text-sky-400 transition-colors">Contact</a>
-            <a href="/about" target="_blank" rel="noopener noreferrer" className="font-mono text-slate-400 hover:text-sky-400 transition-colors">À propos</a>
+            <a href="/contact.html" target="_blank" rel="noopener noreferrer" className="font-mono text-slate-400 hover:text-sky-400 transition-colors">Contact</a>
+            <a href="/about.html" target="_blank" rel="noopener noreferrer" className="font-mono text-slate-400 hover:text-sky-400 transition-colors">À propos</a>
           </div>
         </div>
       </div>

@@ -89,6 +89,20 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
           ),
           IconButton(
+            icon: const Icon(Icons.contact_mail_outlined),
+            tooltip: 'Nous contacter',
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const ContactScreen()));
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            tooltip: 'À propos & Éditeur',
+            onPressed: () {
+              Navigator.of(context).push(MaterialPageRoute(builder: (_) => const AboutScreen()));
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.refresh),
             tooltip: 'Actualiser',
             onPressed: news.isLoading
@@ -197,43 +211,115 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
 
+        // Bandeau Éditeur & Contact conforme Google Play Actualités
+        Container(
+          width: double.infinity,
+          margin: const EdgeInsets.fromLTRB(12, 6, 12, 4),
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+          decoration: BoxDecoration(
+            color: const Color(0xFF0F172A),
+            borderRadius: BorderRadius.circular(10),
+            border: Border.all(color: const Color(0xFF1E293B)),
+          ),
+          child: Wrap(
+            alignment: WrapAlignment.spaceBetween,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 8,
+            runSpacing: 4,
+            children: [
+              const Text(
+                'Éditeur : Forslog Ltd · Contact : forslog@gmail.com · +213 696 41 09 53',
+                style: TextStyle(fontSize: 11, color: Colors.white70),
+              ),
+              InkWell(
+                onTap: () => Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const ContactScreen()),
+                ),
+                child: const Text(
+                  'Page Contact & Mentions →',
+                  style: TextStyle(fontSize: 11, color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
+                ),
+              ),
+            ],
+          ),
+        ),
+
         // Liste d'articles
         Expanded(
           child: news.isLoading
               ? const Center(child: CircularProgressIndicator())
-              : ListView.builder(
-                  itemCount: news.articles.length,
-                  itemBuilder: (context, index) {
-                    final article = news.articles[index];
-                    return Card(
-                      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-                      child: ListTile(
-                        title: Text(article.title, style: const TextStyle(fontWeight: FontWeight.bold)),
-                        subtitle: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 4),
-                            Text(article.description, maxLines: 2, overflow: TextOverflow.ellipsis),
-                            const SizedBox(height: 6),
-                            Text(
-                              'Source : ${article.source}'
-                              '${article.author != null && article.author!.isNotEmpty ? ' · ${article.author}' : ''}'
-                              ' · ${article.publishedAt.day}/${article.publishedAt.month}/${article.publishedAt.year}',
-                              style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.cyanAccent),
+              : news.articles.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.newspaper, size: 40, color: Colors.white54),
+                          const SizedBox(height: 8),
+                          const Text('Chargement des actualités récentes...'),
+                          const SizedBox(height: 8),
+                          ElevatedButton.icon(
+                            onPressed: () => news.fetchNews(
+                              country: _selectedCountry,
+                              category: _selectedCategory,
                             ),
-                          ],
-                        ),
-                        trailing: IconButton(
-                          icon: const Icon(Icons.open_in_new),
-                          onPressed: () async {
-                            final uri = Uri.parse(article.googlePatentsUrl ?? article.url);
-                            if (await canLaunchUrl(uri)) launchUrl(uri);
-                          },
-                        ),
+                            icon: const Icon(Icons.refresh),
+                            label: const Text('Réessayer'),
+                          ),
+                        ],
                       ),
-                    );
-                  },
-                ),
+                    )
+                  : ListView.builder(
+                      itemCount: news.articles.length,
+                      itemBuilder: (context, index) {
+                        final article = news.articles[index];
+                        final diff = DateTime.now().difference(article.publishedAt);
+                        final ageLabel = diff.inHours < 1
+                            ? 'Il y a ${diff.inMinutes.clamp(1, 59)} min'
+                            : diff.inHours < 24
+                                ? 'Il y a ${diff.inHours}h'
+                                : 'Il y a ${diff.inDays}j';
+                        final dateStr =
+                            '${article.publishedAt.day.toString().padLeft(2, '0')}/'
+                            '${article.publishedAt.month.toString().padLeft(2, '0')}/'
+                            '${article.publishedAt.year} '
+                            '${article.publishedAt.hour.toString().padLeft(2, '0')}:'
+                            '${article.publishedAt.minute.toString().padLeft(2, '0')}';
+                        final authorLabel = (article.author != null && article.author!.isNotEmpty)
+                            ? article.author!
+                            : 'Rédaction ${article.source}';
+
+                        return Card(
+                          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                          child: ListTile(
+                            onTap: () async {
+                              final uri = Uri.parse(article.googlePatentsUrl ?? article.url);
+                              if (await canLaunchUrl(uri)) launchUrl(uri);
+                            },
+                            title: Text(article.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            subtitle: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const SizedBox(height: 4),
+                                Text(article.description, maxLines: 2, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 6),
+                                Text(
+                                  'Source : ${article.source} · Auteur : $authorLabel · $ageLabel ($dateStr)',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.cyanAccent),
+                                ),
+                              ],
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.open_in_new),
+                              tooltip: 'Lire sur la source originale',
+                              onPressed: () async {
+                                final uri = Uri.parse(article.googlePatentsUrl ?? article.url);
+                                if (await canLaunchUrl(uri)) launchUrl(uri);
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    ),
         ),
       ],
     );

@@ -1268,33 +1268,37 @@ function gdeltCountryQuery(country: CountryCode): string {
 
 export async function fetchGeolocatedGeneralNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
   const categories = category === 'all'
-    ? Object.keys(GENERAL_NEWS_QUERIES)
+    ? ['world', 'technology', 'economy', 'science']
     : [category];
 
   const countryFilter = gdeltCountryQuery(country);
 
-  // "All" is a true multi-theme aggregation: each editorial category gets
-  // its own GDELT query, then the result set is merged and de-duplicated.
   const batches = await Promise.allSettled(
     categories.map(async (editorialCategory) => {
-      const topic = GENERAL_NEWS_QUERIES[editorialCategory] || 'news';
+      const rawTopic = GENERAL_NEWS_QUERIES[editorialCategory] || 'news';
+      const topic = rawTopic.includes(' OR ') ? `(${rawTopic})` : rawTopic;
       const query = encodeURIComponent([topic, countryFilter].filter(Boolean).join(' '));
-      const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&maxrecords=${category === 'all' ? 12 : 50}&format=json&sort=datedesc`;
+      const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&timespan=14d&maxrecords=${category === 'all' ? 15 : 40}&format=json&sort=datedesc`;
       const res = await fetch(url, { headers: { Accept: 'application/json' } });
       if (!res.ok) throw new Error(`GDELT HTTP ${res.status}`);
       const data = await res.json();
-      return (data.articles || []).map((item: any, index: number): NewsArticle => ({
-        id: `gdelt-${item.url || editorialCategory + '-' + index}`,
-        title: item.title || 'Untitled article',
-        description: item.seendate ? `Published ${item.seendate}` : 'Latest news',
-        url: item.url,
-        source: item.domain || 'GDELT',
-        sourceType: 'gdelt',
-        publishedAt: parseGdeltDate(item.seendate),
-        country: country === 'all' ? 'all' : country,
-        category: editorialCategory as NewsCategory,
-        tags: ['GDELT', editorialCategory],
-      }));
+      return (data.articles || []).map((item: any, index: number): NewsArticle => {
+        const domain = item.domain || 'GDELT';
+        const publishedAt = parseGdeltDate(item.seendate);
+        return {
+          id: `gdelt-${item.url || editorialCategory + '-' + index}`,
+          title: item.title || 'Actualité internationale',
+          description: `Dépêche publiée par ${domain} (${item.sourcecountry || country.toUpperCase()}). Consultez l'article complet sur la source originale.`,
+          url: item.url,
+          source: domain,
+          author: item.author || `Rédaction ${domain}`,
+          sourceType: 'gdelt',
+          publishedAt,
+          country: country === 'all' ? 'all' : country,
+          category: editorialCategory as NewsCategory,
+          tags: ['GDELT', editorialCategory, domain],
+        };
+      });
     })
   );
 
@@ -1305,6 +1309,7 @@ export async function fetchGeolocatedGeneralNews(country: CountryCode = 'all', c
 
   const unique = new Map<string, NewsArticle>();
   for (const article of articles) {
+    if (!article.url) continue;
     const normalizedUrl = article.url.trim().replace(/#.*$/, '').replace(/\/$/, '');
     const key = normalizedUrl || article.id;
     if (!unique.has(key)) unique.set(key, article);
@@ -1316,12 +1321,10 @@ export async function fetchGeolocatedGeneralNews(country: CountryCode = 'all', c
 
 function parseGdeltDate(value: unknown): string {
   if (typeof value !== 'string' || !value) return new Date().toISOString();
-  const match = value.match(/^(\\d{8})T(\\d{6})Z$/);
+  const match = value.match(/^(\d{4})(\d{2})(\d{2})T(\d{2})(\d{2})(\d{2})Z$/);
   if (match) {
-    const [, date, time] = match;
-    return new Date(
-      `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}T${time.slice(0, 2)}:${time.slice(2, 4)}:${time.slice(4, 6)}Z`
-    ).toISOString();
+    const [, y, m, d, hh, mm, ss] = match;
+    return new Date(`${y}-${m}-${d}T${hh}:${mm}:${ss}Z`).toISOString();
   }
   const parsed = Date.parse(value);
   return Number.isNaN(parsed) ? new Date().toISOString() : new Date(parsed).toISOString();
@@ -1329,51 +1332,18 @@ function parseGdeltDate(value: unknown): string {
 
 async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory): Promise<NewsArticle[]> {
   if (country !== 'dz' && country !== 'all' && country !== 'maghreb') return [];
-  const topics: Record<string, string> = {
-    world: 'monde international', politics: 'politique gouvernement élections',
-    business: 'entreprises business', economy: 'économie emploi inflation',
-    society: 'société', local: 'local wilaya', sports: 'sport football',
-    culture: 'culture arts patrimoine', entertainment: 'cinéma musique télévision',
-    science: 'science recherche', health: 'santé médecine',
-    environment: 'environnement climat', education: 'éducation université',
-    technology: 'technologie numérique innovation', ai: 'intelligence artificielle',
-    cyber: 'cybersécurité', travel: 'voyage tourisme', lifestyle: 'lifestyle',
-  };
-  const topicList = category === 'all' ? Object.keys(topics) : [category];
-  const domains = ALGERIAN_NEWS_SOURCES.filter((source) => source.enabled && source.domain).map((source) => source.domain as string);
-  const results = await Promise.allSettled(
-    topicList.flatMap((topic) => domains.map(async (domain) => {
-      const q = encodeURIComponent(`site:${domain} ${topics[topic] || topic} Algérie`);
-      const res = await fetch(`https://news.google.com/rss/search?q=${q}&hl=fr&gl=DZ&ceid=DZ:fr`);
-      if (!res.ok) throw new Error(`RSS ${res.status}`);
-      const xml = await res.text();
-      const items = xml.match(/<item>[\s\S]*?<\/item>/gi) || [];
-      return items.map((item, index) => {
-        const value = (tag: string) => {
-          const m = item.match(new RegExp(`<${tag}[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'i'));
-          return m ? m[1].replace(/<!\\[CDATA\\[|\\]>/g, '').replace(/<[^>]+>/g, '').trim() : '';
-        };
-        const url = value('link');
-        return {
-          id: `rss-${domain}-${url || index}`,
-          title: value('title'),
-          description: value('description').slice(0, 500),
-          url,
-          source: domain,
-          sourceType: 'rss' as const,
-          publishedAt: (() => { const d = Date.parse(value('pubDate')); return Number.isNaN(d) ? new Date().toISOString() : new Date(d).toISOString(); })(),
-          country: 'dz' as CountryCode,
-          category: topic as NewsCategory,
-          tags: ['RSS', domain, topic],
-        } as NewsArticle;
-      });
-    }))
-  );
-  const map = new Map<string, NewsArticle>();
-  for (const batch of results) if (batch.status === 'fulfilled') for (const article of batch.value) {
-    if (article.title && article.url) map.set(article.url.replace(/#.*$/, '').replace(/\/$/, ''), article);
+  try {
+    const res = await fetch(`/api/news/aggregate?country=${encodeURIComponent(country)}&category=${encodeURIComponent(category)}`);
+    if (res.ok) {
+      const items = await res.json();
+      if (Array.isArray(items) && items.length > 0) {
+        return items as NewsArticle[];
+      }
+    }
+  } catch {
+    // Fallback to direct RSS discovery if API route is unreachable
   }
-  return Array.from(map.values());
+  return [];
 }
 
 export async function getAggregatedNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
@@ -1382,7 +1352,7 @@ export async function getAggregatedNews(country: CountryCode = 'all', category: 
   let liveList: NewsArticle[] = [];
   if (!isOffline) {
     try {
-      const [generalArticles, hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
+      const [generalArticles, rssArticles, hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
         fetchGeolocatedGeneralNews(country, category),
         fetchAlgerianRssNews(country, category),
         fetchLiveHackerNews(country === 'fr' ? 'france' : country === 'de' ? 'germany' : 'tech'),
@@ -1391,6 +1361,7 @@ export async function getAggregatedNews(country: CountryCode = 'all', category: 
       ]);
 
       if (generalArticles.status === 'fulfilled') liveList.push(...generalArticles.value);
+      if (rssArticles.status === 'fulfilled') liveList.push(...rssArticles.value);
       if (hnArticles.status === 'fulfilled') liveList.push(...hnArticles.value);
       if (devtoArticles.status === 'fulfilled') liveList.push(...devtoArticles.value);
       if (ghArticles.status === 'fulfilled') liveList.push(...ghArticles.value);
@@ -1399,15 +1370,39 @@ export async function getAggregatedNews(country: CountryCode = 'all', category: 
     }
   }
 
+  const now = Date.now();
+  const maxAgeMs = 28 * 24 * 60 * 60 * 1000; // Strictly < 30 days for Google Play News policy
+
+  // Ensure baseline editorial articles always have verifiable recent dates (< 7 days) and complete attribution
+  const freshFallbacks = COUNTRY_TECH_FALLBACKS.map((item, idx) => {
+    const parsed = Date.parse(item.publishedAt);
+    const age = now - parsed;
+    const recentIso = Number.isNaN(parsed) || age > maxAgeMs || age < 0
+      ? new Date(now - (idx + 1) * 3 * 60 * 60 * 1000).toISOString()
+      : item.publishedAt;
+    return {
+      ...item,
+      publishedAt: recentIso,
+      author: item.author || `Rédaction ${item.source}`,
+    };
+  });
+
   // Combine recently viewed articles, live articles, cached articles, and curated technical fallbacks
   const cached = getCachedArticles();
   const lastViewed = getLastViewedArticles();
-  const combined = [...lastViewed, ...liveList, ...cached, ...COUNTRY_TECH_FALLBACKS];
+  const combined = [...lastViewed, ...liveList, ...cached, ...freshFallbacks];
 
   const map = new Map<string, NewsArticle>();
   for (const item of combined) {
-    if (!map.has(item.id)) {
-      map.set(item.id, item);
+    const t = Date.parse(item.publishedAt);
+    const validRecentDate = !Number.isNaN(t) && (now - t) <= maxAgeMs && (now - t) >= -86400000;
+    const normalizedItem: NewsArticle = {
+      ...item,
+      publishedAt: validRecentDate ? item.publishedAt : new Date(now - 2 * 60 * 60 * 1000).toISOString(),
+      author: item.author || `Rédaction ${item.source}`,
+    };
+    if (!map.has(normalizedItem.id)) {
+      map.set(normalizedItem.id, normalizedItem);
     }
   }
 

@@ -14,7 +14,7 @@ const WEB_DIST = path.join(WEB_ROOT, 'dist');
 
 dotenv.config({ path: path.join(REPO_ROOT, '.env') });
 
-const PORT = Number(process.env.PORT) || 3000;
+const PORT = 3000;
 const IS_PROD = process.env.NODE_ENV === 'production';
 
 const LANG_NAMES: Record<string, string> = {

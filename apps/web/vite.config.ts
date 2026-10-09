@@ -3,7 +3,7 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 
 const host = process.env.HOST || '0.0.0.0';
-const port = Number(process.env.PORT) || 3000;
+const port = Number(process.env.VITE_PORT) || 5173;
 
 export default defineConfig(() => ({
   base: process.env.BASE_PATH || '/',
@@ -16,9 +16,9 @@ export default defineConfig(() => ({
   server: {
     host,
     port,
-    strictPort: true,
+    strictPort: false,
     allowedHosts: true as const,
-    hmr: process.env.DISABLE_HMR !== 'true',
+    hmr: false,
     watch: process.env.DISABLE_HMR === 'true' ? null : {},
   },
   preview: {

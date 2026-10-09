@@ -476,6 +476,37 @@ export default function App() {
               )}
             </div>
           )}
+          {/* Editorial & Publisher Compliance Footer (Google Play News Policy) */}
+          <footer className="mt-6 p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 text-[11px] text-slate-400 space-y-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div className="font-semibold text-slate-200">
+                Éditeur : Forslog Ltd — DZ News (Agrégateur d&apos;actualités)
+              </div>
+              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
+                Flux vérifiés &lt; 30 jours
+              </span>
+            </div>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300">
+              <a href="mailto:forslog@gmail.com" className="hover:text-sky-400 underline">
+                ✉️ forslog@gmail.com
+              </a>
+              <a href="tel:+213696410953" className="hover:text-sky-400 underline">
+                📞 +213 696 41 09 53
+              </a>
+              <a href="/contact.html" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 font-medium">
+                Page Contact
+              </a>
+              <a href="/about.html" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 font-medium">
+                À propos
+              </a>
+              <a href="/mentions-legales.html" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 font-medium">
+                Mentions légales
+              </a>
+              <a href="/security-policy.html" target="_blank" rel="noopener noreferrer" className="text-sky-400 hover:text-sky-300 font-medium">
+                Confidentialité
+              </a>
+            </div>
+          </footer>
         </main>
 
         {/* 4. Mobile Bottom Navigation Bar (Persistent Thumb Anchor) */}
