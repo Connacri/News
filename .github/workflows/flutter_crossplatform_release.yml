@@ -52,7 +52,7 @@ jobs:
       - name: Static analysis
         run: flutter analyze
 
-      - name: Vérification conformité Google Play
+      - name: Vï¿½rification conformitï¿½ Google Play
         shell: pwsh
         working-directory: ${{ github.workspace }}
         run: ./scripts/check_play_compliance.ps1
