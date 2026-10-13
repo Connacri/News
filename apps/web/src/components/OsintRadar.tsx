@@ -4,6 +4,7 @@ import { Language, OsintAlert } from '../types';
 import { translations } from '../services/translations';
 import { OSINT_ALERTS_DATABASE } from '../services/newsApi';
 import { PRETRANSLATED_OSINT_ALERTS_AR } from '../services/translator';
+import osintCyberFeedImage from '../assets/images/osint_cyber_feed_1790977920915.jpg';
 
 interface OsintRadarProps {
   currentLang: Language;
@@ -41,7 +42,7 @@ export const OsintRadar: React.FC<OsintRadarProps> = ({ currentLang }) => {
       {/* Banner Visual Asset with Zero-Broken-Image Fallback */}
       <div className="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 aspect-[21/9] max-h-56">
         <img
-          src="/src/assets/images/osint_cyber_feed_1790977920915.jpg"
+          src={osintCyberFeedImage}
           alt="OSINT Cyber Intelligence Radar"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover opacity-60"

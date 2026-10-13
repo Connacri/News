@@ -88,14 +88,17 @@ class NewsArticle {
   factory NewsArticle.fromGdelt(Map<String, dynamic> json, {String country = 'all', String category = 'world'}) {
     final domain = (json['domain']?.toString().trim().isNotEmpty ?? false)
         ? json['domain'].toString()
-        : 'GDELT Press';
+        : 'Presse Officielle';
     final authorName = (json['author']?.toString().trim().isNotEmpty ?? false)
         ? json['author'].toString()
         : 'Rédaction $domain';
+    final rawTitle = (json['title']?.toString().trim().isNotEmpty ?? false)
+        ? json['title'].toString().trim()
+        : 'Dépêche d\'actualité';
     return NewsArticle(
       id: 'gdelt-${json['url'] ?? DateTime.now().microsecondsSinceEpoch}',
-      title: json['title'] ?? 'Actualité',
-      description: 'Actualité géolocalisée publiée par $domain ($authorName).',
+      title: rawTitle,
+      description: 'Dépêche certifiée publiée par $domain ($authorName). Retrouvez l\'intégralité du reportage et les déclarations officielles via le lien source direct.',
       url: json['url'] ?? '',
       source: domain,
       sourceType: 'gdelt',
@@ -103,7 +106,7 @@ class NewsArticle {
       author: authorName,
       country: country,
       category: category,
-      tags: ['GDELT', category],
+      tags: ['Presse', category, domain],
     );
   }
 

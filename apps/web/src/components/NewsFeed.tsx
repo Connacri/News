@@ -4,6 +4,7 @@ import { CountryCode, Language, NewsArticle, NewsCategory } from '../types';
 import { translations } from '../services/translations';
 import { COUNTRIES } from '../services/countries';
 import { NewsCard } from './NewsCard';
+import techNewsRadarImage from '../assets/images/tech_news_radar_1790977909954.jpg';
 
 interface NewsFeedProps {
   articles: NewsArticle[];
@@ -68,7 +69,7 @@ export const NewsFeed: React.FC<NewsFeedProps> = ({
       {/* Editorial Hero Banner */}
       <div className="relative rounded-2xl overflow-hidden border border-slate-800 bg-slate-950 aspect-[21/8] max-h-64 shadow-2xl">
         <img
-          src="/src/assets/images/tech_news_radar_1790977909954.jpg"
+          src={techNewsRadarImage}
           alt="Tech News Radar Global"
           referrerPolicy="no-referrer"
           className="w-full h-full object-cover opacity-60"

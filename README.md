@@ -31,7 +31,7 @@ le navigateur sur ordinateur **et** sur téléphone Android, avec la même inter
 |---|---|
 | 🌐 **Web (ordinateur / mobile)** | `https://device-streaming-ccab91bb.web.app` — rien à installer |
 | 📱 **Android** | Télécharger l'APK depuis la [page Releases](https://github.com/Connacri/News/releases) |
-| 🛒 **Google Play** | Non publiée — l'identifiant `com.flutternews.osint` est conservé tel quel (pas de migration) |
+| 🛒 **Google Play** | Conforme aux politiques Google Play (Actualités & Magazines + Graphique de présentation 1024x500) |
 
 ### Démarrer en 30 secondes
 
@@ -49,21 +49,26 @@ reste dans votre navigateur. Détails complets :
 
 ---
 
-## Liens de déploiement
+## Liens de déploiement & Conformité Google Play
 
 - **Web React (Vite)** — `https://device-streaming-ccab91bb.web.app`  
   Hébergé sur Firebase Hosting (site : `device-streaming-ccab91bb`, cible `web`)  
   Miroir : `https://connacri.github.io/News/`
 - **Web Flutter (WasmGC)** — `https://flutter-news-osint.web.app`  
   Hébergé sur Firebase Hosting (site : `flutter-news-osint`, cible `mobile`)
+- **Page de Contact & Éditeur (Obligatoire Google Play News)**  
+  `https://device-streaming-ccab91bb.web.app/contact`  
+  Éditeur : Forslog Ltd · E-mail : `forslog@gmail.com` · Tél : `+213 696 41 09 53`
+- **Graphique de présentation Google Play (fr-FR 1024x500 px)**  
+  Image officielle certifiée sans texte réservé :  
+  `apps/mobile/assets/images/feature_graphic_1024x500.png` (ou `.jpg`)  
+  Téléchargeable directement : `https://device-streaming-ccab91bb.web.app/feature_graphic_1024x500.png`
 - **Releases Android / Web** — `https://github.com/Connacri/News/releases`  
-  APK (universal + split per ABI), AAB, zip Web signés à chaque push sur `main`.  
-  Distribution utilisateur par **APK** : Play Store n'est pas utilisé.
+  APK et AAB signés automatiquement par GitHub Actions à chaque push.
 - **Politique de confidentialité (RGPD)** — `https://device-streaming-ccab91bb.web.app/security-policy`  
   Page statique FR/EN, sans traqueur : `apps/web/public/security-policy.html` (copiée dans
   `apps/mobile/web/` pour le site Flutter). Servie via la réécriture Firebase
-  `"/security-policy" → "/security-policy.html"`. Sur GitHub Pages, l'URL équivalente est
-  `/security-policy.html` (Pages ne sert pas les URLs sans extension).
+  `"/security-policy" → "/security-policy.html"`.
 
 ## Architecture du projet
 

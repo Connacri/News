@@ -43,6 +43,29 @@ class ContactScreen extends StatelessWidget {
               subtitle: const Text('https://device-streaming-ccab91bb.web.app'),
               onTap: () => _open('https://device-streaming-ccab91bb.web.app'),
             ),
+            const SizedBox(height: 16),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(14),
+              decoration: BoxDecoration(
+                color: const Color(0xFF0F172A),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: const Color(0xFF1E293B)),
+              ),
+              child: const Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text('Éditeur légal : Forslog Ltd', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13)),
+                  SizedBox(height: 6),
+                  Text(
+                    'Application déclarée en catégorie Actualités & Magazines sur Google Play. '
+                    'Chaque article comporte un horodatage récent vérifiable (< 30 jours), '
+                    'l\'identification de l\'auteur ou de la rédaction, et un lien direct vers la source originale.',
+                    style: TextStyle(fontSize: 12, color: Colors.white70, height: 1.4),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),

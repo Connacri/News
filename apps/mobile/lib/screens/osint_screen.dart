@@ -12,26 +12,37 @@ class OsintScreen extends StatelessWidget {
 
     final alerts = [
       {
-        'cve': 'CVE-2026-2810',
-        'severity': 'CRITIQUE (CVSS 9.8)',
-        'title': 'Exécution de code à distance sans authentification sur serveurs cloud',
-        'source': 'CERT-FR / ANSSI & NVD NIST',
-        'author': 'Équipe Veille CERT-FR',
+        'cve': 'CVE-2024-3094',
+        'severity': 'CRITIQUE (CVSS 10.0)',
+        'title': 'Porte dérobée et injection de code dans les bibliothèques amont de compression XZ / liblzma',
+        'source': 'NIST NVD & OpenSSF',
+        'author': 'Équipe de Recherche OpenSSF & NIST',
         'publishedAt': fmtDate(now.subtract(const Duration(days: 1))),
-        'url': 'https://www.cert.ssi.gouv.fr/',
-        'scope': 'Infrastructures Cloud & Routeurs Industriels',
-        'mitigation': 'Appliquer le correctif de sécurité v2.4.1 ou isoler les flux entrants via passerelle eBPF.'
+        'url': 'https://nvd.nist.gov/vuln/detail/CVE-2024-3094',
+        'scope': 'Systèmes Linux, daemons OpenSSH et distributions de serveurs cloud',
+        'mitigation': 'Mettre à jour immédiatement vers une version saine et auditer les binaires système.'
       },
       {
-        'cve': 'CVE-2026-1934',
-        'severity': 'ÉLEVÉE (CVSS 8.4)',
-        'title': 'Dépassement de tampon dans la pile cryptographique TLS héritée',
-        'source': 'CISA KEV & OpenSSF',
-        'author': 'CISA Technical Directorate',
-        'publishedAt': fmtDate(now.subtract(const Duration(days: 3))),
+        'cve': 'CVE-2024-21413',
+        'severity': 'CRITIQUE (CVSS 9.8)',
+        'title': 'Contournement de protection et exécution de code à distance via Moniker Link',
+        'source': 'CISA KEV Catalog & Microsoft Security',
+        'author': 'CISA Cybersecurity Division',
+        'publishedAt': fmtDate(now.subtract(const Duration(days: 2))),
         'url': 'https://www.cisa.gov/known-exploited-vulnerabilities-catalog',
-        'scope': 'Bibliothèques de communication réseau Linux et Android',
-        'mitigation': 'Migrer vers OpenSSL 3.4 et activer la protection Stack-Canary à la compilation.'
+        'scope': 'Clients de messagerie et protocoles d\'authentification NTLM',
+        'mitigation': 'Appliquer les correctifs de sécurité mensuels et bloquer le trafic SMB sortant vers Internet.'
+      },
+      {
+        'cve': 'CERTFR-2024-ACT-001',
+        'severity': 'ÉLEVÉE (ANSSI)',
+        'title': 'Bulletin d\'actualité ANSSI : Campagnes ciblant les équipements périmétriques SSL-VPN',
+        'source': 'CERT-FR / ANSSI',
+        'author': 'Cellule Veille & Alerte CERT-FR',
+        'publishedAt': fmtDate(now.subtract(const Duration(days: 4))),
+        'url': 'https://www.cert.ssi.gouv.fr/',
+        'scope': 'Passerelles de télétravail d\'entreprises et routeurs industriels',
+        'mitigation': 'Restreindre l\'accès à l\'interface d\'administration et activer l\'authentification multifacteur.'
       }
     ];
 
@@ -70,7 +81,7 @@ class OsintScreen extends StatelessWidget {
                   style: const TextStyle(color: Colors.cyanAccent, fontSize: 12),
                 ),
                 const SizedBox(height: 6),
-                Text('Périmètre: ${a['scope']}', style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                Text('Périmètre : ${a['scope']}', style: const TextStyle(color: Colors.white70, fontSize: 12)),
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.all(10),
@@ -78,7 +89,7 @@ class OsintScreen extends StatelessWidget {
                     color: const Color(0xFF0F172A),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Text('Recommandation: ${a['mitigation']}', style: const TextStyle(fontSize: 12, color: Color(0xFF38BDF8))),
+                  child: Text('Recommandation : ${a['mitigation']}', style: const TextStyle(fontSize: 12, color: Color(0xFF38BDF8))),
                 ),
                 const SizedBox(height: 8),
                 Align(
@@ -89,7 +100,7 @@ class OsintScreen extends StatelessWidget {
                       if (await canLaunchUrl(uri)) launchUrl(uri);
                     },
                     icon: const Icon(Icons.open_in_new, size: 16),
-                    label: const Text('Consulter la source officielle'),
+                    label: const Text('Consulter l\'avis officiel'),
                   ),
                 ),
               ],

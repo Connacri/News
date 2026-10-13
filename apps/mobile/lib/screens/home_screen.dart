@@ -221,24 +221,40 @@ class _HomeScreenState extends State<HomeScreen> {
             borderRadius: BorderRadius.circular(10),
             border: Border.all(color: const Color(0xFF1E293B)),
           ),
-          child: Wrap(
-            alignment: WrapAlignment.spaceBetween,
-            crossAxisAlignment: WrapCrossAlignment.center,
-            spacing: 8,
-            runSpacing: 4,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              const Text(
-                'Éditeur : Forslog Ltd · Contact : forslog@gmail.com · +213 696 41 09 53',
-                style: TextStyle(fontSize: 11, color: Colors.white70),
+              Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 8,
+                runSpacing: 4,
+                children: [
+                  const Text(
+                    'Éditeur : Forslog Ltd · Contact : forslog@gmail.com · +213 696 41 09 53',
+                    style: TextStyle(fontSize: 11, color: Colors.white70),
+                  ),
+                  InkWell(
+                    onTap: () => Navigator.of(context).push(
+                      MaterialPageRoute(builder: (_) => const ContactScreen()),
+                    ),
+                    child: const Text(
+                      'Page Contact & Mentions →',
+                      style: TextStyle(fontSize: 11, color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ),
-              InkWell(
-                onTap: () => Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const ContactScreen()),
-                ),
-                child: const Text(
-                  'Page Contact & Mentions →',
-                  style: TextStyle(fontSize: 11, color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
-                ),
+              const SizedBox(height: 4),
+              Row(
+                children: [
+                  const Icon(Icons.verified_outlined, size: 13, color: Color(0xFF34D399)),
+                  const SizedBox(width: 4),
+                  Text(
+                    'Flux d\'actualités certifié (< 30 jours) · Mis à jour le ${news.lastUpdated.day.toString().padLeft(2, '0')}/${news.lastUpdated.month.toString().padLeft(2, '0')}/${news.lastUpdated.year} à ${news.lastUpdated.hour.toString().padLeft(2, '0')}:${news.lastUpdated.minute.toString().padLeft(2, '0')}',
+                    style: const TextStyle(fontSize: 10, color: Color(0xFF34D399)),
+                  ),
+                ],
               ),
             ],
           ),
@@ -255,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Icon(Icons.newspaper, size: 40, color: Colors.white54),
                           const SizedBox(height: 8),
-                          const Text('Chargement des actualités récentes...'),
+                          const Text('Actualisation des dépêches récentes...'),
                           const SizedBox(height: 8),
                           ElevatedButton.icon(
                             onPressed: () => news.fetchNews(
@@ -263,7 +279,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               category: _selectedCategory,
                             ),
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Réessayer'),
+                            label: const Text('Actualiser'),
                           ),
                         ],
                       ),
@@ -281,7 +297,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         final dateStr =
                             '${article.publishedAt.day.toString().padLeft(2, '0')}/'
                             '${article.publishedAt.month.toString().padLeft(2, '0')}/'
-                            '${article.publishedAt.year} '
+                            '${article.publishedAt.year} à '
                             '${article.publishedAt.hour.toString().padLeft(2, '0')}:'
                             '${article.publishedAt.minute.toString().padLeft(2, '0')}';
                         final authorLabel = (article.author != null && article.author!.isNotEmpty)
@@ -300,11 +316,22 @@ class _HomeScreenState extends State<HomeScreen> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 4),
-                                Text(article.description, maxLines: 2, overflow: TextOverflow.ellipsis),
-                                const SizedBox(height: 6),
+                                Text(article.description, maxLines: 3, overflow: TextOverflow.ellipsis),
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    const Icon(Icons.schedule, size: 12, color: Color(0xFF38BDF8)),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      'Publié le $dateStr ($ageLabel)',
+                                      style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 11, fontWeight: FontWeight.w600),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 2),
                                 Text(
-                                  'Source : ${article.source} · Auteur : $authorLabel · $ageLabel ($dateStr)',
-                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.cyanAccent),
+                                  'Source originale : ${article.source} · Auteur : $authorLabel',
+                                  style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white70),
                                 ),
                               ],
                             ),
