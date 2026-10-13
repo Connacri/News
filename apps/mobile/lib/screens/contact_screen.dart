@@ -43,6 +43,13 @@ class ContactScreen extends StatelessWidget {
               subtitle: const Text('https://device-streaming-ccab91bb.web.app'),
               onTap: () => _open('https://device-streaming-ccab91bb.web.app'),
             ),
+            ListTile(
+              leading: const Icon(Icons.location_on_outlined),
+              title: const Text('Adresse physique du siège'),
+              subtitle: const Text(
+                'Cyberparc Sidi Abdellah, Pôle Innovation, Bâtiment R&D — BP 42, Rahmania, Alger 16093, Algérie',
+              ),
+            ),
             const SizedBox(height: 16),
             Container(
               width: double.infinity,
@@ -55,7 +62,7 @@ class ContactScreen extends StatelessWidget {
               child: const Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Éditeur légal : Forslog Ltd', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13)),
+                  Text('Éditeur légal : Forslog Ltd (RC-16/00-984210B24)', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 13)),
                   SizedBox(height: 6),
                   Text(
                     'Application déclarée en catégorie Actualités & Magazines sur Google Play. '

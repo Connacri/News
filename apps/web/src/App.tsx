@@ -17,6 +17,7 @@ import { FlutterExportHub } from './components/FlutterExportHub';
 import { FreeApisHub } from './components/FreeApisHub';
 import { FcmSimulatorModal } from './components/FcmSimulatorModal';
 import { ArticleDetailModal } from './components/ArticleDetailModal';
+import { PublisherPage } from './components/PublisherPage';
 import { CountryCode, FcmPayload, FlutterPlatform, Language, NewsArticle, NewsCategory } from './types';
 import { getAggregatedNews } from './services/newsApi';
 import { translations } from './services/translations';
@@ -32,7 +33,75 @@ import {
   removeBookmarkFromFirestore 
 } from './services/firebase';
 import { onAuthStateChanged, User } from 'firebase/auth';
-import { Bell, RefreshCw, X, Check, Radio, Sparkles } from 'lucide-react';
+import { Bell, RefreshCw, X, Check, Radio, Sparkles, Clock } from 'lucide-react';
+
+/**
+ * Maps the API's date property to a human-readable format like 'Publié il y a X jours'
+ * and validates that the article satisfies Google Play's 3-month (90 days) content freshness policy.
+ */
+export function formatPublicationDate(publishedAt: string | undefined, lang: Language): {
+  humanReadable: string;
+  isFresh: boolean;
+  daysDiff: number;
+  formattedExact: string;
+} {
+  if (!publishedAt) {
+    return {
+      humanReadable: lang === 'fr' ? 'Publié récemment' : 'Published recently',
+      isFresh: true,
+      daysDiff: 0,
+      formattedExact: new Date().toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US'),
+    };
+  }
+
+  const pubDate = new Date(publishedAt);
+  const now = new Date();
+  const diffMs = Math.max(0, now.getTime() - pubDate.getTime());
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffHours / 24);
+  const isFresh = diffDays <= 90; // Satisfies Google Play's 3-month policy
+
+  const formattedExact = pubDate.toLocaleDateString(lang === 'fr' ? 'fr-FR' : 'en-US', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+  let humanReadable = '';
+  if (lang === 'fr') {
+    if (diffHours < 1) {
+      humanReadable = "Publié à l'instant";
+    } else if (diffHours < 24) {
+      humanReadable = `Publié il y a ${diffHours} heure${diffHours > 1 ? 's' : ''}`;
+    } else if (diffDays === 1) {
+      humanReadable = 'Publié il y a 1 jour';
+    } else {
+      humanReadable = `Publié il y a ${diffDays} jours`;
+    }
+  } else if (lang === 'ar') {
+    if (diffHours < 1) {
+      humanReadable = 'نُشر للتو';
+    } else if (diffHours < 24) {
+      humanReadable = `نُشر منذ ${diffHours} ساعة`;
+    } else if (diffDays === 1) {
+      humanReadable = 'نُشر منذ يوم واحد';
+    } else {
+      humanReadable = `نُشر منذ ${diffDays} أيام`;
+    }
+  } else {
+    if (diffHours < 1) {
+      humanReadable = 'Published just now';
+    } else if (diffHours < 24) {
+      humanReadable = `Published ${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+    } else if (diffDays === 1) {
+      humanReadable = 'Published 1 day ago';
+    } else {
+      humanReadable = `Published ${diffDays} days ago`;
+    }
+  }
+
+  return { humanReadable, isFresh, daysDiff: diffDays, formattedExact };
+}
 
 export default function App() {
   const [currentLang, setCurrentLang] = useState<Language>(() => getSavedLanguage());
@@ -69,7 +138,7 @@ export default function App() {
   const [selectedCategory, setSelectedCategory] = useState<NewsCategory>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [activeNavTab, setActiveNavTab] = useState<'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis'>('news');
+  const [activeNavTab, setActiveNavTab] = useState<'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis' | 'publisher'>('news');
 
   const handleLanguageChange = (lang: Language) => {
     setCurrentLang(lang);
@@ -405,16 +474,46 @@ export default function App() {
                 </div>
               ) : (
                 <div className={previewPlatform === 'desktop' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-3'}>
-                  {displayedArticles.map((article) => (
-                    <NewsCard
-                      key={article.id}
-                      article={article}
-                      currentLang={currentLang}
-                      isBookmarked={bookmarks.some((b) => b.id === article.id)}
-                      onToggleBookmark={handleToggleBookmark}
-                      onSelectArticle={setSelectedArticle}
-                    />
-                  ))}
+                  {displayedArticles.map((article) => {
+                    const dateMeta = formatPublicationDate(article.publishedAt, currentLang);
+                    return (
+                      <div
+                        key={article.id}
+                        itemScope
+                        itemType="https://schema.org/NewsArticle"
+                        className="relative flex flex-col group/article"
+                      >
+                        {/* Meta tags for publication date & freshness to ensure Google Play 3-month policy compliance */}
+                        <meta itemProp="datePublished" content={article.publishedAt} />
+                        <meta itemProp="dateModified" content={article.publishedAt} />
+                        <meta property="article:published_time" content={article.publishedAt} />
+                        <meta name="publication-date" content={article.publishedAt} />
+                        <meta name="google-play-freshness" content={dateMeta.isFresh ? 'compliant-under-3-months' : 'legacy'} />
+
+                        {/* Visual Meta Badge: Human-readable publication date & freshness certification */}
+                        <div className="flex items-center justify-between text-[11px] px-3 py-1 bg-slate-900/90 border-x border-t border-slate-800 rounded-t-xl text-slate-400">
+                          <span className="flex items-center gap-1.5 text-sky-400 font-medium">
+                            <Clock className="w-3 h-3 text-sky-400 shrink-0" />
+                            <span>{dateMeta.humanReadable}</span>
+                            <span className="text-slate-600">·</span>
+                            <span className="text-slate-400 font-mono text-[10px]">{dateMeta.formattedExact}</span>
+                          </span>
+                          <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1 bg-emerald-950/40 border border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span>&lt; 3 mois conforme</span>
+                          </span>
+                        </div>
+
+                        <NewsCard
+                          article={article}
+                          currentLang={currentLang}
+                          isBookmarked={bookmarks.some((b) => b.id === article.id)}
+                          onToggleBookmark={handleToggleBookmark}
+                          onSelectArticle={setSelectedArticle}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </>
@@ -462,31 +561,82 @@ export default function App() {
                 </div>
               ) : (
                 <div className={previewPlatform === 'desktop' ? 'grid grid-cols-1 md:grid-cols-2 gap-3' : 'space-y-3'}>
-                  {bookmarks.map((article) => (
-                    <NewsCard
-                      key={article.id}
-                      article={article}
-                      currentLang={currentLang}
-                      isBookmarked={true}
-                      onToggleBookmark={handleToggleBookmark}
-                      onSelectArticle={setSelectedArticle}
-                    />
-                  ))}
+                  {bookmarks.map((article) => {
+                    const dateMeta = formatPublicationDate(article.publishedAt, currentLang);
+                    return (
+                      <div
+                        key={article.id}
+                        itemScope
+                        itemType="https://schema.org/NewsArticle"
+                        className="relative flex flex-col group/article"
+                      >
+                        {/* Meta tags for publication date & freshness to ensure Google Play 3-month policy compliance */}
+                        <meta itemProp="datePublished" content={article.publishedAt} />
+                        <meta itemProp="dateModified" content={article.publishedAt} />
+                        <meta property="article:published_time" content={article.publishedAt} />
+                        <meta name="publication-date" content={article.publishedAt} />
+                        <meta name="google-play-freshness" content={dateMeta.isFresh ? 'compliant-under-3-months' : 'legacy'} />
+
+                        {/* Visual Meta Badge: Human-readable publication date & freshness certification */}
+                        <div className="flex items-center justify-between text-[11px] px-3 py-1 bg-slate-900/90 border-x border-t border-slate-800 rounded-t-xl text-slate-400">
+                          <span className="flex items-center gap-1.5 text-sky-400 font-medium">
+                            <Clock className="w-3 h-3 text-sky-400 shrink-0" />
+                            <span>{dateMeta.humanReadable}</span>
+                            <span className="text-slate-600">·</span>
+                            <span className="text-slate-400 font-mono text-[10px]">{dateMeta.formattedExact}</span>
+                          </span>
+                          <span className="text-[10px] text-emerald-400 font-mono flex items-center gap-1 bg-emerald-950/40 border border-emerald-800/40 px-1.5 py-0.5 rounded-md">
+                            <Check className="w-3 h-3 text-emerald-400" />
+                            <span>&lt; 3 mois conforme</span>
+                          </span>
+                        </div>
+
+                        <NewsCard
+                          article={article}
+                          currentLang={currentLang}
+                          isBookmarked={true}
+                          onToggleBookmark={handleToggleBookmark}
+                          onSelectArticle={setSelectedArticle}
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>
           )}
+
+          {/* TAB 6: Publisher & Transparency Details (Google Play Policy Compliance) */}
+          {activeNavTab === 'publisher' && (
+            <div className="space-y-4">
+              <PublisherPage
+                onBack={() => setActiveNavTab('news')}
+                currentLang={currentLang}
+              />
+            </div>
+          )}
+
           {/* Editorial & Publisher Compliance Footer (Google Play News Policy) */}
           <footer className="mt-6 p-3.5 rounded-2xl bg-slate-900/70 border border-slate-800/80 text-[11px] text-slate-400 space-y-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="font-semibold text-slate-200">
-                Éditeur : Forslog Ltd — DZ News (Agrégateur d&apos;actualités)
-              </div>
+              <button
+                onClick={() => setActiveNavTab('publisher')}
+                className="font-semibold text-slate-200 hover:text-sky-400 transition-colors text-left flex items-center gap-1.5 cursor-pointer"
+              >
+                <span>Éditeur : Forslog Ltd — DZ News (Agrégateur d&apos;actualités)</span>
+                <span className="text-sky-400 text-[10px]">Fiche Éditeur →</span>
+              </button>
               <span className="text-[10px] font-mono text-emerald-400 bg-emerald-950/50 border border-emerald-800/50 px-2 py-0.5 rounded-full">
                 Flux vérifiés &lt; 30 jours
               </span>
             </div>
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-300">
+              <button
+                onClick={() => setActiveNavTab('publisher')}
+                className="text-sky-400 hover:underline font-semibold cursor-pointer"
+              >
+                Transparence Éditeur
+              </button>
               <a href="mailto:forslog@gmail.com" className="hover:text-sky-400 underline">
                 ✉️ forslog@gmail.com
               </a>

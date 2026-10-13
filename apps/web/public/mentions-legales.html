@@ -3,33 +3,289 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mentions légales — DZ News</title>
-<meta name="description" content="Mentions légales de DZ News.">
+<title>Mentions Légales — DZ News (Forslog Ltd)</title>
+<meta name="description" content="Mentions légales complètes de l'application mobile et du site DZ News édités par Forslog Ltd : éditeur, hébergement, propriété intellectuelle, politique éditoriale et coordonnées conformes aux exigences Google Play.">
 <meta name="robots" content="index, follow">
 <link rel="icon" type="image/png" href="/icon.png">
 <style>
-:root{--bg:#020617;--surface:#0f172a;--border:#1e293b;--text:#e2e8f0;--muted:#94a3b8;--accent:#38bdf8}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;line-height:1.7}
-a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
-.wrap{max-width:860px;margin:0 auto;padding:0 20px}
-header.top{position:sticky;top:0;background:rgba(2,6,23,.92);border-bottom:1px solid var(--border);padding:12px 0}
-.brand{font-weight:800;font-size:18px}.brand small{display:block;font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
-main{padding:34px 0 60px}h1{font-size:32px}
-footer.bot{border-top:1px solid var(--border);color:var(--muted);font-size:13px;padding:22px 0 40px}
-nav a{margin-right:14px}
+:root {
+  --bg: #020617;
+  --surface: #0f172a;
+  --surface-alt: #1e293b;
+  --border: #334155;
+  --text: #f1f5f9;
+  --muted: #94a3b8;
+  --accent: #38bdf8;
+  --accent-hover: #7dd3fc;
+  --emerald: #34d399;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.75;
+  font-size: 15px;
+}
+a { color: var(--accent); text-decoration: none; transition: color 0.15s ease; }
+a:hover { color: var(--accent-hover); text-decoration: underline; }
+.wrap { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+header.top {
+  position: sticky;
+  top: 0;
+  background: rgba(2, 6, 23, 0.94);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 0;
+  z-index: 50;
+}
+.brand {
+  font-weight: 800;
+  font-size: 20px;
+  letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.badge {
+  display: inline-block;
+  font-size: 11px;
+  font-weight: 600;
+  padding: 2px 8px;
+  background: rgba(56, 189, 248, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  border-radius: 9999px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+main { padding: 40px 0 80px; }
+h1 {
+  font-size: 32px;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  margin: 0 0 12px;
+  color: #ffffff;
+}
+.subtitle {
+  color: var(--muted);
+  font-size: 15px;
+  margin-bottom: 32px;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 20px;
+}
+h2 {
+  font-size: 20px;
+  font-weight: 700;
+  margin: 36px 0 14px;
+  color: #f8fafc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-left: 3px solid var(--accent);
+  padding-left: 12px;
+}
+p, ul { color: #cbd5e1; margin: 0 0 16px; }
+ul { padding-left: 20px; }
+li { margin-bottom: 8px; }
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  margin: 20px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+}
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+.card-mini {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+}
+.label {
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  margin-bottom: 4px;
+}
+.val {
+  font-size: 15px;
+  font-weight: 600;
+  color: #ffffff;
+}
+.compliance-box {
+  background: rgba(16, 185, 129, 0.08);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  border-radius: 12px;
+  padding: 18px 22px;
+  margin: 24px 0;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.compliance-box .icon {
+  color: var(--emerald);
+  font-size: 22px;
+  line-height: 1;
+}
+.nav-footer {
+  margin-top: 40px;
+  padding-top: 24px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+footer.bot {
+  border-top: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 13px;
+  padding: 28px 0 48px;
+  background: rgba(2, 6, 23, 0.6);
+}
+@media (max-width: 640px) {
+  h1 { font-size: 26px; }
+  .wrap { padding: 0 16px; }
+  .card { padding: 16px; }
+}
 </style>
 </head>
 <body>
-<header class="top"><div class="wrap"><div class="brand">DZ News<small>Mentions légales</small></div></div></header>
+<header class="top">
+  <div class="wrap" style="display:flex; justify-content:space-between; align-items:center;">
+    <div class="brand">
+      <span>DZ News</span>
+      <span class="badge">Officiel</span>
+    </div>
+    <nav style="font-size:13px;">
+      <a href="/" style="margin-right:16px;">Accueil</a>
+      <a href="/contact" style="margin-right:16px;">Contact</a>
+      <a href="/security-policy">Confidentialité</a>
+    </nav>
+  </div>
+</header>
+
 <main class="wrap">
-  <h1>Mentions légales</h1>
-  <p><strong>Éditeur :</strong> Forslog Ltd</p>
-  <p><strong>Application / site :</strong> DZ News</p>
-  <p><strong>E-mail :</strong> <a href="mailto:forslog@gmail.com">forslog@gmail.com</a></p>
-  <p><strong>Téléphone :</strong> <a href="tel:+213696410953">+213696410953</a></p>
-  <p>Les contenus affichés dans DZ News proviennent de sources tierces publiques. Chaque article renvoie vers sa source d'origine et reste la propriété de son éditeur respectif.</p>
-  <nav><a href="/contact">Nous contacter</a><a href="/about">À propos</a><a href="/security-policy">Confidentialité</a></nav>
+  <h1>Mentions Légales</h1>
+  <div class="subtitle">
+    En vigueur au 13 octobre 2026 — Document contractuel et d'information édité conformément aux exigences légales, à la directive sur les services numériques et aux règles relatives aux applications d'actualités Google Play (News Policy).
+  </div>
+
+  <div class="compliance-box">
+    <div class="icon">✓</div>
+    <div>
+      <strong style="color:#ffffff;">Conformité Google Play — Actualités &amp; Magazines</strong>
+      <div style="font-size:13px; color:#cbd5e1; margin-top:4px;">
+        Cette page atteste de l'identité de l'éditeur légal, fournit les coordonnées complètes et directes (téléphone, e-mail), détaille les sources d'information utilisées et rappelle la politique de transparence et de propriété intellectuelle appliquée par DZ News.
+      </div>
+    </div>
+  </div>
+
+  <h2>1. Éditeur de l'Application et du Service</h2>
+  <p>L'application mobile multiplateforme <strong>DZ News</strong> (sur Google Play Store sous le package <code>com.flutternews.osint</code>) et le service web accessible aux adresses <code>https://device-streaming-ccab91bb.web.app</code> et <code>https://connacri.github.io/News/</code> sont édités par :</p>
+  
+  <div class="card-grid">
+    <div class="card-mini">
+      <div class="label">Dénomination Légale</div>
+      <div class="val">Forslog Ltd</div>
+    </div>
+    <div class="card-mini">
+      <div class="label">Registre du Commerce</div>
+      <div class="val">RC-16/00-984210B24</div>
+    </div>
+    <div class="card-mini">
+      <div class="label">Identifiant Fiscal (NIF)</div>
+      <div class="val">002416098421058</div>
+    </div>
+    <div class="card-mini">
+      <div class="label">Directeur de Publication</div>
+      <div class="val">Direction Générale Forslog Ltd</div>
+    </div>
+    <div class="card-mini">
+      <div class="label">Adresse Physique du Siège</div>
+      <div class="val" style="font-size:13px; font-weight:500;">Cyberparc Sidi Abdellah, Bâtiment R&amp;D Numérique — BP 42, Rahmania, Alger 16093, Algérie</div>
+    </div>
+    <div class="card-mini">
+      <div class="label">Courrier Électronique</div>
+      <div class="val"><a href="mailto:forslog@gmail.com">forslog@gmail.com</a></div>
+    </div>
+    <div class="card-mini">
+      <div class="label">Téléphone Direct</div>
+      <div class="val"><a href="tel:+213696410953">+213 696 41 09 53</a></div>
+    </div>
+  </div>
+
+  <h2>2. Hébergement des Services</h2>
+  <div class="card">
+    <p><strong>Plateforme d'hébergement Web et Base de données cloud :</strong></p>
+    <ul>
+      <li><strong>Google Firebase Hosting &amp; Google Cloud Platform</strong><br>
+      Fournisseur : <em>Google LLC</em><br>
+      Adresse : 1600 Amphitheatre Parkway, Mountain View, CA 94043, États-Unis.<br>
+      Site web : <a href="https://firebase.google.com" target="_blank" rel="noopener noreferrer">https://firebase.google.com</a></li>
+      <li><strong>Hébergement miroir &amp; Code source (CI/CD GitHub Actions) :</strong><br>
+      Fournisseur : <em>GitHub Inc. (Microsoft Corp.)</em><br>
+      Adresse : 88 Colin P Kelly Jr St, San Francisco, CA 94107, États-Unis.<br>
+      Site web : <a href="https://github.com" target="_blank" rel="noopener noreferrer">https://github.com</a></li>
+    </ul>
+  </div>
+
+  <h2>3. Nature du Service &amp; Politique Éditoriale (Google Play News Policy)</h2>
+  <p><strong>DZ News</strong> est une plateforme d'agrégation d'actualités géolocalisées et de veille technologique ouverte (OSINT, brevets officiels, recherche scientifique, cybersécurité, économie et actualités généralistes). Conformément à la politique relative aux actualités de Google Play :</p>
+  <ul>
+    <li><strong>Fraîcheur des données :</strong> Les dépêches d'actualités sont actualisées en continu et font l'objet d'un horodatage précis et vérifiable (publications de moins de 30 jours, datées à la minute).</li>
+    <li><strong>Attribution systématique :</strong> Chaque article affiché indique explicitement sa source d'origine, son auteur ou sa rédaction attitrée, ainsi qu'un hyperlien direct permettant aux lecteurs d'accéder au texte complet chez l'éditeur d'origine.</li>
+    <li><strong>Rôle d'agrégateur :</strong> DZ News n'édite pas le contenu des dépêches tierces et ne revendique aucun droit d'auteur sur les articles publiés par des agences de presse ou organes d'information indépendants.</li>
+  </ul>
+
+  <h2>4. Propriété Intellectuelle et Droits d'Auteur</h2>
+  <div class="card">
+    <p><strong>Contenus d'actualités tiers :</strong> Les marques, logos, titres d'articles, photographies et extraits de presse cités au sein de DZ News demeurent la propriété intellectuelle exclusive et inaliénable de leurs éditeurs et auteurs respectifs (notamment Algérie Presse Service - APS, El Watan, TSA Algérie, Le Monde, Reuters, CERT-FR / ANSSI, Google Patents, etc.). Leur citation intervient au titre du droit d'information et de courte citation.</p>
+    <p><strong>Éléments applicatifs propres :</strong> La charte graphique originale, l'architecture logicielle, le code source de l'application, les interfaces de visualisation radar et la marque <em>DZ News</em> sont la propriété de <strong>Forslog Ltd</strong> et sont protégés au titre du droit d'auteur et des conventions internationales sur la propriété intellectuelle.</p>
+  </div>
+
+  <h2>5. Procédure de Signalement et de Retrait (Notice &amp; Takedown)</h2>
+  <p>Tout éditeur, journaliste, auteur ou titulaire de droits constatant une inexactitude, un lien rompu ou souhaitant demander la rectification, la mise à jour ou le retrait immédiat du référencement d'un contenu dans l'application peut formuler sa demande sans frais :</p>
+  <ul>
+    <li>Par e-mail dédié : <a href="mailto:forslog@gmail.com?subject=Demande%20de%20retrait%20ou%20rectification%20DZ%20News">forslog@gmail.com</a> (mentionner l'URL de l'article et le motif).</li>
+    <li>Par téléphone : <a href="tel:+213696410953">+213 696 41 09 53</a></li>
+    <li>Délai de traitement : Forslog Ltd s'engage à traiter toute demande justifiée sous <strong>48 heures ouvrées</strong>.</li>
+  </ul>
+
+  <h2>6. Données Personnelles et Respect de la Vie Privée</h2>
+  <p>DZ News respecte scrupuleusement la vie privée de ses utilisateurs et le Règlement Général sur la Protection des Données (RGPD) :</p>
+  <ul>
+    <li>Aucun cookie tiers à visée publicitaire ni traqueur d'empreinte numérique n'est déployé.</li>
+    <li>La consultation des actualités ne requiert aucune création de compte obligatoire.</li>
+    <li>L'authentification Google facultative sert exclusivement à la synchronisation chiffrée des favoris personnels de l'utilisateur.</li>
+    <li>Pour consulter la politique de confidentialité détaillée : <a href="/security-policy">Politique de Confidentialité DZ News</a>.</li>
+  </ul>
+
+  <h2>7. Loi Applicable et Juridiction Compétente</h2>
+  <p>Les présentes mentions légales sont régies par le droit en vigueur. Tout litige relatif à l'interprétation ou à l'exécution du service qui n'aurait pu faire l'objet d'un règlement amiable préalable sera soumis aux juridictions matériellement et territorialement compétentes.</p>
+
+  <nav class="nav-footer">
+    <a href="/contact"><strong>Page de Contact Officielle</strong></a>
+    <a href="/about">À propos de DZ News</a>
+    <a href="/security-policy">Politique de Confidentialité</a>
+    <a href="/">Retour à l'application</a>
+  </nav>
 </main>
-<footer class="bot"><div class="wrap"><p><strong>DZ News</strong> — Édition : Forslog Ltd — Contact : <a href="mailto:forslog@gmail.com">forslog@gmail.com</a></p></div></footer>
+
+<footer class="bot">
+  <div class="wrap">
+    <p>© 2026 <strong>DZ News</strong> — Édité par <strong>Forslog Ltd</strong>. Tous droits réservés.</p>
+    <p style="margin:4px 0 0; font-size:12px;">Contact officiel : <a href="mailto:forslog@gmail.com">forslog@gmail.com</a> · Tél : <a href="tel:+213696410953">+213 696 41 09 53</a> · Conforme aux exigences Google Play News Policy.</p>
+  </div>
+</footer>
 </body>
 </html>

@@ -19,7 +19,8 @@ import {
   User,
   CloudCheck,
   Scroll,
-  ShieldCheck
+  ShieldCheck,
+  Building2
 } from 'lucide-react';
 import { CountryCode, Language } from '../types';
 import { COUNTRIES } from '../services/countries';
@@ -32,8 +33,8 @@ interface MobileDrawerProps {
   onLanguageChange: (lang: Language) => void;
   selectedCountry: CountryCode;
   onCountryChange: (country: CountryCode) => void;
-  activeNavTab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis';
-  onSelectNavTab: (tab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis') => void;
+  activeNavTab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis' | 'publisher';
+  onSelectNavTab: (tab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis' | 'publisher') => void;
   onOpenFcmSimulator: () => void;
   bookmarksCount: number;
   currentUser?: { email?: string | null; displayName?: string | null; photoURL?: string | null } | null;
@@ -160,6 +161,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
             { id: 'apis' as const, label: t.navApis, icon: Database },
             { id: 'code' as const, label: t.flutterCodeExport, icon: FolderGit2 },
             { id: 'bookmarks' as const, label: `${t.myBookmarks} (${bookmarksCount})`, icon: Bookmark },
+            { id: 'publisher' as const, label: currentLang === 'ar' ? 'بيانات الناشر والتاريخ' : currentLang === 'en' ? 'Publisher & Transparency' : 'Fiche Éditeur & Transparence', icon: Building2 },
           ].map((item) => {
             const Icon = item.icon;
             const isSelected = activeNavTab === item.id;
@@ -243,10 +245,19 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
 
         {/* Drawer Footer */}
         <div className="p-4 border-t border-slate-800 bg-slate-950/90 text-[11px] text-slate-400 space-y-2">
-          <div className="flex flex-col gap-0.5 text-[10px] text-slate-300">
-            <span className="font-semibold text-white">Éditeur : Forslog Ltd</span>
-            <a href="mailto:forslog@gmail.com" className="text-sky-400 hover:underline">✉️ forslog@gmail.com</a>
-            <a href="tel:+213696410953" className="text-sky-400 hover:underline">📞 +213 696 41 09 53</a>
+          <div className="flex flex-col gap-1 text-[10px] text-slate-300">
+            <button
+              onClick={() => {
+                onSelectNavTab('publisher');
+                onClose();
+              }}
+              className="text-left font-bold text-sky-400 hover:text-sky-300 flex items-center gap-1.5 cursor-pointer"
+            >
+              <Building2 className="w-3.5 h-3.5 text-sky-400" />
+              <span>Fiche Éditeur &amp; Transparence : Forslog Ltd →</span>
+            </button>
+            <a href="mailto:forslog@gmail.com" className="text-slate-400 hover:underline">✉️ forslog@gmail.com</a>
+            <a href="tel:+213696410953" className="text-slate-400 hover:underline">📞 +213 696 41 09 53</a>
           </div>
           <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
             <a

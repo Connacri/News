@@ -4,8 +4,8 @@ import { Language } from '../types';
 import { translations } from '../services/translations';
 
 interface MobileBottomNavProps {
-  activeTab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis';
-  onSelectTab: (tab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis') => void;
+  activeTab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis' | 'publisher';
+  onSelectTab: (tab: 'news' | 'osint' | 'github' | 'code' | 'bookmarks' | 'apis' | 'publisher') => void;
   bookmarksCount: number;
   currentLang: Language;
 }
