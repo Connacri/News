@@ -24,6 +24,7 @@ le navigateur sur ordinateur **et** sur téléphone Android, avec la même inter
 | **Notifications push** | Soyez alerté des sujets importants (activables ou désactivables à tout moment). |
 | **Fonctionne hors ligne** | Les articles déjà consultés restent lisibles sans connexion grâce au cache local. |
 | **6 langues / 10 zones** | Interface en français, anglais, espagnol, allemand, arabe et japonais. |
+| **Traduction Arabe & Préservation Technique** | En mode Arabe, tous les articles et dépêches sont traduits en arabe avec préservation stricte des termes techniques et scientifiques en graphie latine (Flutter, Impeller, Vulkan, Linux, API, LLM, CVE, etc.). |
 
 ### Sur quelles plateformes
 

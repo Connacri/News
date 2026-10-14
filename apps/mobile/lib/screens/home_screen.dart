@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../services/news_api_service.dart';
+import '../services/article_translator.dart';
 import 'patents_screen.dart';
 import 'osint_screen.dart';
 import 'about_screen.dart';
@@ -19,6 +20,33 @@ class _HomeScreenState extends State<HomeScreen> {
   int _currentTabIndex = 0;
   final String _selectedCountry = 'all';
   String _selectedCategory = 'all';
+
+  static const Map<String, String> _categoriesAr = {
+    'all': '🌐 الرئيسية',
+    'world': '🌍 دولي',
+    'local': '📍 محلي',
+    'politics': '🏛️ سياسة',
+    'business': '💼 شركات',
+    'economy': '📈 اقتصاد',
+    'society': '👥 مجتمع',
+    'sports': '⚽ رياضة',
+    'culture': '🎭 ثقافة',
+    'entertainment': '🎬 ترفيه',
+    'science': '🔬 علوم',
+    'health': '🩺 صحة',
+    'environment': '🌱 بيئة',
+    'education': '🎓 تعليم',
+    'technology': '💻 تكنولوجيا',
+    'ai': '🤖 ذكاء اصطناعي AI',
+    'cyber': '🛡️ أمن سيبراني',
+    'travel': '✈️ سياحة',
+    'lifestyle': '✨ نمط حياة',
+    'opensource': '⭐ برمجيات حرة Open Source',
+    'mobile': '📱 هواتف وتطبيقات Mobile',
+    'cloud': '☁️ حوسبة سحابية Cloud',
+    'patents': '📜 براءات اختراع',
+    'blueprints': '📐 مخططات هندسية',
+  };
 
   final List<Map<String, String>> _categories = [
     {'id': 'all', 'label': '🌐 À la une'},
@@ -184,6 +212,8 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildNewsList(NewsApiService news) {
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
     return Column(
       children: [
         // Filtres par Catégorie Horizontal
@@ -197,8 +227,9 @@ class _HomeScreenState extends State<HomeScreen> {
             itemBuilder: (context, index) {
               final cat = _categories[index];
               final isSelected = cat['id'] == _selectedCategory;
+              final catLabel = isArabic ? (_categoriesAr[cat['id']] ?? cat['label']!) : cat['label']!;
               return ChoiceChip(
-                label: Text(cat['label']!),
+                label: Text(catLabel),
                 selected: isSelected,
                 onSelected: (selected) {
                   if (selected) {
@@ -230,17 +261,19 @@ class _HomeScreenState extends State<HomeScreen> {
                 spacing: 8,
                 runSpacing: 4,
                 children: [
-                  const Text(
-                    'Éditeur : Forslog Ltd · Contact : forslog@gmail.com · +213 696 41 09 53',
-                    style: TextStyle(fontSize: 11, color: Colors.white70),
+                  Text(
+                    isArabic
+                        ? 'الناشر: Forslog Ltd · الاتصال: forslog@gmail.com · +213 696 41 09 53'
+                        : 'Éditeur : Forslog Ltd · Contact : forslog@gmail.com · +213 696 41 09 53',
+                    style: const TextStyle(fontSize: 11, color: Colors.white70),
                   ),
                   InkWell(
                     onTap: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const ContactScreen()),
                     ),
-                    child: const Text(
-                      'Page Contact & Mentions →',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
+                    child: Text(
+                      isArabic ? 'صفحة الاتصال والبيانات ←' : 'Page Contact & Mentions →',
+                      style: const TextStyle(fontSize: 11, color: Color(0xFF38BDF8), fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],
@@ -251,7 +284,9 @@ class _HomeScreenState extends State<HomeScreen> {
                   const Icon(Icons.verified_outlined, size: 13, color: Color(0xFF34D399)),
                   const SizedBox(width: 4),
                   Text(
-                    'Flux d\'actualités certifié (< 30 jours) · Mis à jour le ${news.lastUpdated.day.toString().padLeft(2, '0')}/${news.lastUpdated.month.toString().padLeft(2, '0')}/${news.lastUpdated.year} à ${news.lastUpdated.hour.toString().padLeft(2, '0')}:${news.lastUpdated.minute.toString().padLeft(2, '0')}',
+                    isArabic
+                        ? 'موجز إخباري معتمد (< 30 يوماً) · تم التحديث في ${news.lastUpdated.day.toString().padLeft(2, '0')}/${news.lastUpdated.month.toString().padLeft(2, '0')}/${news.lastUpdated.year}'
+                        : 'Flux d\'actualités certifié (< 30 jours) · Mis à jour le ${news.lastUpdated.day.toString().padLeft(2, '0')}/${news.lastUpdated.month.toString().padLeft(2, '0')}/${news.lastUpdated.year} à ${news.lastUpdated.hour.toString().padLeft(2, '0')}:${news.lastUpdated.minute.toString().padLeft(2, '0')}',
                     style: const TextStyle(fontSize: 10, color: Color(0xFF34D399)),
                   ),
                 ],
@@ -271,7 +306,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const Icon(Icons.newspaper, size: 40, color: Colors.white54),
                           const SizedBox(height: 8),
-                          const Text('Actualisation des dépêches récentes...'),
+                          Text(isArabic ? 'جاري تحديث الأخبار الأخيرة...' : 'Actualisation des dépêches récentes...'),
                           const SizedBox(height: 8),
                           ElevatedButton.icon(
                             onPressed: () => news.fetchNews(
@@ -279,7 +314,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               category: _selectedCategory,
                             ),
                             icon: const Icon(Icons.refresh),
-                            label: const Text('Actualiser'),
+                            label: Text(isArabic ? 'تحديث' : 'Actualiser'),
                           ),
                         ],
                       ),
@@ -289,11 +324,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       itemBuilder: (context, index) {
                         final article = news.articles[index];
                         final diff = DateTime.now().difference(article.publishedAt);
-                        final ageLabel = diff.inHours < 1
-                            ? 'Il y a ${diff.inMinutes.clamp(1, 59)} min'
-                            : diff.inHours < 24
-                                ? 'Il y a ${diff.inHours}h'
-                                : 'Il y a ${diff.inDays}j';
+                        final ageLabel = isArabic
+                            ? ArticleTranslator.formatAgeArabic(article.publishedAt)
+                            : (diff.inHours < 1
+                                ? 'Il y a ${diff.inMinutes.clamp(1, 59)} min'
+                                : diff.inHours < 24
+                                    ? 'Il y a ${diff.inHours}h'
+                                    : 'Il y a ${diff.inDays}j');
                         final dateStr =
                             '${article.publishedAt.day.toString().padLeft(2, '0')}/'
                             '${article.publishedAt.month.toString().padLeft(2, '0')}/'
@@ -304,6 +341,13 @@ class _HomeScreenState extends State<HomeScreen> {
                             ? article.author!
                             : 'Rédaction ${article.source}';
 
+                        final displayTitle = isArabic
+                            ? ArticleTranslator.translateToArabic(article.title)
+                            : article.title;
+                        final displayDescription = isArabic
+                            ? ArticleTranslator.translateToArabic(article.description)
+                            : article.description;
+
                         return Card(
                           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                           child: ListTile(
@@ -311,33 +355,35 @@ class _HomeScreenState extends State<HomeScreen> {
                               final uri = Uri.parse(article.googlePatentsUrl ?? article.url);
                               if (await canLaunchUrl(uri)) launchUrl(uri);
                             },
-                            title: Text(article.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                            title: Text(displayTitle, style: const TextStyle(fontWeight: FontWeight.bold)),
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const SizedBox(height: 4),
-                                Text(article.description, maxLines: 3, overflow: TextOverflow.ellipsis),
+                                Text(displayDescription, maxLines: 3, overflow: TextOverflow.ellipsis),
                                 const SizedBox(height: 8),
                                 Row(
                                   children: [
                                     const Icon(Icons.schedule, size: 12, color: Color(0xFF38BDF8)),
                                     const SizedBox(width: 4),
                                     Text(
-                                      'Publié le $dateStr ($ageLabel)',
+                                      isArabic ? 'نُشر في $dateStr ($ageLabel)' : 'Publié le $dateStr ($ageLabel)',
                                       style: const TextStyle(color: Color(0xFF38BDF8), fontSize: 11, fontWeight: FontWeight.w600),
                                     ),
                                   ],
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
-                                  'Source originale : ${article.source} · Auteur : $authorLabel',
+                                  isArabic
+                                      ? 'المصدر: ${article.source} · الكاتب: $authorLabel'
+                                      : 'Source originale : ${article.source} · Auteur : $authorLabel',
                                   style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.white70),
                                 ),
                               ],
                             ),
                             trailing: IconButton(
                               icon: const Icon(Icons.open_in_new),
-                              tooltip: 'Lire sur la source originale',
+                              tooltip: isArabic ? 'طالع المصدر الأصلي' : 'Lire sur la source originale',
                               onPressed: () async {
                                 final uri = Uri.parse(article.googlePatentsUrl ?? article.url);
                                 if (await canLaunchUrl(uri)) launchUrl(uri);

@@ -1,6 +1,7 @@
-import { CountryCode, NewsArticle, NewsCategory, OsintAlert } from '../types';
+import { CountryCode, Language, NewsArticle, NewsCategory, OsintAlert } from '../types';
 import { getCachedArticles, getLastViewedArticles, saveCachedArticles } from './offlineCache';
 import { ALGERIAN_NEWS_SOURCES } from './algerianSources';
+import { getPersistentTranslation } from './translator';
 
 // Curated live baseline dataset with rich technical content for each country
 const COUNTRY_TECH_FALLBACKS: NewsArticle[] = [
@@ -1625,50 +1626,59 @@ export async function fetchGeolocatedGeneralNews(country: CountryCode = 'all', c
 
   const countryFilter = gdeltCountryQuery(country);
 
-  const batches = await Promise.allSettled(
-    categories.map(async (editorialCategory) => {
-      const rawTopic = GENERAL_NEWS_QUERIES[editorialCategory] || 'news';
-      const topic = rawTopic.includes(' OR ') ? `(${rawTopic})` : rawTopic;
-      const query = encodeURIComponent([topic, countryFilter].filter(Boolean).join(' '));
-      const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&timespan=14d&maxrecords=${category === 'all' ? 15 : 40}&format=json&sort=datedesc`;
-      const res = await fetch(url, { headers: { Accept: 'application/json' } });
-      if (!res.ok) throw new Error(`GDELT HTTP ${res.status}`);
-      const data = await res.json();
-      return (data.articles || []).map((item: any, index: number): NewsArticle => {
-        const domain = item.domain || 'GDELT';
-        const publishedAt = parseGdeltDate(item.seendate);
-        return {
-          id: `gdelt-${item.url || editorialCategory + '-' + index}`,
-          title: item.title || 'Actualité internationale',
-          description: `Dépêche publiée par ${domain} (${item.sourcecountry || country.toUpperCase()}). Consultez l'article complet sur la source originale.`,
-          url: item.url,
-          source: domain,
-          author: item.author || `Rédaction ${domain}`,
-          sourceType: 'gdelt',
-          publishedAt,
-          country: country === 'all' ? 'all' : country,
-          category: editorialCategory as NewsCategory,
-          tags: ['GDELT', editorialCategory, domain],
-        };
-      });
-    })
-  );
+  try {
+    const batches = await Promise.allSettled(
+      categories.map(async (editorialCategory) => {
+        const rawTopic = GENERAL_NEWS_QUERIES[editorialCategory] || 'news';
+        const topic = rawTopic.includes(' OR ') ? `(${rawTopic})` : rawTopic;
+        const query = encodeURIComponent([topic, countryFilter].filter(Boolean).join(' '));
+        const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${query}&mode=artlist&timespan=14d&maxrecords=${category === 'all' ? 10 : 25}&format=json&sort=datedesc`;
+        const res = await fetch(url, { 
+          headers: { Accept: 'application/json' },
+          signal: AbortSignal.timeout(3500)
+        });
+        if (!res.ok) return [];
+        const data = await res.json();
+        return (data.articles || []).map((item: any, index: number): NewsArticle => {
+          const domain = item.domain || 'GDELT';
+          const publishedAt = parseGdeltDate(item.seendate);
+          return {
+            id: `gdelt-${item.url || editorialCategory + '-' + index}`,
+            title: item.title || 'Actualité internationale',
+            description: `Dépêche publiée par ${domain} (${item.sourcecountry || country.toUpperCase()}). Consultez l'article complet sur la source originale.`,
+            url: item.url,
+            source: domain,
+            author: item.author || `Rédaction ${domain}`,
+            sourceType: 'gdelt',
+            publishedAt,
+            country: country === 'all' ? 'all' : country,
+            category: editorialCategory as NewsCategory,
+            tags: ['GDELT', editorialCategory, domain],
+          };
+        });
+      })
+    );
 
-  const articles: NewsArticle[] = [];
-  for (const batch of batches) {
-    if (batch.status === 'fulfilled') articles.push(...batch.value);
+    const articles: NewsArticle[] = [];
+    for (const batch of batches) {
+      if (batch.status === 'fulfilled' && Array.isArray(batch.value)) {
+        articles.push(...batch.value);
+      }
+    }
+
+    const unique = new Map<string, NewsArticle>();
+    for (const article of articles) {
+      if (!article.url) continue;
+      const normalizedUrl = article.url.trim().replace(/#.*$/, '').replace(/\/$/, '');
+      const key = normalizedUrl || article.id;
+      if (!unique.has(key)) unique.set(key, article);
+    }
+
+    return Array.from(unique.values())
+      .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
+  } catch {
+    return [];
   }
-
-  const unique = new Map<string, NewsArticle>();
-  for (const article of articles) {
-    if (!article.url) continue;
-    const normalizedUrl = article.url.trim().replace(/#.*$/, '').replace(/\/$/, '');
-    const key = normalizedUrl || article.id;
-    if (!unique.has(key)) unique.set(key, article);
-  }
-
-  return Array.from(unique.values())
-    .sort((a, b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
 }
 
 function parseGdeltDate(value: unknown): string {
@@ -1682,10 +1692,12 @@ function parseGdeltDate(value: unknown): string {
   return Number.isNaN(parsed) ? new Date().toISOString() : new Date(parsed).toISOString();
 }
 
-async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory): Promise<NewsArticle[]> {
-  if (country !== 'dz' && country !== 'all' && country !== 'maghreb') return [];
+export async function fetchLiveRssNews(country: CountryCode, category: NewsCategory, lang: Language): Promise<NewsArticle[]> {
   try {
-    const res = await fetch(`/api/news/aggregate?country=${encodeURIComponent(country)}&category=${encodeURIComponent(category)}`);
+    const res = await fetch(
+      `/api/news/aggregate?country=${encodeURIComponent(country)}&category=${encodeURIComponent(category)}&lang=${encodeURIComponent(lang)}`,
+      { signal: AbortSignal.timeout(5000) }
+    );
     if (res.ok) {
       const items = await res.json();
       if (Array.isArray(items) && items.length > 0) {
@@ -1693,27 +1705,31 @@ async function fetchAlgerianRssNews(country: CountryCode, category: NewsCategory
       }
     }
   } catch {
-    // Fallback to direct RSS discovery if API route is unreachable
+    // Fallback to cache / baseline
   }
   return [];
 }
 
-export async function getAggregatedNews(country: CountryCode = 'all', category: NewsCategory = 'all'): Promise<NewsArticle[]> {
+export async function getAggregatedNews(
+  country: CountryCode = 'all',
+  category: NewsCategory = 'all',
+  lang: Language = 'fr'
+): Promise<NewsArticle[]> {
   const isOffline = typeof navigator !== 'undefined' && !navigator.onLine;
 
   let liveList: NewsArticle[] = [];
   if (!isOffline) {
     try {
-      const [generalArticles, rssArticles, hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
+      const [rssArticles, generalArticles, hnArticles, devtoArticles, ghArticles] = await Promise.allSettled([
+        fetchLiveRssNews(country, category, lang),
         fetchGeolocatedGeneralNews(country, category),
-        fetchAlgerianRssNews(country, category),
         fetchLiveHackerNews(country === 'fr' ? 'france' : country === 'de' ? 'germany' : 'tech'),
         fetchLiveDevToArticles(),
         fetchLiveGitHubRepos()
       ]);
 
-      if (generalArticles.status === 'fulfilled') liveList.push(...generalArticles.value);
       if (rssArticles.status === 'fulfilled') liveList.push(...rssArticles.value);
+      if (generalArticles.status === 'fulfilled') liveList.push(...generalArticles.value);
       if (hnArticles.status === 'fulfilled') liveList.push(...hnArticles.value);
       if (devtoArticles.status === 'fulfilled') liveList.push(...devtoArticles.value);
       if (ghArticles.status === 'fulfilled') liveList.push(...ghArticles.value);
@@ -1766,14 +1782,35 @@ export async function getAggregatedNews(country: CountryCode = 'all', category: 
   }
 
   if (country !== 'all') {
-    results = results.filter(a => a.country === country || a.country === 'all');
+    const filteredCountry = results.filter(a => a.country === country || a.country === 'all');
+    if (filteredCountry.length > 0) {
+      results = filteredCountry;
+    }
   }
 
   if (category !== 'all') {
-    results = results.filter(a => a.category === category);
+    const filteredCategory = results.filter(a => a.category === category);
+    if (filteredCategory.length > 0) {
+      results = filteredCategory;
+    }
   }
 
   results.sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime());
+
+  // If app is in Arabic, ensure all articles are translated into Arabic with technical terms preserved
+  if (lang === 'ar') {
+    results = results.map((article) => {
+      // Import and apply persistent translation
+      const trans = getPersistentTranslation(article, 'ar');
+      return {
+        ...article,
+        translatedTitle: trans.title,
+        translatedDescription: trans.description,
+        translatedFullContent: trans.content,
+        keyTakeaways: trans.keyTakeaways || article.keyTakeaways,
+      };
+    });
+  }
 
   return results;
 }

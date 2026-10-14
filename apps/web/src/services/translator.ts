@@ -579,6 +579,47 @@ function translateDynamicTextToArabic(text: string): string {
     return `__TECH_TERM_${preservedTerms.length - 1}__`;
   });
 
+  // 2. Direct exact mappings for editorial baselines
+  const exactBaselineMap: Record<string, string> = {
+    "Partenariats transméditerranéens : Accélération des échanges universitaires et technologiques": "شراكات عبر المتوسط: تسريع التبادل الأكاديمي والتكنولوجي",
+    "Mise en place de programmes conjoints de recherche appliquée entre universités du bassin méditerranéen pour la transition numérique et la cybersécurité.": "إطلاق برامج مشتركة للبحث العلمي التطبيقي بين جامعات حوض المتوسط للتحول الرقمي والأمن السيبراني.",
+    "Algérie : Modernisation des services publics locaux et déploiement de la fibre dans 58 wilayas": "الجزائر: تحديث الخدمات العامة المحلية ونشر شبكة Fibre في 58 ولاية",
+    "Le ministère de l'Intérieur et Algérie Télécom finalisent la numérisation complète de l'état civil et le raccordement haut débit des communes enclavées.": "وزارة الداخلية و Algérie Télécom تضعان اللمسات الأخيرة على رقمنة الحالة المدنية وربط البلديات المعزولة بالإنترنت فائق السرعة.",
+    "Grand Alger : Extension du réseau de métro et inauguration des nouvelles stations intermodales": "الجزائر الكبرى: توسيع شبكة المترو وتدشين محطات جديدة متعددة الوسائط",
+    "Entrée en service des nouvelles rames automatisées et des passerelles d'accès reliant l'aéroport d'Alger aux grands pôles universitaires de Bab Ezzouar.": "دخول قطارات آلية جديدة الخدمة وممرات ربط مطار الجزائر العاصمة بالأقطاب الجامعية الكبرى في Bab Ezzouar.",
+    "Conseil des ministres : Nouvelles mesures pour l'appui aux startups et la transformation numérique": "مجلس الوزراء: تدابير جديدة لدعم الشركات الناشئة والتحول الرقمي",
+    "Adoption de décrets exécutifs favorisant les exonérations fiscales pour les jeunes entreprises innovantes et l'exportation de services informatiques.": "المصادقة على مراسيم تنفيذية تقر إعفاءات ضريبية للمؤسسات المبتكرة وتصدير الخدمات البرمجية.",
+    "Entrepreneuriat : Levée de fonds record pour les fintechs et plateformes de logistique maghrébines": "ريادة الأعمال: جولة تمويل قياسية لشركات Fintech والمنصات اللوجستية المغاربية",
+    "Plusieurs fonds d'investissement régionaux annoncent la clôture de tours de table stratégiques pour accompagner la croissance des plateformes de paiement et de commerce en ligne.": "صناديق استثمار إقليمية تعلن إغلاق جولات تمويل استراتيجية لمواكبة نمو منصات الدفع والتجارة الإلكترونية.",
+    "Banque d'Algérie : Hausse des exportations hors hydrocarbures et stabilité des réserves de change": "بنك الجزائر: ارتفاع الصادرات خارج المحروقات واستقرار احتياطي الصرف الأجنبي",
+    "Rapport annuel : Les indicateurs macroéconomiques confirment la résilience financière et le renforcement de la production industrielle locale.": "التقرير السنوي: المؤشرات الاقتصادية الكلية تؤكد متانة المالية العامة وتعزيز الإنتاج الصناعي المحلي.",
+    "Éliminatoires Mondial 2026 : Victoire éclatante de la sélection nationale à Alger": "تصفيات كأس العالم 2026: فوز مستحق للمنتخب الوطني في الجزائر العاصمة",
+    "Les Verts consolident leur première place du groupe grâce à un jeu offensif séduisant devant plus de 40 000 supporters au stade Nelson Mandela.": "الخضر يعززون صدارتهم للمجموعة بفضل أداء هجومي مميز أمام أكثر من 40 ألف مشجع في ملعب Nelson Mandela.",
+    "Patrimoine saharien : Inscription de nouveaux sites géologiques et gravures rupestres au Tassili": "التراث الصحراوي: تصنيف مواقع جيولوجية ونقوش صخرية جديدة في طاسيلي",
+    "L'UNESCO et le ministère de la Culture saluent les efforts de préservation durable des écosystèmes culturels et archéologiques de Djanet et Tamanrasset.": "اليونسكو ووزارة الثقافة تشيدان بجهود الحماية المستدامة للمواقع الأثرية والثقافية في جانت وتمنراست.",
+    "Festival international du cinéma d'Alger : Hommage aux pionniers du 7e art méditerranéen": "المهرجان الدولي للسينما بالجزائر: تكريم رواد الفن السابع في البحر المتوسط",
+    "Ouverture officielle de la 12e édition avec la projection de documentaires inédits sur l'histoire contemporaine et les luttes d'émancipation.": "الافتتاح الرسمي للدورة 12 بعرض أفلام وثائقية حصرية حول التاريخ المعاصر وقضايا التحرر.",
+    "Recherche spatiale : L'Agence Spatiale Algérienne (ASAL) présente les données environnementales d'Alsat": "أبحاث الفضاء: الوكالة الفضائية الجزائرية (ASAL) تعرض بيانات القمر الصناعي Alsat البيئية",
+    "Cartographie de haute précision des nappes phréatiques et suivi satellitaire de la désertification en partenariat avec les centres universitaires du Sud.": "خرائط فضائية عالية الدقة للمياه الجوفية ومراقبة التصحر بالأقمار الصناعية بالشراكة مع جامعات الجنوب.",
+    "CHU Mustapha Pacha : Déploiement de la télémédecine et des dossiers médicaux électroniques unifiés": "مستشفى مصطفى باشا الجامعي: إطلاق الطب الاتصالي والملفات الطبية الإلكترونية الموحدة",
+    "Généralisation des téléconsultations spécialisées pour les wilayas du Sud et des Hauts-Plateaux, réduisant les délais de prise en charge chirurgicale.": "تعميم الاستشارات الطبية المتخصصة عن بُعد لولايات الجنوب والهضاب العليا لتقليص مواعيد الجراحة.",
+    "Parc Solaire National : Raccordement des premières centrales photovoltaïques au réseau électrique": "مشروع الطاقة الشمسية الوطني: ربط أولى المحطات الكهروضوئية بالشبكة الكهربائية",
+    "Mise en service de 500 MW de capacités solaires dans les wilayas de Djelfa et El Oued dans le cadre du programme national des énergies renouvelables.": "تشغيل 500 MW من قدرات الطاقة الشمسية في ولايتي الجلفة والوادي ضمن البرنامج الوطني للطاقات المتجددة.",
+    "Enseignement Supérieur : Création de 10 pôles d'excellence en intelligence artificielle et cybersécurité": "التعليم العالي: إنشاء 10 أقطاب امتياز في الذكاء الاصطناعي والأمن السيبراني",
+    "Les écoles nationales supérieures d'Alger et d'Oran accueillent les premières promotions d'ingénieurs d'élite avec des cursus co-construits avec le secteur industriel.": "المدارس الوطنية العليا بالجزائر ووهران تستقبل أولى دفعات مهندسي النخبة بمناهج مشتركة مع الصناعة.",
+    "Algérie Télécom : Déploiement massif du FTTH et franchissement du cap des 2 millions de foyers connectés": "Algérie Télécom: نشر مكثف لشبكات FTTH وتجاوز حاجز مليوني منزل موصول",
+    "Multiplication des débits par quatre et modernisation des réseaux d'accès pour les professionnels et particuliers à travers le territoire national.": "مضاعفة سرعات التدفق 4 مرات وتحديث شبكات الوصول للشركات والأفراد عبر كامل التراب الوطني.",
+    "Saison touristique saharienne : Afflux record de visiteurs internationaux à Djanet et Taghit": "الموسم السياحي الصحراوي: إقبال قياسي للسياح الدوليين على جانت وتاغيت",
+    "Facilitation des visas à l'arrivée et multiplication des vols directs entre l'Europe et le grand Sud algérien pour soutenir l'artisanat et l'hôtellerie locale.": "تسهيل التأشيرات عند الوصول وتكثيف الرحلات المباشرة بين أوروبا والجنوب الجزائري لدعم السياحة والصناعات التقليدية.",
+    "Artisanat et design contemporain : Les tapis de Ghardaïa et la poterie de Kabylie à l'honneur": "الصناعات التقليدية والتصميم المعاصر: الاحتفاء بزربية غرداية وفخار منطقة القبائل",
+    "Exposition internationale célébrant le savoir-faire ancestral algérien combiné aux techniques de modélisation 3D modernes pour conquérir les marchés d'export.": "معرض دولي يحتفي بالحرف التقليدية الجزائرية الأصيلة المدمجة مع تقنيات النمذجة 3D لغزو أسواق التصدير."
+  };
+
+  const cleanText = text.trim();
+  if (exactBaselineMap[cleanText]) {
+    return exactBaselineMap[cleanText];
+  }
+
   // 2. Replacements for common phrases, headers, and journalistic boilerplate
   const phraseMap: [RegExp, string][] = [
     // Feed prefixes
@@ -621,6 +662,22 @@ function translateDynamicTextToArabic(text: string): string {
     [/Infrastructures télécoms/gi, 'البنية التحتية للاتصالات'],
     [/Tourisme saharien/gi, 'السياحة الصحراوية'],
     [/Artisanat contemporain/gi, 'الصناعات التقليدية المعاصرة'],
+    [/Conseil des ministres/gi, 'مجلس الوزراء'],
+    [/Premier ministre/gi, 'الوزير الأول'],
+    [/ministre de l'Intérieur/gi, 'وزير الداخلية'],
+    [/ministre de la Santé/gi, 'وزير الصحة'],
+    [/ministère de l'Économie/gi, 'وزارة الاقتصاد'],
+    [/ministère de l'Enseignement supérieur/gi, 'وزارة التعليم العالي'],
+    [/Banque d'Algérie/gi, 'بنك الجزائر'],
+    [/Algérie Télécom/gi, 'Algérie Télécom'],
+    [/Air Algérie/gi, 'Air Algérie'],
+    [/Grand Alger/gi, 'الجزائر الكبرى'],
+    [/réseau de métro/gi, 'شبكة المترو'],
+    [/l'aéroport d'Alger/gi, 'مطار الجزائر العاصمة'],
+    [/centres de données|datacenter/gi, 'مراكز البيانات'],
+    [/technologie numérique/gi, 'التكنولوجيا الرقمية'],
+    [/intelligence artificielle/gi, 'الذكاء الاصطناعي'],
+    [/cybersécurité/gi, 'الأمن السيبراني'],
 
     // English technical and journalistic phrases
     [/Open source project/gi, 'مشروع برمجي حر مفتوح المصدر'],

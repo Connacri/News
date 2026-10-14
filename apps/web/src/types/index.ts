@@ -20,7 +20,7 @@ export interface NewsArticle {
   translatedDescription?: string;
   url: string;
   source: string;
-  sourceType: 'hackernews' | 'devto' | 'github' | 'rss' | 'gdelt' | 'osint' | 'reddit' | 'opensource' | 'ai' | 'cloud' | 'patents' | 'blueprint' | 'arxiv';
+  sourceType: 'hackernews' | 'devto' | 'github' | 'rss' | 'gdelt' | 'osint' | 'reddit' | 'opensource' | 'ai' | 'cloud' | 'patents' | 'blueprint' | 'arxiv' | 'news';
   publishedAt: string;
   author?: string;
   country: CountryCode;

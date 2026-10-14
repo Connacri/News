@@ -224,7 +224,7 @@ export default function App() {
   const loadNews = async () => {
     setIsLoading(true);
     try {
-      const data = await getAggregatedNews(selectedCountry, selectedCategory);
+      const data = await getAggregatedNews(selectedCountry, selectedCategory, currentLang);
       setArticles(data);
     } catch (e) {
       console.error('Error fetching news:', e);
@@ -235,7 +235,19 @@ export default function App() {
 
   useEffect(() => {
     loadNews();
-  }, [selectedCountry, selectedCategory]);
+  }, [selectedCountry, selectedCategory, currentLang]);
+
+  // Re-render when background translation finishes
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const detail = (e as CustomEvent).detail;
+      if (detail && detail.lang === currentLang) {
+        setArticles((prev) => [...prev]);
+      }
+    };
+    window.addEventListener('translation_updated', handler);
+    return () => window.removeEventListener('translation_updated', handler);
+  }, [currentLang]);
 
   const handleToggleBookmark = (article: NewsArticle) => {
     setBookmarks((prev) => {
@@ -271,8 +283,8 @@ export default function App() {
     }
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
-      const matchTitle = art.title.toLowerCase().includes(q);
-      const matchDesc = art.description.toLowerCase().includes(q);
+      const matchTitle = art.title.toLowerCase().includes(q) || (Boolean(art.translatedTitle) && art.translatedTitle!.toLowerCase().includes(q));
+      const matchDesc = art.description.toLowerCase().includes(q) || (Boolean(art.translatedDescription) && art.translatedDescription!.toLowerCase().includes(q));
       const matchSource = art.source.toLowerCase().includes(q);
       const matchTags = art.tags.some((tg) => tg.toLowerCase().includes(q));
       if (!matchTitle && !matchDesc && !matchSource && !matchTags) return false;
