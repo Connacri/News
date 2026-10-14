@@ -338,6 +338,198 @@ const PRETRANSLATED_ARABIC: Record<string, TranslatedArticleData> = {
       'لوحة قيادة تفاعلية مبرمجة بفلاتر تعمل على أندرويد والأجهزة اللوحية والويب',
       'مفتوح المصدر بنسبة 100% ومتاح للجميع على منصة جيت هب'
     ]
+  },
+
+  // 🌍 MONDE & INTERNATIONAL
+  'world-reuters-diplomacy-tech': {
+    title: 'قمة جنيف العالمية حول حوكمة الشبكات وتأمين الاتصالات العابرة للحدود',
+    description: 'وفود دولية تعتمد ميثاقاً عالمياً لتأمين كوابل الألياف الضوئية البحرية وضمان استدامة الترابط الشبكي لخدمات الاتصالات.',
+    content: `جنيف — اختتمت القمة الدولية للاتصال العالمي بالمصادقة على اتفاقية متعددة الأطراف لحماية البنى التحتية للكوابل البحرية وضمان استمرار تدفق البيانات عبر الحدود دون انقطاع.`,
+    keyTakeaways: [
+      'معاهدة دولية لحماية كوابل الألياف البحرية',
+      'تنويع مسارات الربط القاري للاتصالات',
+      'تعزيز التعاون لمواجهة انقطاعات الشبكات'
+    ]
+  },
+
+  // 📍 LOCAL & RÉGIONAL
+  'local-aps-algerie-villes-intelligentes': {
+    title: 'إطلاق مشروع «المدن الذكية» في ولايات الجزائر العاصمة ووهران وقسنطينة',
+    description: 'وزارة الجماعات المحلية تعلن نشر أنظمة إدارة الطاقة المتصلة والشبابيك الرقمية الموحدة في أكثر من 60 بلدية نموذجية.',
+    content: `الجزائر ووهران — يدخل البرنامج الوطني للعصرنة الحضرية مرحلة حاسمة بتجهيز 60 بلدية بأجهزة الاستشعار الذكية والمحطات الإلكترونية الموحدة لتقديم الخدمات الإدارية للمواطنين في دقائق.`,
+    keyTakeaways: [
+      'إجراءات إدارية رقمية في 60 بلدية',
+      'تخفيض استهلاك إنارة الشوارع بنسبة 25%',
+      'بوابة موحدة للربط مع مصالح الولايات'
+    ]
+  },
+
+  // 🏛️ POLITIQUE & INSTITUTIONS
+  'politics-elwatan-reforme-numerique': {
+    title: 'المصادقة على القانون الوطني الجديد لأمن نظم المعلومات والسيادة الرقمية',
+    description: 'المجلس الشعبي الوطني يصادق بالإجماع على تشريع يفرض الاستضافة السيادية لقواعد البيانات العامة والتشفير الشامل لبيانات المواطنين.',
+    content: `الجزائر — صادق نواب البرلمان على الإطار التشريعي لتحديث حوكمة نظم المعلومات، مع فرض عمليات تدقيق نصف سنوية للأمن السيبراني واستضافة البيانات في مراكز بيانات وطنية معتمدة.`,
+    keyTakeaways: [
+      'استضافة محلية إلزامية لبيانات الدولة الحساسة',
+      'إنشاء مركز وطني للتنسيق السيبراني',
+      'عمليات تدقيق دورية مفروضة على الإدارات'
+    ]
+  },
+
+  // 💼 ENTREPRISES & BUSINESS
+  'business-lesechos-startups-maghreb': {
+    title: 'تمويلات قياسية للشركات الناشئة في مجال DeepTech بشمال إفريقيا خلال الربع الثالث',
+    description: 'صناديق الاستثمار الجريء تضخ أكثر من 180 مليون دولار في الشركات الناشئة المتخصصة في التكنولوجيا المالية والذكاء الاصطناعي التوليدي واللوجستيات الذكية.',
+    content: `باريس والجزائر — سجل مؤشر الاستثمار الجريء تسارعاً لافتاً في تمويل مشاريع التكنولوجيا المتقدمة بالمنطقة المغاربية، بقيادة مهندسين خريجي الجامعات المحلية.`,
+    keyTakeaways: [
+      '180 مليون دولار من الصناديق الاستثمارية',
+      'مضاعفة تقييمات شركات الذكاء الاصطناعي',
+      'دور محوري لحاضنات الأعمال الجامعية'
+    ]
+  },
+
+  // 📈 ÉCONOMIE & FINANCES
+  'economy-aps-croissance-exportations': {
+    title: 'بنك الجزائر: ارتفاع قياسي في الصادرات خارج المحروقات في أحدث حصيلة نصف سنوية',
+    description: 'استراتيجية تنويع الاقتصاد تؤتي ثمارها مع نمو ملحوظ في قطاعات الصناعات الغذائية والحديد والصلب ومواد البناء والخدمات البرمجية الرقمية.',
+    content: `الجزائر — أكد التقرير المالي الصادر عن بنك الجزائر تعزيز احتياطيات الصرف الأجنبي ونمو الصادرات الصناعية والبرمجية بنسب مزدوجة مدعومة بالتسهيلات الجمركية الأخيرة.`,
+    keyTakeaways: [
+      'تحسن ملحوظ في الميزان التجاري الخارجي',
+      'نمو قوي للصادرات الصناعية والبرمجية',
+      'استقرار المؤشرات المالية الكلية'
+    ]
+  },
+
+  // 👥 SOCIÉTÉ & EMPLOI
+  'society-tsa-formation-jeunes-numerique': {
+    title: 'البرنامج الوطني للتوظيف: تخريج 50 ألف مطور وتقني في المهارات السحابية والبرمجية',
+    description: 'إطلاق معسكرات تدريب مكثفة لتأهيل الشباب في مجالات الحوسبة السحابية Cloud وتطوير تطبيقات Flutter وتحليل البيانات الضخمة.',
+    content: `الجزائر — أطلقت وزارة اقتصاد المعرفة والمؤسسات الناشئة دورات تدريبية رقمية مجانية لتزويد الشباب بالمهارات التقنية المطلوبة لدى كبرى الشركات محلياً ودولياً.`,
+    keyTakeaways: [
+      '50 ألف مقعد تدريبي مجاني للشباب',
+      'برامج تركز على Flutter و Python و Cloud و DevOps',
+      'شراكات توظيف مع أكثر من 300 مؤسسة'
+    ]
+  },
+
+  // ⚽ SPORTS
+  'sports-fennec-equipe-nationale': {
+    title: 'تصفيات كأس العالم وكأس إفريقيا: الخضر يكتملون في مركز سيدي موسى قبل المواجهة الحاسمة',
+    description: 'الناخب الوطني يعلن قائمة الـ 25 لاعباً لمعسكر سيدي موسى مع تركيز تام على الجاهزية البدنية والانضباط التكتيكي.',
+    content: `الجزائر وسيدي موسى — باشر المنتخب الوطني الجزائري تدريباته التكتيكية بالمركز التقني بسيدي موسى بحضور جميع المحترفين استعداداً للمباريات القارية المقبلة.`,
+    keyTakeaways: [
+      'معسكر مغلق بمركز سيدي موسى التقني',
+      'جاهزية تامة للعناصر الهجومية',
+      'هدف التأهل المباشر ومواصلة الانتصارات'
+    ]
+  },
+
+  // 🎭 CULTURE & PATRIMOINE
+  'culture-aps-casbah-numerisation': {
+    title: 'حماية التراث: مسح ضوئي ثلاثي الأبعاد بتقنية LiDAR لمعالم قصبة الجزائر التاريخية',
+    description: 'فريق من المهندسين والمؤرخين يوثق القصور العثمانية والمساجد العتيقة بالمسح الليزري لحفظ الذاكرة المعمارية وتوجيه مشاريع الترميم.',
+    content: `الجزائر — المصنفة ضمن التراث العالمي لليونسكو، تستفيد قصبة الجزائر من توثيق رقمي فائق الدقة بماسحات LiDAR لإنشاء توائم رقمية ثلاثية الأبعاد للقصور والمساجد العتيقة.`,
+    keyTakeaways: [
+      'مسح ضوئي بتقنية LiDAR لأكثر من 40 معلماً تاريخياً',
+      'حفظ الأرشيف الرقمي للأجيال القادمة',
+      'جولات افتراضية تفاعلية للجمهور'
+    ]
+  },
+
+  // 🎬 DIVERTISSEMENT & ARTS
+  'entertainment-allocine-festivals-cinema': {
+    title: 'مهرجان الجزائر الدولي للسينما: جوائز الدورة تحتفي بجيل جديد من المخرجين الواعدين',
+    description: 'المسابقة الرسمية تتوج أفلاماً روائية ووثائقية ملتزمة وتبرز حيوية الإبداع السينمائي المعاصر في حوض البحر الأبيض المتوسط.',
+    content: `الجزائر — اختتم مهرجان السينما بقاعة ابن زيدون وسط حضور جماهيري لافت، متوجاً أعمالاً تميزت بالجرأة البصرية وتناول القضايا الإنسانية والاجتماعية المعاصرة.`,
+    keyTakeaways: [
+      'حضور جماهيري لافت بقاعة ابن زيدون',
+      'بروز مواهب شابة من معاهد الفنون الوطنية',
+      'ورشات إنتاج سينمائي مشتركة'
+    ]
+  },
+
+  // 🔬 SCIENCE & RECHERCHE
+  'science-nature-craag-sismologie': {
+    title: 'دراسة في مجلة Nature: مركز CRAAG يرسم خريطة الصدوع التكتونية في شمال إفريقيا عبر أقمار InSAR',
+    description: 'بحث علمي رائد يدمج قياسات الرادار الفضائي ومصفوفات GNSS الأرضية لتحسين نماذج التنبؤ بالمخاطر الزلزالية في منطقة الأطلس.',
+    content: `باريس والجزائر — نُشرت في مجلة Nature Geoscience المرموقة دراسة أعدها مركز البحث في علم الفلك والفيزياء الفلكية والجيوفيزياء CRAAG بالتعاون مع باحثين دوليين لرصد حركة القشرة الأرضية بدقة المليمتر.`,
+    keyTakeaways: [
+      'بحث علمي منشور في مجلة Nature Geoscience العالمية',
+      'نموذج وقائي متطور للسلامة العمرانية والمنشآت',
+      'بيانات مفتوحة لمهندسي الهندسة المدنية'
+    ]
+  },
+
+  // 🩺 SANTÉ & MÉDECINE
+  'health-pasteur-veille-sanitaire': {
+    title: 'معهد باستور بالجزائر: تحديث المنظومة الوطنية للترصد الوبائي وتجهيزها بأحدث تقنيات السلسلة الجينية',
+    description: 'تشغيل أجهزة تسلسل جيني آلية فائقة السرعة تتيح تحديد السلالات الفيروسية والميكروبية المستجدة في أقل من 12 ساعة.',
+    content: `الجزائر — دشن معهد باستور بالجزائر منصته الجديدة للتحليل الجيني الآلي بالقبة، مما يعزز قدرة الرصد المبكر للأوبئة والتنسيق الفوري مع منظمة الصحة العالمية OMS.`,
+    keyTakeaways: [
+      'أجهزة تسلسل جيني فائقة السرعة تعمل بكفاءة',
+      'ربط مباشر مع شبكة منظمة الصحة العالمية OMS',
+      'تعزيز السيادة الصحية والتشخيصية الوطنية'
+    ]
+  },
+
+  // 🌱 ENVIRONNEMENT & TRANSITION ÉCOLOGIQUE
+  'environment-solaire-hassi-rmel': {
+    title: 'الانتقال الطاقوي: ربط أولى محطات مشروع الطاقة الشمسية بقدرة 3000 MW بالشبكة الكهربائية الوطنية',
+    description: 'الحقول الكهروضوئية في الهضاب العليا والجنوب تبدأ بضخ الميغاواطات الأولى من الكهرباء النظيفة الصديقة للبيئة.',
+    content: `حاسي الرمل وورقلة — حقق البرنامج الوطني للطاقات المتجددة خطوة مفصلية بربط المحطات الشمسية الكهروضوئية المجهزة بألواح ثنائية الوجه بالشبكة الكهربائية، مساهماً في توفير ملايين الأمتار المكعبة من الغاز.`,
+    keyTakeaways: [
+      'ضخ 500 MW خضراء إضافية في الشبكة الوطنية',
+      'توفير مئات الملايين من الأمتار المكعبة من الغاز الطبيعي',
+      'تكوين كوادر محلية متخصصة في تشغيل محطات الطاقة الشمسية'
+    ]
+  },
+
+  // 🎓 ÉDUCATION & UNIVERSITÉS
+  'education-usthb-cursus-ia-cyber': {
+    title: 'الدخول الجامعي: جامعة باب الزوار USTHB والمدارس العليا تطلق 10 برامج ماستر متخصصة في الذكاء الاصطناعي والأنظمة المدمجة',
+    description: 'شراكات وثيقة مع الأقطاب التكنولوجية لتوفير تكوين نوعي يجمع بين البحث الأكاديمي والتطبيقات الهندسية الصناعية الميدانية.',
+    content: `الجزائر (باب الزوار) — دشنت جامعة هواري بومدين للعلوم والتكنولوجيا مخابرها الجديدة المخصصة للحوسبة السحابية والذكاء الاصطناعي والمجهزة بمحطات معالجة GPU حديثة لاستيعاب 1200 طالب متميز.`,
+    keyTakeaways: [
+      '10 برامج ماستر جديدة في التكنولوجيات الدقيقة',
+      'مخابر مجهزة بمحطات حوسبة GPU متطورة',
+      'فرص تربصات مضمونة بالقطب التكنولوجي سيدي عبد الله'
+    ]
+  },
+
+  // 💻 TECHNOLOGIE GÉNÉRALE
+  'technology-ftth-algerie-telecom': {
+    title: 'البنية التحتية للاتصالات: اتصالات الجزائر تتجاوز حاجز مليوني مشترك في شبكة الألياف الضوئية FTTH',
+    description: 'التحول الشامل نحو شبكات FTTH يضمن سرعات اتصال فائقة تصل إلى 1 Gbps مع زمن استجابة منخفض للمنازل والشركات.',
+    content: `الجزائر — أعلنت اتصالات الجزائر تسريع تعميم شبكة الألياف الضوئية FTTH عبر كافة ولايات الوطن، مع تقليص زمن الكمون والوصول لسرعات متناظرة تدعم العمل عن بُعد والخدمات السحابية.`,
+    keyTakeaways: [
+      'مليونا منزل موصول بشبكة الألياف الضوئية FTTH',
+      'سرعات متناظرة تصل إلى 1 Gbps',
+      'تغطية شاملة وموسعة عبر كافة الولايات'
+    ]
+  },
+
+  // ✈️ VOYAGE & TOURISME
+  'travel-air-algerie-nouvelles-lignes': {
+    title: 'السياحة الصحراوية والنقل الجوي: الخطوط الجوية الجزائرية تفتح خمسة خطوط مباشرة نحو جانت وتمنراست',
+    description: 'تسهيلات في التأشيرة عند الوصول لرحلات الاستكشاف في الحظيرة الثقافية طاسيلي ناجر وتعزيز الرحلات الشتوية المنتظمة.',
+    content: `جانت والجزائر — انطلق الموسم السياحي الصحراوي ببرمجة رحلات جوية مباشرة وتسهيلات في منح التأشيرة عند الوصول بمطار جانت لاستقبال السياح الراغبين في استكشاف نقوش وآثار طاسيلي ناجر.`,
+    keyTakeaways: [
+      'رحلات مباشرة جديدة تربط الجزائر العاصمة بجانت وتمنراست',
+      'تسهيل التأشيرة عند الوصول عبر الوكالات السياحية المعتمدة',
+      'تثمين الثروات الطبيعية والسياحية للجنوب الكبير'
+    ]
+  },
+
+  // ✨ LIFESTYLE & ART DE VIVRE
+  'lifestyle-design-artisanat-durable': {
+    title: 'الحرف المعاصرة والتصميم المستدام: مبدعون مغاربيون يعيدون ابتكار الخزف والفلين الطبيعي',
+    description: 'مزيج يجمع بين التقاليد العريقة والخطوط العصرية البسيطة في صالونات الديكور الدولية باستخدام مواد حيوية وطبيعية مستدامة.',
+    content: `الجزائر وميلانو — حظيت الإبداعات المغاربية بإشادة واسعة في المعارض الدولية للديكور والتصميم عبر استغلال المواد الطبيعية كخشب الفلين وخزف بيدر وصناعات الحلفاء بلمسات عصرية ملهمة.`,
+    keyTakeaways: [
+      'تثمين المواد الطبيعية المحلية كالخزف والفلين والحلفاء',
+      'تشجيع الورشات الحرفية والتجارة العادلة المستدامة',
+      'حضور لافت للتصاميم المتوسطية في المعارض الأوروبية'
+    ]
   }
 };
 
@@ -369,20 +561,39 @@ export const PRETRANSLATED_OSINT_ALERTS_AR: Record<string, Partial<OsintAlert>> 
 };
 
 /**
- * Intelligent dictionary-based translator for dynamic live feeds (HackerNews, Dev.to, GitHub)
+ * Technical and scientific terms to preserve strictly in their original Latin / acronym format
+ */
+const TECHNICAL_TERMS_REGEX = /\b(Flutter|Android|iOS|Impeller|Vulkan|Metal|WasmGC|WebAssembly|Wasm|eBPF|CVE[-0-9A-Za-z]*|Linux|API|REST API|LLM|MoE|FlashAttention|SRAM|DRAM|VRAM|INT4|FP8|INT8|FP16|GPU|CPU|NPU|TPU|Docker|Kubernetes|K8s|Python|Rust|C\+\+|Go|Node\.js|TypeScript|Dart|NIST|CISA|CERT-FR|ANSSI|USPTO|EPO|WIPO|INAPI|FTTH|Gbps|Mbps|LiDAR|InSAR|GNSS|CRAAG|Nature Geoscience|WiFi|5G|4G|Bluetooth|TCP|IP|HTTP|HTTPS|DNS|SSL|TLS|mTLS|RAM|ROM|SSD|SQL|NoSQL|PostgreSQL|Firebase|Firestore|FCM|Git|GitHub|GitLab|DeepSeek|Mistral AI|OpenAI|ChatGPT|Gemini|Claude|Llama|Hugging Face|Kaggle|TensorFlow|PyTorch|ONNX|GGUF|CUDA|AMD|NVIDIA|Qualcomm|ARM|Intel|Apple Silicon|Air Algérie|Algérie Télécom|Sidi Abdellah|USTHB|CERIST|SATIM|Edahabia|APS|TSA|El Watan)\b/gi;
+
+/**
+ * Intelligent dictionary-based translator for dynamic live feeds (RSS, GDELT, HackerNews, Dev.to, GitHub)
+ * Stricts rule: Keep all technical and scientific terms in original form, translate the rest into Arabic.
  */
 function translateDynamicTextToArabic(text: string): string {
   if (!text) return '';
 
-  let out = text;
+  // 1. Extract and preserve technical and scientific terms
+  const preservedTerms: string[] = [];
+  let out = text.replace(TECHNICAL_TERMS_REGEX, (match) => {
+    preservedTerms.push(match);
+    return `__TECH_TERM_${preservedTerms.length - 1}__`;
+  });
 
-  // Replacements for common phrases and headers
+  // 2. Replacements for common phrases, headers, and journalistic boilerplate
   const phraseMap: [RegExp, string][] = [
+    // Feed prefixes
     [/^Show HN:\s*/i, 'مشروع هكر نيوز: '],
     [/^Ask HN:\s*/i, 'نقاش مجتمع هكر نيوز: '],
     [/^Tell HN:\s*/i, 'تقرير هكر نيوز: '],
     [/\[HN Traduction\]\s*/i, 'هكر نيوز: '],
     [/\[Dev\.to\]\s*/i, 'ديف تو: '],
+
+    // French GDELT & RSS boilerplate
+    [/Dépêche publiée par\s*/gi, 'برقية إخبارية صادرة عن '],
+    [/Dépêche certifiée publiée par\s*/gi, 'برقية إخبارية معتمدة صادرة عن '],
+    [/Consultez l'article complet sur la source originale\./gi, 'طالع المقال الأصلي كاملاً عبر المصدر المباشر.'],
+    [/Retrouvez l'intégralité du reportage et les déclarations officielles via le lien source direct\./gi, 'طالع التقرير كاملاً والتصريحات الرسمية عبر الرابط المباشر.'],
+    [/Retrouvez l'analyse détaillée et les réactions sur le site officiel\./gi, 'طالع التحليل المفصل والتفاعلات الرسمية عبر الموقع المعتمد.'],
     [/Discussions et analyses techniques de la communauté Hacker News sur/gi, 'نقاشات وتحليلات تقنية من مجتمع المطورين حول'],
     [/Synthèse technique de la communauté de développeurs concernant/gi, 'ملخص تقني من مجتمع المطورين بخصوص'],
     [/Article publié sur Dev\.to par/gi, 'مقال تقني منشور على Dev.to بواسطة'],
@@ -393,6 +604,25 @@ function translateDynamicTextToArabic(text: string): string {
     [/Dépôt GitHub/gi, 'مستودع جيت هب'],
     [/Article complet et analyse technique sur/gi, 'مقال تفصيلي وتحليل تقني شامل حول'],
     [/Cet article est issu de la communauté mondiale des développeurs/gi, 'هذا المقال صادر عن المجتمع التقني الدولي للمطورين'],
+    [/Actualité internationale/gi, 'أخبار دولية'],
+    [/Sommet mondial sur/gi, 'قمة عالمية حول'],
+    [/Sommet international sur/gi, 'قمة دولية حول'],
+    [/Déploiement du projet/gi, 'إطلاق مشروع'],
+    [/Adoption de la nouvelle loi/gi, 'المصادقة على القانون الجديد'],
+    [/Levée de fonds record/gi, 'جولة تمويلية قياسية'],
+    [/Hausse conséquente/gi, 'ارتفاع ملحوظ'],
+    [/Programme national/gi, 'برنامج وطني'],
+    [/Éliminatoires Coupe du Monde/gi, 'تصفيات كأس العالم'],
+    [/Sauvegarde du patrimoine/gi, 'حماية التراث'],
+    [/Festival international/gi, 'المهرجان الدولي'],
+    [/Publication majeure/gi, 'دراسة علمية بارزة'],
+    [/Transition énergétique/gi, 'الانتقال الطاقوي'],
+    [/Rentrée universitaire/gi, 'الدخول الجامعي'],
+    [/Infrastructures télécoms/gi, 'البنية التحتية للاتصالات'],
+    [/Tourisme saharien/gi, 'السياحة الصحراوية'],
+    [/Artisanat contemporain/gi, 'الصناعات التقليدية المعاصرة'],
+
+    // English technical and journalistic phrases
     [/Open source project/gi, 'مشروع برمجي حر مفتوح المصدر'],
     [/vulnerability/gi, 'ثغرة أمنية'],
     [/vulnerabilities/gi, 'ثغرات أمنية'],
@@ -427,6 +657,11 @@ function translateDynamicTextToArabic(text: string): string {
   for (const [pattern, replacement] of phraseMap) {
     out = out.replace(pattern, replacement);
   }
+
+  // 3. Restore preserved technical & scientific terms
+  preservedTerms.forEach((term, index) => {
+    out = out.replace(new RegExp(`__TECH_TERM_${index}__`, 'g'), term);
+  });
 
   return out;
 }
